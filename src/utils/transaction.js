@@ -45,8 +45,6 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
     }
   }
 
-  //{"kind":"AddKey","args":{"access_key":{"nonce":0,"permission":{"FunctionCall":{"allowance":null,"method_names":[],"receiver_id":"v5-app.bhc8521.testnet"}}},"public_key":"ed25519:FK5ScVR2ERijmaaLgVJ6NopzdECzuSBXwY8JWwt3EoEs"}}
-
   actions = actions.map((fc) => {
     if (fc.kind == "functionCall") {
       return transaction.functionCall(
