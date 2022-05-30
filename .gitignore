@@ -1,4 +1,4 @@
 node_modules
 dist
-src/utils/secret.js
+src/utils/env.js
 .DS_Store

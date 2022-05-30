@@ -11,7 +11,7 @@ export default function getConfig(env) {
         explorerUrl: "https://explorer.mainnet.near.org",
         MAIN_CONTRACT: "v5-app.bhc8521.testnet",
         ENCRYPTION_CONTRACT: "encryption.bhc8521.testnet",
-        COMMUNITY_GENESIS_CONTRACT: "community-genesis2.bhc8521.testnet",
+        COMMUNITY_GENESIS_CONTRACT: "community.bhc8521.testnet",
         NFT_CONTRACT: "nft.bhc8521.testnet",
         TOKEN_FACTORY: "token3.popula.near",
         FACILITY_FACTORY: "facility.popula.near",
@@ -20,7 +20,6 @@ export default function getConfig(env) {
         IPFS: "https://ipfs.popula.io",
         storageCostPerByte: "10000000000000000000" 
       };
-    case "development":
     case "testnet":
       return {
         networkId: "testnet",
@@ -28,17 +27,29 @@ export default function getConfig(env) {
         walletUrl: "https://wallet.testnet.near.org",
         helperUrl: "https://helper.testnet.near.org",
         explorerUrl: "https://explorer.testnet.near.org",
-        MAIN_CONTRACT: "v5-app.bhc8521.testnet",
-        ENCRYPTION_CONTRACT: "encryption.bhc8521.testnet",
-        COMMUNITY_GENESIS_CONTRACT: "community-genesis2.bhc8521.testnet",
-        NFT_CONTRACT: "nft.bhc8521.testnet",
-        TOKEN_FACTORY: "token3.bhc8521.testnet",
-        FACILITY_FACTORY: "facility.bhc8521.testnet",
-        LINKDROP: "linkdrop7.bhc8521.testnet",
-        REFERRAL: "referral8.bhc8521.testnet",
+        MAIN_CONTRACT: "app.beepopula.testnet",
+        ENCRYPTION_CONTRACT: "encryption.beepopula.testnet",
+        COMMUNITY_GENESIS_CONTRACT: "community.beepopula.testnet",
+        NFT_CONTRACT: "nft.beepopula.testnet",
+        TOKEN_FACTORY: "token.beepopula.testnet",
         IPFS: "https://ipfs.popula.io",
         storageCostPerByte: "10000000000000000000" 
       };
+      case "dev-testnet":
+        return {
+          networkId: "testnet",
+          nodeUrl: "https://rpc.testnet.near.org",
+          walletUrl: "https://wallet.testnet.near.org",
+          helperUrl: "https://helper.testnet.near.org",
+          explorerUrl: "https://explorer.testnet.near.org",
+          MAIN_CONTRACT: "v5-app.bhc8521.testnet",
+          ENCRYPTION_CONTRACT: "encryption.bhc8521.testnet",
+          COMMUNITY_GENESIS_CONTRACT: "community-genesis2.bhc8521.testnet",
+          NFT_CONTRACT: "nft.bhc8521.testnet",
+          TOKEN_FACTORY: "token3.bhc8521.testnet",
+          IPFS: "https://ipfs.popula.io",
+          storageCostPerByte: "10000000000000000000" 
+        };
     case "betanet":
       return {
         networkId: "betanet",
