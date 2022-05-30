@@ -1,4 +1,4 @@
 node_modules
 dist
-src/utils/env.js
+src/env.js
 .DS_Store

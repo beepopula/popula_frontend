@@ -1,5 +1,6 @@
+import env from './env.js'
 
-export default function getConfig(env) {
+export default function getConfig() {
   switch (env) {
     case "production":
     case "mainnet":
