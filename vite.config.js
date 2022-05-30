@@ -35,7 +35,7 @@ export default defineConfig({
     host: "0.0.0.0", 
     proxy: {
       "^/api": {
-        target: "http://13.214.203.20",
+        target: "https://testnet.popula.io",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, "/api"),
       },
