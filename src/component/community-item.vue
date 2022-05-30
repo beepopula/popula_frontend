@@ -1,0 +1,267 @@
+<template>
+  <div v-if="detail" :class="['community-item','community-item-'+from]" @click="redirectPage('/community-detail/'+detail.communityId,false,true)">
+    <img v-if="detail.cover" class="cover" :src="detail.cover">
+    <img v-else class="cover" src="@/assets/images/test/bg.png">
+    <div class="info">
+      <div class="avatar-border">
+        <img v-if="detail.avatar"  class="avatar" :src="detail.avatar">
+        <img v-else  class="avatar" src="@/assets/images/test/community.png">
+      </div>
+      <div class="item-token item-token-multiple3">
+        <!--
+        <img class="token-icon token-icon0" src="@/assets/images/test/token_icon1.png"/>
+        <img class="token-icon token-icon1" src="@/assets/images/test/token_icon2.png"/>
+        <img class="token-icon token-icon2" src="@/assets/images/test/token_icon3.png"/>
+        -->
+      </div>
+      <div class="name txt-wrap" v-html="name"></div>
+      <!--createUser-->
+      <div class="creator txt-wrap" v-if="from=='popup' && detail.data.createUser">@{{detail.data.createUser.name || detail.data.createUser.account_id}}</div>
+      <div class="creator txt-wrap" v-else-if="from=='popup'">@{{detail.accountId}}</div>
+      <el-popover v-else placement="bottom-start"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
+        <template #reference>
+          <div class="creator txt-wrap" @click.stop="redirectPage('/user-profile/'+detail.accountId,false)">@{{detail.accountId}}</div>
+        </template>
+        <template v-if="showCreateUser">
+          <UserPopup :account="detail.accountId" @login="showLogin=true"/>
+        </template>
+      </el-popover>
+
+      <div class="total">
+        <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
+        <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+      </div>
+      <div class="bio txt-wrap2">{{detail.info}}</div>
+    </div>
+  </div>
+
+  <!-- login-mask -->
+  <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
+</template>
+
+<script>
+  import { reactive, toRefs , onMounted, computed, watch } from "vue";
+  import { useRouter } from "vue-router";
+  import { useStore } from 'vuex';
+  import UserPopup from '@/component/user-popup.vue';
+  import LoginMask from "@/component/login-mask.vue";
+  export default {
+    props:{
+      from:{
+        type:String,
+        value:""
+      },
+      item:{
+        type:Object,
+        value:{}
+      },
+      searchWord:{
+        type:String,
+        value:""
+      },
+    },
+    components: {
+      LoginMask,
+      UserPopup,
+    },
+    setup(props,{ emit }) {
+      const store = useStore();
+      const router = useRouter();
+
+      const state = reactive({
+        detail:"",
+        showLogin:false,
+        showCreateUser:false,
+      })
+
+      const name = computed(() => {
+        if(props.searchWord){
+          let name = ""
+          const reg = RegExp(props.searchWord,"ig");
+          name = state.detail.name.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
+          return name;
+        }else{
+          return state.detail.name;
+        }
+      })
+
+      const init = async () => {
+        state.detail = props.item;
+        // if(props.searchWord){
+        //   const reg = RegExp(props.searchWord,"ig");
+        //   state.detail.name = state.detail.name.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
+        // }
+      };
+
+
+      //redirectPage
+      const redirectPage = (path,need_login=true,open_new_tab=false) => {
+        if(!store.getters.isLogin && need_login){
+          state.showLogin = true
+        }else{
+          if(open_new_tab && props.from == "popup"){
+            window.open(window.location.origin+path);
+          }else{
+            router.push(path);
+          }
+        }
+      };
+
+      //LoginMask
+      const showLoginMask = () => {
+        state.showLogin = true
+      }
+      const closeLoginMask = () => {
+        state.showLogin = false
+      }
+
+      return {
+        ...toRefs(state),
+        name,
+        init,
+        redirectPage,
+        showLoginMask,
+        closeLoginMask,
+
+      }
+    },
+    mounted(){
+      this.init();
+    }
+  }
+  
+</script>
+
+<style lang="scss" scoped>
+  .community-item{
+    margin-top:20px;
+    margin-right:20px;
+    width: 335px;
+    height: 394px;
+    background: #28282D;
+    border-radius: 24px;
+    overflow: hidden;
+    position:relative;
+    cursor:pointer;
+    &.community-item-popup{
+      margin-top:0;
+      background: #000000;
+      transform:translateX(-1px);
+    }
+    .cover{
+      width: 335px;
+      height: 150px;
+      object-fit: cover;
+    }
+    .avatar-border{
+      width: 88px;
+      height: 88px;
+      background:#28282D;
+      border-radius: 20px;
+      position:absolute;
+      top:132px;
+      left:20px;
+      display:flex;
+      align-items: center;
+      justify-content:center;
+      .avatar{
+        width:80px;
+        height:80px;
+        border-radius: 16px;
+      }
+    }
+    .info{
+      padding:16px 20px 20px;
+      .item-token{
+        height:30px;
+        display:flex;
+        justify-content:end;
+        cursor:pointer;
+        .token-icon{
+          width: 30px;
+          height: 30px;
+          border-radius:50%;
+        }
+        .token-symbol{
+          margin-left:10px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          font-weight: 400;
+        }
+        &.item-token-multiple2{
+          .token-icon0{
+            position:relative;
+            left:10px;
+            z-index:3;
+          }
+        }
+        &.item-token-multiple3{
+          .token-icon0{
+            position:relative;
+            left:20px;
+            z-index:3;
+          }
+          .token-icon1{
+            position:relative;
+            left:10px;
+            z-index:2;
+          }
+        }
+      }
+      .name{
+        font-family: D-DINExp-Bold;
+        font-size: 18px;
+        color: #FFFFFF;
+        letter-spacing: 0;
+        font-weight: 700;
+        margin-top:36px;
+        line-height: 20px;
+      }
+      .creator{
+        display: inline-block;
+        max-width:100%;
+        margin-top:4px;
+        opacity: 0.5;
+        font-family: D-DINExp;
+        font-size: 14px;
+        color: #FFFFFF;
+        letter-spacing: 0;
+        font-weight: 400;
+        height: 16px;
+      }
+      .total{
+        margin-top:20px;
+        display:flex; 
+        height: 17px;
+        .total-item{
+          margin-right:30px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: rgba(255,255,255,0.5);
+          letter-spacing: 0;
+          font-weight: 400;
+          span{
+            font-size: 16px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+          }
+        }
+      }
+      .bio{
+        margin-top:20px;
+        font-family: D-DINExp;
+        font-size: 14px;
+        color: #FFFFFF;
+        letter-spacing: 0;
+        text-align: justify;
+        line-height: 22px;
+        font-weight: 400;
+        height:44px;
+      }
+    }
+    
+  }
+</style>

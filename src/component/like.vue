@@ -1,0 +1,198 @@
+<template>
+  <div :id="'pop-like-notice'+item.targetHash" :class="['like',likeActive?'like-active':'',isLiked?'liked':'']" @click="changeLike()">
+    <template v-if="likeCount">{{likeCount}}</template>
+    <template v-else>Like</template>
+    <!-- like notice -->
+    <div class="pop-box pop-intro pop-notice" v-if="showNotice">
+      <div class="title">Notice</div>
+      <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on [Recent activity (<a href="https://wallet.testnet.near.org/" target="_blank">https://wallet.testnet.near.org/ </a>) ]</div>
+      <div class="button-box">
+        <div class="mini-button-border button-cancle" @click.stop="showNotice=false">
+          <div class="mini-button">Cancle</div>
+        </div>
+        <div class="mini-button-border" @click="confirmLike()">
+          <div class="mini-button">Confirm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- login-mask -->
+  <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
+</template>
+
+<script>
+  import { reactive, toRefs, watch  } from "vue";
+  import { useStore } from 'vuex';
+  import MainContract from "@/contract/MainContract";
+  import CommunityContract from "@/contract/CommunityContract";
+  import LoginMask from "@/component/login-mask.vue";
+  export default {
+    components: {
+      LoginMask
+    },
+    props:{
+      item:{
+        type:Object,
+        value:{}
+      },
+    },
+    setup(props,{ emit }) {
+      const store = useStore();
+      const mainContract = new MainContract(store.state.account);
+
+      //state
+      const state = reactive({
+        likeCount:props.item.likeCount,
+        isLiked:props.item.isLiked,
+        targetHash:props.item.targetHash,
+        communityId:props.item.communityId,
+        isLiking:false,
+        showLogin:false,
+        showNotice:false,
+        likeActive:false,
+      })
+
+      // watch(
+      //   () => props.item,
+      //   () => {
+      //     state.likeCount=props.item.likeCount;
+      //     state.isLiked=props.item.isLiked;
+      //     state.communityId=(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT) ? '' : props.item.receiverId;
+      //     state.targetHash=props.item.target_hash;
+      //   }
+      // );
+
+      //LoginMask
+      const showLoginMask = () => {
+        state.showLogin = true
+      }
+      const closeLoginMask = () => {
+        state.showLogin = false
+      }
+
+      const confirmLike = () => {
+        state.showNotice = false;
+        localStorage.setItem("likeAlerted",true)
+        changeLike();
+      }
+
+      const changeLike = async (item) => {
+        if(store.getters.isLogin){
+          //notice
+          if(!localStorage.getItem("likeAlerted")){
+            state.showNotice = true;
+            return;
+          }
+          if(state.isLiking) {
+            return
+          }
+          state.isLiking = true;
+          if(state.communityId){
+            const communityContract = await CommunityContract.new(state.communityId);
+            const res = state.isLiked ? await communityContract.unlike({target_hash:state.targetHash}) : await communityContract.like({target_hash:state.targetHash}) 
+          }else{
+            const res = state.isLiked ? await mainContract.unlike({target_hash:state.targetHash}) : await mainContract.like({target_hash:state.targetHash})
+          }
+          state.likeCount = state.isLiked ? Number(state.likeCount)-1 : Number(state.likeCount)+1;
+          state.likeActive = true;
+          setTimeout(()=>{
+            state.likeActive = false;
+            state.isLiked  = !state.isLiked;
+            state.isLiking = false;
+          },400)
+          // if(!state.isLiked){
+          //   state.likeActive = true;
+          //   setTimeout(()=>{
+          //     state.likeActive = false;
+          //     state.isLiked  = !state.isLiked;
+          //     state.isLiking = false;
+          //   },500)
+          // }else{
+          //   state.isLiked  = !state.isLiked;
+          //   state.isLiking = false;
+          // }
+        }else{
+          state.showLogin = true
+        }
+      }
+
+      return {
+        ...toRefs(state),
+        showLoginMask,
+        closeLoginMask,
+        confirmLike,
+        changeLike,
+      };
+    },
+    mounted(){
+      document.addEventListener('click',(e) => {
+        const pop_notice = document.getElementById('pop-like-notice'+ this.$props.item.targetHash);
+        if(this.showNotice && pop_notice &&　!pop_notice.contains(e.target)) {
+            this.showNotice = false;
+        }
+      })
+    },
+  }
+</script>
+
+
+<style lang="scss">
+  .like{
+    margin-left:30px;
+    padding-left:30px;
+    font-family: D-DINExp;
+    font-size: 14px;
+    line-height:24px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: right;
+    font-weight: 400;
+    background:url("@/assets/images/post-item/icon-unlike.png") no-repeat left center;
+    background-size:24px 24px;
+    /*
+    background: url('@/assets/images/test/like_icon.png') no-repeat left center;
+    background-size: auto 45px;
+    */
+    position:relative;
+    cursor:pointer;
+    &:hover{
+      background-image:url("@/assets/images/post-item/icon-unlike-hover.png");
+    }
+    &.liked{
+      background-image:url("@/assets/images/post-item/icon-like.png");
+    }
+    .pop-notice{
+      position:absolute;
+      top:46px;
+      left:0;
+      .title{
+        text-align: left;
+      }
+    }
+  }
+
+  .like-active {
+    animation-timing-function: steps(13);
+    animation-name: plus-one;
+    animation-duration: 0.4s;
+    animation-iteration-count: 1;
+    display: inline-block;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes plus-one {
+    0% {
+      background-position: 6px center;
+      background-size:12px 12px
+    }
+    75% {
+      background-position: -2px center;
+      background-size:28px 28px
+    }
+    100% {
+      background-position: left center;
+      background-size:24px 24px
+    }
+  }
+
+</style>
