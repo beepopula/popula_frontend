@@ -9,7 +9,7 @@
         trigger="hover"
         >
         <template #reference>
-          <a class="media-item" target="_blank" href="https://discord.com/invite/eCUJztfuju">
+          <a class="media-item" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
             <img src="@/assets/images/common/logo-discord.png"/>
             <img class="hover" src="@/assets/images/common/logo-discord-hover.png"/>
           </a>

@@ -242,7 +242,7 @@
       <!-- right -->
       <div class="right">
         <!-- Points Amount-->
-        <template v-if="$route.params.id == ''">
+        <template v-if="$route.params.id == 't3.community-genesis2.bhc8521.testnet'">
           <div class="title">Points Amount</div>
         </template>
         

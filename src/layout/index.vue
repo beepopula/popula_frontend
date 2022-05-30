@@ -1,5 +1,5 @@
 <template>
-  <div :class="['page-box',$route.path=='/index' ? 'page-index' : '']">
+  <div :class="['page-box',$route.path=='/home' ? 'page-index' : '']">
     <page-header></page-header>
     <router-view :key="$route.fullPath"></router-view>
   </div>
@@ -41,8 +41,8 @@ export default {
     &.page-index{
       background: #020202;
       padding-bottom:0;
-      .page-header{
-        background:rgba(2,2,2,0.9);
+      .page-header-box{
+        background:rgba(0,0,0,0.9);
       }
     }
   }
@@ -84,7 +84,7 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    word-break: break-all;
+    word-break: break-word;
   }
   .txt-wrap2{
     overflow: hidden;
@@ -92,7 +92,7 @@ export default {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    word-wrap:break-word;
+    word-break: break-word;
   }
   .icon{
     width:24px;
@@ -398,10 +398,9 @@ export default {
         text-align: left;
         line-height: 22px;
         font-weight: 400;
-        word-break: break-all;
+        word-break: break-word;
         cursor: default;
         a{
-          word-break: break-all;
           display: inline;
         }
       }

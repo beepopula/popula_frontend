@@ -4,23 +4,30 @@
       <img src="@/assets/images/index/banner.png">
       <div class="content">
         <div class="title">
-          Where<br/>
+          Where the<br/>
           Community Economy<br/>
           Happens
         </div>
         <div class="button-box">
-          <div v-if="!$store.getters.isLogin" class="button-register" @click="showLoginMask">Creator Register</div>
+          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
           <div class="button-border" @click="$router.push('/explore')">
             <div class="button">Explore</div>
           </div>
         </div>
       </div>
     </div>
+    <!-- line -->
+    <div class="line">
+      <!--
+      <img src="@/assets/images/index/line-logo.png">
+      -->
+    </div>
+
     <div class="main">
       <div class="about-popula">
         <div class="title">About Popula</div>
         <div class="intro">
-          Popula is an infrastructure devoted to the Web3 Community Economy which enable participants in the creator economy to build the internet reputation and monetise through creation and social engagement.
+          Popula is the infrastructure devoted to the Web3 Community Economy which enables participants in the Creator Economy to build their internet reputation and monetise through creation and social engagement.
         </div>
         <img src="@/assets/images/index/about.png">
       </div>
@@ -34,12 +41,12 @@
               <div class="intro">A user-friendly Web3 community platform to amplify creations and empower social engagement, where the ownership of content, data, and the power of governance truly belong to the user.</div>
             </div>
             <div class="info-item">
-              <div class="mini-title"><span class="dot" style="background: #A668FF;"></span>Points System (Reputation)</div>
-              <div class="intro">Popula Points System issues Non-transferrable tokens to record value-added behaviour within a community and indicate member reputation, contribution, and commitment.</div>
+              <div class="mini-title"><span class="dot" style="background: #A668FF;"></span>Points System</div>
+              <div class="intro">Popula Points System issues Non-transferrable tokens to record value-added behaviour within a community and signal member reputation, contribution, and commitment.</div>
             </div>
             <div class="info-item">
               <div class="mini-title"><span class="dot" style="background: #574AFF;"></span>Communitiy Economy Protocol Set</div>
-              <div class="intro">Leverage the points system to help creators monetisation and incentivising members’ co-creation. Align the interests and aim of the community to bootstrap growth and creations.</div>
+              <div class="intro">By leveraging the Points System, Popula’s Community Economy Protocol Set aligns the aims and interests of the community to bootstrap growth and creations, helping creators monetise and incentivise member co-creation. </div>
             </div>
           </div>
           <img src="@/assets/images/index/dive-into.png">
@@ -51,14 +58,14 @@
         <div class="mod">
           <img src="@/assets/images/index/launch-community.png">
           <div class="content">
-            <div class="mini-title">Launch Community</div>
-            <div class="intro">Start your Web3 creator journey powered by community economy.</div>
+            <div class="mini-title">Launch a Community</div>
+            <div class="intro">Start your Web3 creator journey powered by the Community Economy.</div>
           </div>
         </div>
 
         <div class="mod">
           <div class="content">
-            <div class="mini-title">Post Web3 Content</div>
+            <div class="mini-title">Post Web3 content</div>
             <div class="intro">Retain content ownership and keep interactions verifiable.</div>
           </div>
           <img src="@/assets/images/index/post-content.png">
@@ -68,7 +75,7 @@
           <img src="@/assets/images/index/create.png">
           <div class="content">
             <div class="mini-title">Create an NFT</div>
-            <div class="intro">Provide your interactions with liquidity.</div>
+            <div class="intro">Fuel your creations with liquidity.</div>
           </div>
         </div>
 
@@ -76,17 +83,18 @@
         <div class="mod">
           <div class="content">
             <div class="mini-title">Token-Gating</div>
-            <div class="intro">Ensure your interactions efficiency.</div>
+            <div class="intro">Ensure the exclusivity of your creations.</div>
           </div>
           <img src="@/assets/images/index/token-gating.png">
         </div>
+      </div>
 
-        <div class="mod">
-          <img src="@/assets/images/index/coming-soon.png">
-          <div class="content">
-            <div class="mini-title">More Coming Soon</div>
-          </div>
-        </div>
+      <!-- More Coming Soon -->
+      <div class="coming-soon">
+        <div class="text">More Coming Soon<br/>Join Popula Server</div>
+        <a class="btn" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
+          <img src="@/assets/images/index/logo-discord.png">
+        </a>
       </div>
 
       <!-- Keep Vibing to Bee Popula-->
@@ -106,7 +114,7 @@
           trigger="hover"
           >
           <template #reference>
-            <a class="media-item" target="_blank" href="https://discord.com/invite/eCUJztfuju">
+            <a class="media-item" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
               <img src="@/assets/images/common/logo-discord.png"/>
               <img class="hover" src="@/assets/images/common/logo-discord-hover.png"/>
             </a>
@@ -159,18 +167,13 @@
       <div class="txt">@popula 2022</div>
     </div>
   </div>
-  <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 </template>
 
 <script>
 import { ref, reactive, toRefs, watch, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
-import LoginMask from "@/component/login-mask.vue";
 export default {
-  components: {
-    LoginMask
-  },
   setup(){
     const store = useStore();
     const router = useRouter();
@@ -178,20 +181,11 @@ export default {
 
     //state
     const state = reactive({
-      showLogin:false,
+      
     })
 
-    const showLoginMask = () => {
-      state.showLogin = true
-    }
-
-    const closeLoginMask = () => {
-      state.showLogin = false
-    }
     return {
       ...toRefs(state),
-      showLoginMask,
-      closeLoginMask
     }
   },
   mounted(){
@@ -202,12 +196,14 @@ export default {
 
 <style lang="scss" scoped>
   .index-box {
-    width: 1440px;
-    min-width: 1440px;
+    width: 100%;
     min-height: calc(100vh - 80px);
     margin: 0 auto;
     .banner{
+      width:1440px;
+      min-width:1440px;
       position: relative;
+      margin: 0 auto;
       img{
         width: 100%;
         vertical-align:middle;
@@ -257,6 +253,10 @@ export default {
           }
         }
       }
+    }
+    .line{
+      height: 40px;
+      background: #FFFFFF;
     }
     .main{
       width:1040px;
@@ -340,6 +340,9 @@ export default {
           align-items: center;
           justify-content:space-between;
           margin-bottom:150px;
+          &:last-child{
+            margin-bottom:130px;
+          }
           .content{
             width:350px;
             .mini-title{
@@ -363,7 +366,31 @@ export default {
           }
         }
       }
+      .coming-soon{
+        .text{
+          font-family: Gilroy-Black;
+          font-size: 50px;
+          color: #FFFFFF;
+          text-align: center;
+          line-height: 58px;
+          font-weight: 900;
+        }
+        .btn{
+          margin:60px auto 0;
+          width: 200px;
+          height: 60px;
+          background: #4154E4;
+          border-radius: 30px;
+          display:flex;
+          align-items: center;
+          justify-content:center;
+          img{
+            width:110px;
+          }
+        }
+      }
       .keep-vibing{
+        margin-top:170px;
         img{
           width:100%;
         }

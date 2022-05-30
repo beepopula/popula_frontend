@@ -1,42 +1,44 @@
 <template>
-  <div class="page-header">
-    <div class="left-mode">
-      <div class="logo" @click="redirectPage('/')">
-        <img src="@/assets/images/header/logo.png">
+  <div class="page-header-box">
+    <div class="page-header">
+      <div class="left-mode">
+        <div class="logo" @click="redirectPage('/')">
+          <img src="@/assets/images/header/logo.png">
+        </div>
+        <el-input class="search-box" v-model="searchWord" @change="search()"/>
       </div>
-      <el-input class="search-box" v-model="searchWord" @change="search()"/>
-    </div>
 
-    <div class="right-nav" align="middle">
-      <div :class="['right-nav-item','nav-hover',$route.path.indexOf('/communities')>-1 ? 'action' : '']" @click="redirectPage('/communities')"><span>Communities</span></div>
-      <div :class="['right-nav-item','nav-hover',$route.path == '/explore' ? 'action' : '']" @click="redirectPage('/explore')"><span>Explore</span></div>
-      <div v-if="false" :class="['right-nav-item','nav-hover',$route.path.indexOf('/create')>-1 ? 'action' : '']" @click="redirectPage('/create-list')"><span>Tools</span></div>
-      <a class="right-nav-item nav-hover" target="_blank" href="https://www.notion.so/bepopula/FAQs-81506fb8e8ab4a68b837aee0decfb888"><span>Learn</span></a>
-      <div v-if="!store.getters.isLogin" class="user-login mini-button-border">
-        <div class="mini-button" @click="showLoginMask">Login</div>
-      </div>
-      <div v-else class="right-nav-item user-photo">
-        <el-popover
-          popper-class="user-menu-box"
-          placement="bottom-end"
-          :width="200"
-          trigger="hover"
-          >
-          <template #reference>
-            <img v-if="store.state.profile.avatar" class="user-photo-img" :src="store.state.profile.avatar"/>
-            <img v-else class="user-photo-img" src="@/assets/images/common/user-default.png"/>
-          </template>
-          <div class="user-menu-list">
-            <div class="user-menu-item account" @click="triggerCopy">
-              <div>{{ store.getters.accountId }}</div>
+      <div class="right-nav" align="middle">
+        <div :class="['right-nav-item','nav-hover',$route.path.indexOf('/communities')>-1 ? 'action' : '']" @click="redirectPage('/communities')"><span>Communities</span></div>
+        <div :class="['right-nav-item','nav-hover',$route.path == '/explore' ? 'action' : '']" @click="redirectPage('/explore')"><span>Explore</span></div>
+        <div v-if="false" :class="['right-nav-item','nav-hover',$route.path.indexOf('/create')>-1 ? 'action' : '']" @click="redirectPage('/create-list')"><span>Tools</span></div>
+        <a v-if="false" class="right-nav-item nav-hover" target="_blank" href="https://www.notion.so/bepopula/FAQs-81506fb8e8ab4a68b837aee0decfb888"><span>Learn</span></a>
+        <div v-if="!store.getters.isLogin" class="user-login mini-button-border">
+          <div class="mini-button" @click="showLoginMask">Login</div>
+        </div>
+        <div v-else class="right-nav-item user-photo">
+          <el-popover
+            popper-class="user-menu-box"
+            placement="bottom-end"
+            :width="200"
+            trigger="hover"
+            >
+            <template #reference>
+              <img v-if="store.state.profile.avatar" class="user-photo-img" :src="store.state.profile.avatar"/>
+              <img v-else class="user-photo-img" src="@/assets/images/common/user-default.png"/>
+            </template>
+            <div class="user-menu-list">
+              <div class="user-menu-item account" @click="triggerCopy">
+                <div>{{ store.getters.accountId }}</div>
+              </div>
+              <!--
+              <div class="user-menu-item" @click="redirectPage('/wallet')">My token</div>
+              -->
+              <div class="user-menu-item" @click="redirectPage('/mine')">Profile</div>
+              <div class="user-menu-item" @click="logout">Sign Out</div>
             </div>
-            <!--
-            <div class="user-menu-item" @click="redirectPage('/wallet')">My token</div>
-            -->
-            <div class="user-menu-item" @click="redirectPage('/mine')">Profile</div>
-            <div class="user-menu-item" @click="logout">Sign Out</div>
-          </div>
-        </el-popover>
+          </el-popover>
+        </div>
       </div>
     </div>
   </div>
@@ -151,12 +153,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.page-header-box{
+  position:fixed;
+  z-index:50;
+  width:100%;
+  height:80px;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.9);
   .page-header {
-    position:fixed;
-    z-index:50;
-    transform:translateX(-50%);
-    top: 0;
-    left: 50%;
+    margin: 0 auto;
     width:1440px;
     min-width:1440px;
     height:80px;
@@ -164,8 +170,7 @@ export default {
     display:flex;
     justify-content:space-between;
     align-items:center;
-    background: rgba(23,23,26,0.9);
-
+    
     .left-mode{
       height:80px;
       display:flex;
@@ -275,6 +280,7 @@ export default {
   .page-header-phone,.menu-box{
     display:none;
   }
+}
 </style>
 
 <style lang="scss" >

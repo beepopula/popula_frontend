@@ -137,7 +137,7 @@ export default {
         padding:2px;
         cursor:pointer;
         &:hover{
-            background: linear-gradient(to right, #F75D23, #E6274E, #5878E5 );
+            background: #FED23C;
         }
         .login-button{
             width:296px;
