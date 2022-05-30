@@ -1,5 +1,10 @@
 node_modules
 dist
+<<<<<<< HEAD
 src/utils/secret.js
 .DS_Store
 env.js
+=======
+src/env.js
+.DS_Store
+>>>>>>> 1fef37a6b6821eca8a1480d19d0eabd09e880396

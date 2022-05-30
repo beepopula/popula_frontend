@@ -384,7 +384,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         }else{
           const res = await proxy.$axios.community.get_community_detail({
             accountId:"",
-            communityId:"v5-app.bhc8521.testnet",
+            communityId: store.state.nearConfig.MAIN_CONTRACT,
           });
           if(res.success) {
             state.defaultCommunity = {

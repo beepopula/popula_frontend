@@ -95,7 +95,7 @@ async function initSenderWallet(keyStore, walletConnection) {
 }
 
 export async function init() {
-  store.commit("setNearConfig", getConfig("development")) //process.env.NODE_ENV === 'production' ? "mainnet" : "development"); 
+  store.commit("setNearConfig", getConfig()) //process.env.NODE_ENV === 'production' ? "mainnet" : "development"); 
   const providers = new nearAPI.providers.JsonRpcProvider(store.state.nearConfig.nodeUrl)
   store.commit("setProvider", providers)
   await initViewAccount()
