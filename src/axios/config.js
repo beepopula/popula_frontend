@@ -10,13 +10,6 @@ axios.defaults.withCredentials = true;
 axios.defaults.timeout = 1e3 * 30;
 
 
-//axios.defaults.headers["Access-Control-Allow-Origin"] = "*";
-// axios.defaults.headers['Content-Type']='Access-Control-Allow-Headers;application/json;charset=utf-8;Access-Control-Allow-Origin;';
-axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8;";
-// axios.defaults.headers["Content-Type"] = "application/x-www-form-urlencoded";
-//axios.defaults.headers["Authorization"] = "Access-Control-Allow-Headers";
-axios.defaults.headers["Accept"] = "application/json;charset=utf-8;";
-//axios.defaults.headers["content-type"] = "application/json";
 
 axios.interceptors.response.use(
   (response) => {
