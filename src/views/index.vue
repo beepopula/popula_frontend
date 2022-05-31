@@ -176,11 +176,7 @@
 import { ref, reactive, toRefs, watch, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
-import InfiniteList from 'vue3-infinite-list';
 export default {
-  components:{
-    InfiniteList
-  },
   setup(){
     const store = useStore();
     const router = useRouter();

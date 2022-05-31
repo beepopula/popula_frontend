@@ -14,7 +14,7 @@
         <div v-if="false" :class="['right-nav-item','nav-hover',$route.path.indexOf('/create')>-1 ? 'action' : '']" @click="redirectPage('/create-list')"><span>Tools</span></div>
         <a v-if="false" class="right-nav-item nav-hover" target="_blank" href="https://www.notion.so/bepopula/FAQs-81506fb8e8ab4a68b837aee0decfb888"><span>Learn</span></a>
         <div v-if="!store.getters.isLogin" class="user-login mini-button-border">
-          <div class="mini-button" @click="showLoginMask">Login</div>
+          <div class="mini-button" @click="showLoginMask">Sign in</div>
         </div>
         <div v-else class="right-nav-item user-photo">
           <el-popover

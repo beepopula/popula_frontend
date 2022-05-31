@@ -109,7 +109,7 @@
         <!-- community select -->
         <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && joinedCommunities.length>0">
           <div class="title">Choose Community</div>
-          <div class="intro">Post Text more more more or more more more Post Text more more more or more more more …</div>
+          <div class="intro">Choose the community you want to share with.</div>
           <div class="joined-list" >
             <template v-for="item in joinedCommunities">
               <div v-if="item.name" :class="['joined-item',item.communityId == postForm.community.communityId ? 'active' : '']" @click="selectCommunity(item)">
@@ -148,7 +148,7 @@
           </div>
           <div class="pop-box pop-intro pop-token-gated" v-if="showTokenBox">
             <div class="title">Token-gated</div>
-            <div class="intro">Post Text more more more or more more more  more more or more more more  more more…</div>
+            <div class="intro">Only the holder of token(s) listed below can get fully access of this content.</div>
             <div class="token-selected" v-if="postForm.access.length>0">
               <div :class="'token-selected-item'" v-for="(item,index) in postForm.access">
                 <div class="close" @click.stop="deleteToken(index)"></div>
