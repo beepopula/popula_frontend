@@ -104,8 +104,8 @@
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                 <div class="creator-flag" v-if="item.data.type=='creator'">creator</div>
                 <div class="info">
-                  <div class="name">{{item.name || item.account_id.split(".testnet")[0]}}</div>
-                  <div class="account">{{item.account_id}}</div>
+                  <div class="name txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</div>
+                  <div class="account txt-wrap">{{item.account_id}}</div>
                 </div>
                 <!-- follow -->
                 <div class="follow-button" v-if="item.account_id != $store.getters.accountId">
@@ -1061,6 +1061,7 @@
               flex-direction: column;
               justify-content: center;
               .name{
+                width:100px;
                 line-height: 19px;
                 font-family: D-DINExp-Bold;
                 font-size: 18px;
@@ -1069,6 +1070,7 @@
                 font-weight: 700;
               }
               .account{
+                width:100px;
                 line-height: 16px;
                 opacity: 0.5;
                 font-family: D-DINExp;
