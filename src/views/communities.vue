@@ -40,10 +40,10 @@
       <div class="right">
         <!-- Creat Community -->
         <div class="creat-community">
-          <div class="font20">Creat Community</div>
+          <div class="font20">Launch a Community</div>
           <div class="intro">The Beta version currently allows only registered creators to launch communities.</div>
-          <div class="button-border" @click="redirectPage('/createCommunity',true)">
-            <div class="button">Apply</div>
+          <div class="button-border">
+            <a class="button" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Apply</a>
           </div>
         </div>
         <!-- About -->
@@ -302,7 +302,6 @@ export default {
         color: #FFFFFF;
         letter-spacing: 0;
         // text-align: justify;
-       word-break:break-all;
         line-height: 24px;
         font-weight: 400;
       }

@@ -189,7 +189,7 @@
             </template>
             <div class="pop-box pop-intro pop-hash">
               <div class="hash-txt">
-                <a  class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">Hash:{{item.transaction_hash}}</a>
+                <a  class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
                 <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
               </div>
             </div>

@@ -5,7 +5,7 @@
             <img class="close" @click="close()" src="@/assets/images/common/icon-close-mini.png">
             <div class="top-info">
                 <img class="icon" src="@/assets/images/common/logo-popula.png">
-                <div class="title">Please Sign in First</div>
+                <div class="title">Sign in</div>
                 <div v-if="tip" class="tip" style="color: #FF6868;">{{tip}}</div>
                 <div v-else class="tip">Connect with one of our available wallet providers<br/>or create a new one.</div>
             </div>
@@ -137,7 +137,7 @@ export default {
         padding:2px;
         cursor:pointer;
         &:hover{
-            background: linear-gradient(to right, #F75D23, #E6274E, #5878E5 );
+            background: #FED23C;
         }
         .login-button{
             width:296px;

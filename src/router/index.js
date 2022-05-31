@@ -8,13 +8,13 @@ import store from "@/store/index.js"
 const routes = [
   {
     path: '/',
-    name: 'home',
-    redirect: '/index',
+    name: 'index',
+    redirect: '/home',
     component: () => import("../layout/index.vue"),
     children: [
       {
-        path: "/index",
-        name: "index",
+        path: "/home",
+        name: "home",
         component: () => import("../views/index.vue"),
       },
       {
