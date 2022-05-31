@@ -17,10 +17,13 @@
       </div>
     </div>
     <!-- line -->
-    <div class="line">
-      <!--
-      <img src="@/assets/images/index/line-logo.png">
-      -->
+    
+    <div class="line" id="line">
+      <div class="scroll-area" id="ul_img">
+        <img src="@/assets/images/index/line-logo.png">
+        <img src="@/assets/images/index/line-logo.png">
+        <img src="@/assets/images/index/line-logo.png">
+      </div>
     </div>
 
     <div class="main">
@@ -173,7 +176,11 @@
 import { ref, reactive, toRefs, watch, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import InfiniteList from 'vue3-infinite-list';
 export default {
+  components:{
+    InfiniteList
+  },
   setup(){
     const store = useStore();
     const router = useRouter();
@@ -181,15 +188,37 @@ export default {
 
     //state
     const state = reactive({
-      
+      list:[{},{},{}] ,
+      left:0
     })
+
+    const scroll = () => {
+      let ul = document.getElementById("ul_img");
+      state.left -= 1;
+      if(state.left <= -ul.offsetWidth / 2) state.left = 0;
+      console.log(state.left)
+      ul.style.left = state.left + "px";
+    }
 
     return {
       ...toRefs(state),
+      scroll,
     }
   },
   mounted(){
-    
+    let left = 0;
+    let intervalId = null;
+    let ul = document.getElementById("ul_img");
+    ul.innerHTML += ul.innerHTML;  
+    let lis = ul.getElementsByTagName("img");
+    ul.style.width = (lis[0].offsetWidth * lis.length) + "px";  
+    function scroll(){
+      left -= 1;
+      if(left <= -ul.offsetWidth / 2) left = 0;
+      ul.style.left = left + "px";
+      requestAnimationFrame(scroll)
+    }
+    requestAnimationFrame(scroll)
   }
 }
 </script>
@@ -255,8 +284,21 @@ export default {
       }
     }
     .line{
+      width:100%;
       height: 40px;
       background: #FFFFFF;
+      position: relative;
+      overflow: hidden;
+      .scroll-area {
+        position: absolute;
+        top: 9px;
+        left: 0;
+        img{
+          width:492px;
+          float: left;
+          margin-right:60px;
+        }
+      }
     }
     .main{
       width:1040px;

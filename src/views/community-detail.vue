@@ -244,8 +244,13 @@
         <!-- Points Amount-->
         <template v-if="$route.params.id == 't3.community-genesis2.bhc8521.testnet'">
           <div class="title">Points Amount</div>
+          <div class="points-amount">
+            <img style="width:100%" src="@/assets/images/community/coming-soon.png"/>
+          </div>
         </template>
         
+        
+        <!--
         <div class="points-amount" v-if="$route.params.id == 't3.community-genesis2.bhc8521.testnet'">
           <div class="points-amount-number">42,698,569</div>
           <div class="points-amount-ratio">
@@ -278,6 +283,7 @@
             <div class="contract-hash">Bo8…gjljioShjklj</div>
           </div>
         </div>
+        -->
         
         <!-- Members rank-->
         <!--
