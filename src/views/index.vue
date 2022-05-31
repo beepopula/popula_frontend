@@ -55,7 +55,7 @@
       </div>
       <!-- How to BEE Popula? -->
       <div class="bee-popula">
-        <div class="title">How to BEE Popula?</div>
+        <div class="title">How to Bee Popula?</div>
         <div class="mod">
           <img src="@/assets/images/index/launch-community.png">
           <div class="content">
@@ -182,21 +182,10 @@ export default {
 
     //state
     const state = reactive({
-      list:[{},{},{}] ,
-      left:0
     })
-
-    // const scroll = () => {
-    //   let ul = document.getElementById("ul_img");
-    //   state.left -= 1;
-    //   if(state.left <= - 492*3) state.left = 0;
-    //   console.log(state.left)
-    //   ul.style.left = state.left + "px";
-    // }
 
     return {
       ...toRefs(state),
-      // scroll,
     }
   },
   mounted(){
@@ -208,7 +197,6 @@ export default {
     ul.style.width = (lis[0].offsetWidth * lis.length) + "px";  
     function scroll(){
       left -= 1;
-      console.log(ul.offsetWidth)
       if(left <= -(492+60)) left = 0;
       ul.style.left = left + "px";
       requestAnimationFrame(scroll)
