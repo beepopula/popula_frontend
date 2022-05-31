@@ -256,7 +256,7 @@ export default {
             align-items: center;
             justify-content:center;
             font-family: D-DINExp-Bold;
-            font-size: 15px;
+            font-size: 14px;
             color: #FFFFFF;
             letter-spacing: 0;
             text-align: center;
@@ -394,9 +394,6 @@ export default {
               }
             }
           }
-          &:last-child{
-            margin-bottom:130px;
-          }
           .content{
             width:350px;
             .mini-title{
@@ -422,7 +419,6 @@ export default {
 
       }
       .keep-vibing{
-        margin-top:170px;
         img{
           width:100%;
         }
