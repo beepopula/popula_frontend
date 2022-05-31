@@ -20,9 +20,7 @@
     
     <div class="line" id="line">
       <div class="scroll-area" id="ul_img">
-        <img src="@/assets/images/index/line-logo.png">
-        <img src="@/assets/images/index/line-logo.png">
-        <img src="@/assets/images/index/line-logo.png">
+        <img v-for="i in 5" src="@/assets/images/index/line-logo.png">
       </div>
     </div>
 
@@ -188,17 +186,17 @@ export default {
       left:0
     })
 
-    const scroll = () => {
-      let ul = document.getElementById("ul_img");
-      state.left -= 1;
-      if(state.left <= -ul.offsetWidth / 2) state.left = 0;
-      console.log(state.left)
-      ul.style.left = state.left + "px";
-    }
+    // const scroll = () => {
+    //   let ul = document.getElementById("ul_img");
+    //   state.left -= 1;
+    //   if(state.left <= - 492*3) state.left = 0;
+    //   console.log(state.left)
+    //   ul.style.left = state.left + "px";
+    // }
 
     return {
       ...toRefs(state),
-      scroll,
+      // scroll,
     }
   },
   mounted(){
@@ -210,7 +208,8 @@ export default {
     ul.style.width = (lis[0].offsetWidth * lis.length) + "px";  
     function scroll(){
       left -= 1;
-      if(left <= -ul.offsetWidth / 2) left = 0;
+      console.log(ul.offsetWidth)
+      if(left <= -(492+60)) left = 0;
       ul.style.left = left + "px";
       requestAnimationFrame(scroll)
     }
@@ -289,6 +288,8 @@ export default {
         position: absolute;
         top: 9px;
         left: 0;
+        height:22px;
+        overflow: hidden;
         img{
           width:492px;
           float: left;
