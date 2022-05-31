@@ -160,8 +160,8 @@
             <div class="title" style="margin-top:30px;">Chose Tokens</div>
             <div class="intro">Add up to 3 tokens.</div>
             <div class="token-select">
-              <el-input v-model="searchValue" @input="search()" class="search-input" placeholder="Search Token" ></el-input>
-              <div class="search-list">
+              <el-input v-model="searchValue" @input="search()" class="search-input" placeholder="Search Token or Paste Token Contract" ></el-input>
+              <div class="search-list" v-if="showTokenList.length>0">
                 <div class="search-item" v-for="item in showTokenList" @click="selectToken(item)">
                   <img class="search-token-icon" :src="item.icon"/>
                   <div class="search-token-symbol txt-wrap">{{item.symbol}}</div>
@@ -377,6 +377,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.defaultTokenList = tokenList.slice(0,9);
         //showTokenList & searchTokenList
         state.searchTokenList = deduplication(usedTokenList.concat(state.defaultTokenList));
+        state.defaultTokenList = state.searchTokenList;
         state.showTokenList = state.searchTokenList.slice(0,9);
         //community
         if(props.community){

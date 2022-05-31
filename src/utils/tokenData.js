@@ -5,6 +5,10 @@ export const popularToken = [
         tokenId:"near",
         icon:nearlogo,
     },
+    
+]
+
+const t = [
     {
         symbol:"USDT",
         tokenId:"dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
