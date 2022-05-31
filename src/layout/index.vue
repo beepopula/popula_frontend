@@ -1,5 +1,5 @@
 <template>
-  <div :class="['page-box',$route.path=='/home' ? 'page-index' : '']">
+  <div :class="['page-box',$route.name=='home' ? 'page-index' : '']">
     <page-header></page-header>
     <router-view :key="$route.fullPath"></router-view>
   </div>

@@ -9,10 +9,10 @@
           Happens
         </div>
         <div class="button-box">
-          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
           <div class="button-border" @click="$router.push('/explore')">
             <div class="button">Explore</div>
           </div>
+          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
         </div>
       </div>
     </div>
@@ -55,7 +55,7 @@
       </div>
       <!-- How to BEE Popula? -->
       <div class="bee-popula">
-        <div class="title">How to BEE Popula?</div>
+        <div class="title">How to Bee Popula?</div>
         <div class="mod">
           <img src="@/assets/images/index/launch-community.png">
           <div class="content">
@@ -88,15 +88,18 @@
           </div>
           <img src="@/assets/images/index/token-gating.png">
         </div>
+
+        <div class="mod coming-soon">
+          <img src="@/assets/images/index/coming-soon.png">
+          <div class="content">
+            <div class="mini-title">Join Popula Server</div>
+            <a class="btn" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
+              <img src="@/assets/images/index/logo-discord.png">
+            </a>
+          </div>
+        </div>
       </div>
 
-      <!-- More Coming Soon -->
-      <div class="coming-soon">
-        <div class="text">More Coming Soon<br/>Join Popula Server</div>
-        <a class="btn" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
-          <img src="@/assets/images/index/logo-discord.png">
-        </a>
-      </div>
 
       <!-- Keep Vibing to Bee Popula-->
       <div class="keep-vibing">
@@ -107,63 +110,69 @@
   <!-- footer-->
   <div class="footer">
     <div class="footer-content">
-      <div class="media-list" >
-        <!-- Discord -->
-        <el-popover
-          popper-class="media-pop"
-          placement="bottom-start"
-          trigger="hover"
-          >
-          <template #reference>
-            <a class="media-item" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
-              <img src="@/assets/images/common/logo-discord.png"/>
-              <img class="hover" src="@/assets/images/common/logo-discord-hover.png"/>
-            </a>
-          </template>
-          <div class="pop-box pop-tip">Discord</div>
-        </el-popover>
-        <!-- Twitter -->
-        <el-popover
-          popper-class="media-pop"
-          placement="bottom-start"
-          trigger="hover"
-          >
-          <template #reference>
-            <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
-              <img src="@/assets/images/common/logo-twitter.png"/>
-              <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
-            </a>
-          </template>
-          <div class="pop-box pop-tip">Twitter</div>
-        </el-popover>
-        <!-- Medium -->
-        <el-popover
-          popper-class="media-pop"
-          placement="bottom-start"
-          trigger="hover"
-          >
-          <template #reference>
-            <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
-              <img src="@/assets/images/common/logo-medium.png"/>
-              <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
-            </a>
-          </template>
-          <div class="pop-box pop-tip">Medium</div>
-        </el-popover>
-        <!-- Github -->
-        <el-popover
-          popper-class="media-pop"
-          placement="bottom-start"
-          trigger="hover"
-          >
-          <template #reference>
-            <a class="media-item" target="_blank" href="https://github.com/popula-io">
-              <img src="@/assets/images/common/logo-github.png"/>
-              <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
-            </a>
-          </template>
-          <div class="pop-box pop-tip">Github</div>
-        </el-popover>
+      <div class="content">
+        <div class="media-list" >
+          <!-- Discord -->
+          <el-popover
+            popper-class="media-pop"
+            placement="bottom-start"
+            trigger="hover"
+            >
+            <template #reference>
+              <a class="media-item" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
+                <img src="@/assets/images/common/logo-discord.png"/>
+                <img class="hover" src="@/assets/images/common/logo-discord-hover.png"/>
+              </a>
+            </template>
+            <div class="pop-box pop-tip">Discord</div>
+          </el-popover>
+          <!-- Twitter -->
+          <el-popover
+            popper-class="media-pop"
+            placement="bottom-start"
+            trigger="hover"
+            >
+            <template #reference>
+              <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
+                <img src="@/assets/images/common/logo-twitter.png"/>
+                <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
+              </a>
+            </template>
+            <div class="pop-box pop-tip">Twitter</div>
+          </el-popover>
+          <!-- Medium -->
+          <el-popover
+            popper-class="media-pop"
+            placement="bottom-start"
+            trigger="hover"
+            >
+            <template #reference>
+              <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
+                <img src="@/assets/images/common/logo-medium.png"/>
+                <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
+              </a>
+            </template>
+            <div class="pop-box pop-tip">Medium</div>
+          </el-popover>
+          <!-- Github -->
+          <el-popover
+            popper-class="media-pop"
+            placement="bottom-start"
+            trigger="hover"
+            >
+            <template #reference>
+              <a class="media-item" target="_blank" href="https://github.com/popula-io">
+                <img src="@/assets/images/common/logo-github.png"/>
+                <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
+              </a>
+            </template>
+            <div class="pop-box pop-tip">Github</div>
+          </el-popover>
+        </div>
+        <a class="power" href="https://near.org/" target="_blank">
+          Powered by
+          <img class="logo-near" src="@/assets/images/index/near.png">
+        </a>
       </div>
       <div class="txt">@popula 2022</div>
     </div>
@@ -182,21 +191,10 @@ export default {
 
     //state
     const state = reactive({
-      list:[{},{},{}] ,
-      left:0
     })
-
-    // const scroll = () => {
-    //   let ul = document.getElementById("ul_img");
-    //   state.left -= 1;
-    //   if(state.left <= - 492*3) state.left = 0;
-    //   console.log(state.left)
-    //   ul.style.left = state.left + "px";
-    // }
 
     return {
       ...toRefs(state),
-      // scroll,
     }
   },
   mounted(){
@@ -208,7 +206,7 @@ export default {
     ul.style.width = (lis[0].offsetWidth * lis.length) + "px";  
     function scroll(){
       left -= 1;
-      if(left <= -(492+60)) left = 0;
+      if(left <= -(482+60)) left = 0;
       ul.style.left = left + "px";
       requestAnimationFrame(scroll)
     }
@@ -249,7 +247,7 @@ export default {
         .button-box{
           display:flex;
           .button-register{
-            margin-right:30px;
+            margin-left:30px;
             width:200px;
             height:60px;
             border: 2px solid #FFFFFF;
@@ -258,7 +256,7 @@ export default {
             align-items: center;
             justify-content:center;
             font-family: D-DINExp-Bold;
-            font-size: 16px;
+            font-size: 14px;
             color: #FFFFFF;
             letter-spacing: 0;
             text-align: center;
@@ -290,7 +288,7 @@ export default {
         height:22px;
         overflow: hidden;
         img{
-          width:492px;
+          width:482px;
           float: left;
           margin-right:60px;
         }
@@ -378,17 +376,32 @@ export default {
           align-items: center;
           justify-content:space-between;
           margin-bottom:150px;
-          &:last-child{
-            margin-bottom:130px;
+          &.coming-soon{
+            .btn{
+              margin-top:40px;
+              width: 180px;
+              height: 60px;
+              background: #4154E4;
+              border-radius: 30px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
+              &:hover{
+                background: #3445C6;
+              }
+              img{
+                width:110px;
+              }
+            }
           }
           .content{
             width:350px;
             .mini-title{
               font-family: D-DINExp-Bold;
-              font-size: 22px;
+              font-size: 28px;
               color: #FFFFFF;
               font-weight: 700;
-              line-height:24px;
+              line-height:30px;
             }
             .intro{
               margin-top:16px;
@@ -403,32 +416,9 @@ export default {
             width:500px;
           }
         }
-      }
-      .coming-soon{
-        .text{
-          font-family: Gilroy-Black;
-          font-size: 50px;
-          color: #FFFFFF;
-          text-align: center;
-          line-height: 58px;
-          font-weight: 900;
-        }
-        .btn{
-          margin:60px auto 0;
-          width: 200px;
-          height: 60px;
-          background: #4154E4;
-          border-radius: 30px;
-          display:flex;
-          align-items: center;
-          justify-content:center;
-          img{
-            width:110px;
-          }
-        }
+
       }
       .keep-vibing{
-        margin-top:170px;
         img{
           width:100%;
         }
@@ -436,45 +426,65 @@ export default {
     }
   }
   .footer{
-    height: 120px;
     background: #17171A;
     .footer-content{
       width:1440px;
-      height: 120px;
       padding:0 200px;
       margin:0 auto;
-      display: flex;
-      align-items: center;
-      justify-content:space-between;
-      .media-list{
+      .content{
+        height: 120px;
         display: flex;
-        justify-content: space-between;
-        .media-item{
-          display: block;
-          cursor:pointer;
-          margin-right:40px;
-          img{
-            width: 24px;
-            height: 24px;
-          }
-          img.hover{
-            display:none;
-          }
-          &:hover{
+        align-items: center;
+        justify-content:space-between;
+        .media-list{
+          display: flex;
+          justify-content: space-between;
+          .media-item{
+            display: block;
+            cursor:pointer;
+            margin-right:40px;
             img{
-              display:none;
+              width: 24px;
+              height: 24px;
             }
             img.hover{
-              display:block;
+              display:none;
+            }
+            &:hover{
+              img{
+                display:none;
+              }
+              img.hover{
+                display:block;
+              }
             }
           }
         }
+        .power{
+          height:20px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: rgba(255,255,255,0.6);
+          font-weight: 400;
+          line-height:16px;
+          display:flex;
+          align-items: center;
+          .logo-near{
+            margin-left:10px;
+            width:60px;
+          }
+        }
+        
       }
       .txt{
+        padding:20px 0;
+        border-top:1px solid rgba(255,255,255,0.1);
         font-family: D-DINExp;
         font-size: 14px;
+        line-height:16px;
         color: rgba(255,255,255,0.6);
         font-weight: 400;
+        text-align: center;
       }
     }
     
