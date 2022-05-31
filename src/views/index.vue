@@ -208,7 +208,6 @@ export default {
     ul.style.width = (lis[0].offsetWidth * lis.length) + "px";  
     function scroll(){
       left -= 1;
-      console.log(ul.offsetWidth)
       if(left <= -(492+60)) left = 0;
       ul.style.left = left + "px";
       requestAnimationFrame(scroll)

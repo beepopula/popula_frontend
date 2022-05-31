@@ -63,7 +63,6 @@ export default {
           lineWidth=0;
           lastSubStrIndex=i;
           line_num += 1;
-          console.log(line_num);
         } 
         if(i==str.length-1){
           ctx.fillText(str.substring(lastSubStrIndex,i+1),initX,initY);
