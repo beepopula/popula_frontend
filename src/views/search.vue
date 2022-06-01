@@ -244,6 +244,7 @@ export default {
     }
   },
   mounted(){
+    this.$router.push({query: {}});
     this.init();
     window.addEventListener('scroll',this.handleScroll);
   }

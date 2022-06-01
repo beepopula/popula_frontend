@@ -57,6 +57,15 @@ const routes = [
         component: () => import("../views/user-profile.vue"),
       },
       // {
+      //   path: "/notice",
+      //   name: "notice",
+      //   component: () => import("../views/notice.vue"),
+      //   meta:{
+      //     requireAuth:true,
+      //     redirectPage:'home',
+      //   }
+      // },
+      // {
       //   path: "/user-profile-edit",
       //   name: "UserProfileEdit",
       //   component: () => import("../views/user-profile-edit.vue"),

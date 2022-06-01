@@ -198,6 +198,7 @@ export default {
     }
   },
   mounted(){
+    this.$router.push({query: {}});
     let left = 0;
     let intervalId = null;
     let ul = document.getElementById("ul_img");
