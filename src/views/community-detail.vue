@@ -1,6 +1,7 @@
 <template>
   <div class="main-box">
-    <img class="bg" src="@/assets/images/community/bg.png"/>
+    <img v-if="detail.cover" class="bg" :src="detail.cover"/>
+    <img v-else class="bg" src="@/assets/images/community/bg.png"/>
     <!-- Community info  -->
     <div class="community-info" v-if="detail.data">
       <div class="info-box">

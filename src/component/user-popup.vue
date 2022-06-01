@@ -135,6 +135,7 @@
       width: 80px;
       height: 80px;
       border-radius:50%;
+      object-fit: cover;
     }
     .follow-button{
       position:absolute;
@@ -206,6 +207,7 @@
           width: 40px;
           height: 40px;
           border-radius: 8px;
+          object-fit: cover;
         }
         .name{
           margin-top:12px;
