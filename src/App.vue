@@ -1,39 +1,14 @@
 <template>
-  <div :class="
-    {
-      'g_model_light': $store.state.theme === 'light',
-      'g_model_black': $store.state.theme === 'black',
-    }
-  ">
-    <router-view></router-view>
-  </div>
+  <Index></Index>
 </template>
-
 <script>
-import { watch } from "vue";
-import { useStore } from "vuex";
-import theme from "./utils/theme.js";
-import "./assets/theme/input.scss";
-
+import Index from "./views/index.vue";
 export default {
-  setup() {
-    const store = useStore();
-    let model = localStorage.getItem("mvp_theme_model");
-    if(model) {
-      store.commit("setTheme", model);
-    }
-    
-    watch(
-      () => store.state.theme,
-      (newVal) => {
-        localStorage.setItem("mvp_theme_model", newVal);
-        theme[newVal]();
-      },
-      {
-        immediate: true,
-      }
-    );
+  components:{
+    Index,
   },
+  setup() {
+  }
 };
 </script>
 

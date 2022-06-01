@@ -1,201 +1,198 @@
 <template>
-  <div class="index-box">
-    <div class="banner">
-      <img src="@/assets/images/index/banner.png">
-      <div class="content">
-        <div class="title">
-          Where the<br/>
-          Community Economy<br/>
-          Happens
+  <div class="page-box page-index">
+    <!-- header -->
+    <div class="page-header-box">
+      <div class="page-header">
+        <div class="logo" @click="redirectPage('/')">
+          <img src="@/assets/images/header/logo.png">
         </div>
-        <div class="button-box">
-          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
-        </div>
-      </div>
-    </div>
-    <!-- line -->
-    
-    <div class="line" id="line">
-      <div class="scroll-area" id="ul_img">
-        <img v-for="i in 5" src="@/assets/images/index/line-logo.png">
       </div>
     </div>
 
-    <div class="main">
-      <div class="about-popula">
-        <div class="title">About Popula</div>
-        <div class="intro">
-          Popula is the infrastructure devoted to the Web3 Community Economy which enables participants in the Creator Economy to build their internet reputation and monetise through creation and social engagement.
-        </div>
-        <img src="@/assets/images/index/about.png">
-      </div>
-      <!-- Dive into Popula -->
-      <div class="dive-into">
-        <div class="title">Dive into Popula</div>
+    <!-- main -->
+    <div class="index-box">
+      <div class="banner">
+        <img src="@/assets/images/index/banner.png">
         <div class="content">
-          <div class="info">
-            <div class="info-item">
-              <div class="mini-title"><span class="dot" style="background: #659DFF;"></span>Communities Platform</div>
-              <div class="intro">A user-friendly Web3 community platform to amplify creations and empower social engagement, where the ownership of content, data, and the power of governance truly belong to the user.</div>
-            </div>
-            <div class="info-item">
-              <div class="mini-title"><span class="dot" style="background: #A668FF;"></span>Points System</div>
-              <div class="intro">Popula Points System issues Non-transferrable tokens to record value-added behaviour within a community and signal member reputation, contribution, and commitment.</div>
-            </div>
-            <div class="info-item">
-              <div class="mini-title"><span class="dot" style="background: #574AFF;"></span>Communitiy Economy Protocol Set</div>
-              <div class="intro">By leveraging the Points System, Popula’s Community Economy Protocol Set aligns the aims and interests of the community to bootstrap growth and creations, helping creators monetise and incentivise member co-creation. </div>
-            </div>
+          <div class="title">
+            Where the<br/>
+            Community Economy<br/>
+            Happens
           </div>
-          <img src="@/assets/images/index/dive-into.png">
-        </div>
-      </div>
-      <!-- How to BEE Popula? -->
-      <div class="bee-popula">
-        <div class="title">How to Bee Popula?</div>
-        <div class="mod">
-          <img src="@/assets/images/index/launch-community.png">
-          <div class="content">
-            <div class="mini-title">Launch a Community</div>
-            <div class="intro">Start your Web3 creator journey powered by the Community Economy.</div>
-          </div>
-        </div>
-
-        <div class="mod">
-          <div class="content">
-            <div class="mini-title">Post Web3 content</div>
-            <div class="intro">Retain content ownership and keep interactions verifiable.</div>
-          </div>
-          <img src="@/assets/images/index/post-content.png">
-        </div>
-
-        <div class="mod">
-          <img src="@/assets/images/index/create.png">
-          <div class="content">
-            <div class="mini-title">Create an NFT</div>
-            <div class="intro">Fuel your creations with liquidity.</div>
-          </div>
-        </div>
-
-
-        <div class="mod">
-          <div class="content">
-            <div class="mini-title">Token-Gating</div>
-            <div class="intro">Ensure the exclusivity of your creations.</div>
-          </div>
-          <img src="@/assets/images/index/token-gating.png">
-        </div>
-
-        <div class="mod coming-soon">
-          <img src="@/assets/images/index/coming-soon.png">
-          <div class="content">
-            <div class="mini-title">Join Popula Server</div>
-            <a class="btn" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
-              <img src="@/assets/images/index/logo-discord.png">
-            </a>
+          <div class="button-box">
+            <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
           </div>
         </div>
       </div>
+      <!-- line -->
+      <div class="line" id="line">
+        <div class="scroll-area" id="ul_img">
+          <img v-for="i in 5" src="@/assets/images/index/line-logo.png">
+        </div>
+      </div>
+      <div class="main">
+        <div class="about-popula">
+          <div class="title">About Popula</div>
+          <div class="intro">
+            Popula is the infrastructure devoted to the Web3 Community Economy which enables participants in the Creator Economy to build their internet reputation and monetise through creation and social engagement.
+          </div>
+          <img src="@/assets/images/index/about.png">
+        </div>
+        <!-- Dive into Popula -->
+        <div class="dive-into">
+          <div class="title">Dive into Popula</div>
+          <div class="content">
+            <div class="info">
+              <div class="info-item">
+                <div class="mini-title"><span class="dot" style="background: #659DFF;"></span>Communities Platform</div>
+                <div class="intro">A user-friendly Web3 community platform to amplify creations and empower social engagement, where the ownership of content, data, and the power of governance truly belong to the user.</div>
+              </div>
+              <div class="info-item">
+                <div class="mini-title"><span class="dot" style="background: #A668FF;"></span>Points System</div>
+                <div class="intro">Popula Points System issues Non-transferrable tokens to record value-added behaviour within a community and signal member reputation, contribution, and commitment.</div>
+              </div>
+              <div class="info-item">
+                <div class="mini-title"><span class="dot" style="background: #574AFF;"></span>Communitiy Economy Protocol Set</div>
+                <div class="intro">By leveraging the Points System, Popula’s Community Economy Protocol Set aligns the aims and interests of the community to bootstrap growth and creations, helping creators monetise and incentivise member co-creation. </div>
+              </div>
+            </div>
+            <img src="@/assets/images/index/dive-into.png">
+          </div>
+        </div>
+        <!-- How to BEE Popula? -->
+        <div class="bee-popula">
+          <div class="title">How to Bee Popula?</div>
+          <div class="mod">
+            <img src="@/assets/images/index/launch-community.png">
+            <div class="content">
+              <div class="mini-title">Launch a Community</div>
+              <div class="intro">Start your Web3 creator journey powered by the Community Economy.</div>
+            </div>
+          </div>
+
+          <div class="mod">
+            <div class="content">
+              <div class="mini-title">Post Web3 content</div>
+              <div class="intro">Retain content ownership and keep interactions verifiable.</div>
+            </div>
+            <img src="@/assets/images/index/post-content.png">
+          </div>
+
+          <div class="mod">
+            <img src="@/assets/images/index/create.png">
+            <div class="content">
+              <div class="mini-title">Create an NFT</div>
+              <div class="intro">Fuel your creations with liquidity.</div>
+            </div>
+          </div>
 
 
-      <!-- Keep Vibing to Bee Popula-->
-      <div class="keep-vibing">
-        <img src="@/assets/images/index/keep-vibing.png">
+          <div class="mod">
+            <div class="content">
+              <div class="mini-title">Token-Gating</div>
+              <div class="intro">Ensure the exclusivity of your creations.</div>
+            </div>
+            <img src="@/assets/images/index/token-gating.png">
+          </div>
+
+          <div class="mod coming-soon">
+            <img src="@/assets/images/index/coming-soon.png">
+            <div class="content">
+              <div class="mini-title">Join Popula Server</div>
+              <a class="btn" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
+                <img src="@/assets/images/index/logo-discord.png">
+              </a>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Keep Vibing to Bee Popula-->
+        <div class="keep-vibing">
+          <img src="@/assets/images/index/keep-vibing.png">
+        </div>
       </div>
     </div>
-  </div>
-  <!-- footer-->
-  <div class="footer">
-    <div class="footer-content">
-      <div class="content">
-        <div class="media-list" >
-          <!-- Discord -->
-          <el-popover
-            popper-class="media-pop"
-            placement="bottom-start"
-            trigger="hover"
-            >
-            <template #reference>
-              <a class="media-item" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
-                <img src="@/assets/images/common/logo-discord.png"/>
-                <img class="hover" src="@/assets/images/common/logo-discord-hover.png"/>
-              </a>
-            </template>
-            <div class="pop-box pop-tip">Discord</div>
-          </el-popover>
-          <!-- Twitter -->
-          <el-popover
-            popper-class="media-pop"
-            placement="bottom-start"
-            trigger="hover"
-            >
-            <template #reference>
-              <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
-                <img src="@/assets/images/common/logo-twitter.png"/>
-                <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
-              </a>
-            </template>
-            <div class="pop-box pop-tip">Twitter</div>
-          </el-popover>
-          <!-- Medium -->
-          <el-popover
-            popper-class="media-pop"
-            placement="bottom-start"
-            trigger="hover"
-            >
-            <template #reference>
-              <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
-                <img src="@/assets/images/common/logo-medium.png"/>
-                <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
-              </a>
-            </template>
-            <div class="pop-box pop-tip">Medium</div>
-          </el-popover>
-          <!-- Github -->
-          <el-popover
-            popper-class="media-pop"
-            placement="bottom-start"
-            trigger="hover"
-            >
-            <template #reference>
-              <a class="media-item" target="_blank" href="https://github.com/popula-io">
-                <img src="@/assets/images/common/logo-github.png"/>
-                <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
-              </a>
-            </template>
-            <div class="pop-box pop-tip">Github</div>
-          </el-popover>
+
+
+    <!-- footer-->
+    <div class="footer">
+      <div class="footer-content">
+        <div class="content">
+          <div class="media-list" >
+            <!-- Discord -->
+            <el-popover
+              popper-class="media-pop"
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <a class="media-item" target="_blank" href="https://discord.com/channels/861518562425176085/862183692889358376">
+                  <img src="@/assets/images/common/logo-discord.png"/>
+                  <img class="hover" src="@/assets/images/common/logo-discord-hover.png"/>
+                </a>
+              </template>
+              <div class="pop-box pop-tip">Discord</div>
+            </el-popover>
+            <!-- Twitter -->
+            <el-popover
+              popper-class="media-pop"
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
+                  <img src="@/assets/images/common/logo-twitter.png"/>
+                  <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
+                </a>
+              </template>
+              <div class="pop-box pop-tip">Twitter</div>
+            </el-popover>
+            <!-- Medium -->
+            <el-popover
+              popper-class="media-pop"
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
+                  <img src="@/assets/images/common/logo-medium.png"/>
+                  <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
+                </a>
+              </template>
+              <div class="pop-box pop-tip">Medium</div>
+            </el-popover>
+            <!-- Github -->
+            <el-popover
+              popper-class="media-pop"
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <a class="media-item" target="_blank" href="https://github.com/popula-io">
+                  <img src="@/assets/images/common/logo-github.png"/>
+                  <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
+                </a>
+              </template>
+              <div class="pop-box pop-tip">Github</div>
+            </el-popover>
+          </div>
+          <a class="power" href="https://near.org/" target="_blank">
+            Powered by
+            <img class="logo-near" src="@/assets/images/index/near.png">
+          </a>
         </div>
-        <a class="power" href="https://near.org/" target="_blank">
-          Powered by
-          <img class="logo-near" src="@/assets/images/index/near.png">
-        </a>
+        <div class="txt">@popula 2022</div>
       </div>
-      <div class="txt">@popula 2022</div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, reactive, toRefs, watch, getCurrentInstance } from "vue";
-import { useRouter } from "vue-router";
-import { useStore } from 'vuex';
 export default {
   setup(){
-    const store = useStore();
-    const router = useRouter();
-    const { proxy } = getCurrentInstance();
-
-    //state
-    const state = reactive({
-    })
-
-    return {
-      ...toRefs(state),
-    }
   },
   mounted(){
-    this.$router.push({query: {}});
     let left = 0;
     let intervalId = null;
     let ul = document.getElementById("ul_img");
@@ -214,6 +211,46 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .page-box {
+    width:100vw;
+    min-width:1440px;
+    transition: 1s;
+    background-color: #17171A;
+    padding-bottom:100px;
+    &.page-index{
+      background: #020202;
+      padding-bottom:0;
+      .page-header-box{
+        background:rgba(0,0,0,0.9);
+      }
+    }
+  }
+
+  .page-header-box{
+    position:absolute;
+    z-index:50;
+    width:100%;
+    height:80px;
+    top: 0;
+    left: 0;
+    .page-header {
+      margin: 0 auto;
+      width:1440px;
+      min-width:1440px;
+      height:80px;
+      padding:0 160px;
+      display: flex;
+      align-items: center;
+      .logo {
+        cursor: pointer;
+        width:96px;
+        img{
+          width:100%;
+        }
+      }
+    }
+  }
+
   .index-box {
     width: 100%;
     min-height: calc(100vh - 80px);
@@ -245,7 +282,6 @@ export default {
         .button-box{
           display:flex;
           .button-register{
-            margin-left:30px;
             width:200px;
             height:60px;
             border: 2px solid #FFFFFF;
@@ -261,14 +297,6 @@ export default {
             font-weight: 700;
             cursor: pointer;
             position:relative;
-          }
-          .button-border{
-            width:200px;
-            height:60px;
-            .button{
-              width:196px;
-              height:56px;
-            }
           }
         }
       }
@@ -423,6 +451,7 @@ export default {
       }
     }
   }
+
   .footer{
     background: #17171A;
     .footer-content{
@@ -486,5 +515,38 @@ export default {
       }
     }
     
+  }
+</style>
+
+<style lang="scss">
+  .el-popover{
+    min-width:40px!important;
+    width:auto!important;
+    height:auto!important;
+    padding:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    border:none!important;
+    .el-popper__arrow{
+      display:none;
+    }
+  }
+  .pop-box{
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0px 2px 30px 0px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    font-family: D-DINExp;
+    font-size: 14px;
+    color: #FFFFFF;
+    font-weight: 400;
+    &.pop-tip{
+      padding:0 20px;
+      width: auto;
+      height: 40px;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 </style>
