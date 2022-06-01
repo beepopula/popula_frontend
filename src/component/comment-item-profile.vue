@@ -153,37 +153,39 @@
     <!-- Comment List -->
     <div class="elastic-layer" v-if="showCommentList" @click.self="closeLayer()">
       <div class="edit-button close" @click="closeLayer()"></div>
-      <div ref="commentLayer" class="child-comments-box" @scroll="commentsScroll()">
-        <div class="parent-comment">
-          <CommentItem 
-            :user="user"
-            :post="post" 
-            :item="item" 
-            :commentC="commentCount" 
-            :from="'elastic-layer-parent'"
-          />
-        </div>
-        <Comment 
-          :targetHash="item.target_hash" 
-          :communityId="item.receiverId" 
-          :methodName="post.methodName" 
-          @comment="commentRefresh"
-        />
-        <div class="all-comments-title">
-          <div class="font20">Comments({{commentCount}})</div>
-          <div class="filter-menu">
-            <div :class="['filter-menu-item',currentTab == 'hot' ? 'active' : '']" @click="changeTab('hot')">Hot</div>
-            <div :class="['filter-menu-item',currentTab == 'new' ? 'active' : '']" @click="changeTab('new')">New</div>
+      <div class="layer-content" ref="commentLayer" @scroll="commentsScroll()">
+        <div class="child-comments-box">
+          <div class="parent-comment">
+            <CommentItem 
+              :user="user"
+              :post="post" 
+              :item="item" 
+              :commentC="commentCount" 
+              :from="'elastic-layer-parent'"
+            />
           </div>
-        </div>
-        <div class="child-comments">
-          <template v-for="item in commentList[currentTab]">
-            <CommentItem :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
-          </template>
-        </div>
-        <div class="no-more" v-if="isEnd">
-          <template v-if="commentCount == 0">No comments</template>
-          <template v-else>No more comments</template>
+          <Comment 
+            :targetHash="item.target_hash" 
+            :communityId="item.receiverId" 
+            :methodName="post.methodName" 
+            @comment="commentRefresh"
+          />
+          <div class="all-comments-title">
+            <div class="font20">Comments({{commentCount}})</div>
+            <div class="filter-menu">
+              <div :class="['filter-menu-item',currentTab == 'hot' ? 'active' : '']" @click="changeTab('hot')">Hot</div>
+              <div :class="['filter-menu-item',currentTab == 'new' ? 'active' : '']" @click="changeTab('new')">New</div>
+            </div>
+          </div>
+          <div class="child-comments">
+            <template v-for="item in commentList[currentTab]">
+              <CommentItem :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
+            </template>
+          </div>
+          <div class="no-more" v-if="isEnd">
+            <template v-if="commentCount == 0">No comments</template>
+            <template v-else>No more comments</template>
+          </div>
         </div>
       </div>
     </div>
@@ -780,8 +782,7 @@ export default {
     }
     .child-comments-box{
       width:706px;
-      padding:60px 10px 60px 0;
-      overflow-y:scroll;
+      margin:0 auto;
       .parent-comment{
         padding:0 20px;
         background: #28282D;

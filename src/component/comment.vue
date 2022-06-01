@@ -248,7 +248,6 @@ export default {
 
 <style lang="scss" scoped>
 .comment{
-  width:690px;
   padding:20px;
   background: #28282D;
   border-radius: 24px;

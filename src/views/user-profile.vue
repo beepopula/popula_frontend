@@ -114,13 +114,15 @@
     <!-- communities layer -->
     <div class="elastic-layer" v-if="showCommunities" @click.self="closeCommunityList()">
       <div class="edit-button close" @click="closeCommunityList()"></div>
-      <div class="elastic-content">
-        <div class="title">Joined Communities</div>
-        <div id="community-list" class="community-list" >
-          <div v-for="(item,index) in joinedCommunityList" :class="['community-item',index%3==2 ? 'mr0' : '']" @click="redirectPage('/community-detail/'+item.communityId)">
-            <img v-if="item.avatar" class="avatar" :src="item.avatar">
-            <img v-else class="avatar" src="@/assets/images/test/community.png">
-            <div class="name txt-wrap">{{item.name}}</div>
+      <div class="layer-content">
+        <div class="elastic-content">
+          <div class="title">Joined Communities</div>
+          <div id="community-list" class="community-list" >
+            <div v-for="(item,index) in joinedCommunityList" :class="['community-item',index%3==2 ? 'mr0' : '']" @click="redirectPage('/community-detail/'+item.communityId)">
+              <img v-if="item.avatar" class="avatar" :src="item.avatar">
+              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <div class="name txt-wrap">{{item.name}}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -129,19 +131,21 @@
     <!-- nfts layer -->
     <div class="elastic-layer" v-if="showNfts" @click.self="closeNftList()">
       <div class="edit-button close" @click="closeNftList()"></div>
-      <div class="elastic-content">
-        <div class="title">
-          NFTs
-          <div class="filter-menu">
-            <div :class="['filter-menu-item',nftCurrentTab == 'collected' ? 'active' : '']" @click="changeNftTab('collected')">Collected {{nftCount['collected']}}</div>
-            <div :class="['filter-menu-item',nftCurrentTab == 'created' ? 'active' : '']" @click="changeNftTab('created')">Created {{nftCount['created']}}</div>
+      <div class="layer-content">
+        <div class="elastic-content">
+          <div class="title">
+            NFTs
+            <div class="filter-menu">
+              <div :class="['filter-menu-item',nftCurrentTab == 'collected' ? 'active' : '']" @click="changeNftTab('collected')">Collected {{nftCount['collected']}}</div>
+              <div :class="['filter-menu-item',nftCurrentTab == 'created' ? 'active' : '']" @click="changeNftTab('created')">Created {{nftCount['created']}}</div>
+            </div>
           </div>
-        </div>
-        <div id="nft-list" class="nft-list" >
-          <div v-for="(item,index) in nftList[nftCurrentTab]" :class="['nft-item',index%4==3 ? 'mr0' : '']" @click="redirectPage('/detail/'+item.target_hash)">
-            <img class="media" :src="item.metadata.media"/>
-            <div class="name txt-wrap">{{item.metadata.title}}</div>
-            <div class="collection txt-wrap">{{item.contract_id}}</div>
+          <div id="nft-list" class="nft-list" >
+            <div v-for="(item,index) in nftList[nftCurrentTab]" :class="['nft-item',index%4==3 ? 'mr0' : '']" @click="redirectPage('/detail/'+item.target_hash)">
+              <img class="media" :src="item.metadata.media"/>
+              <div class="name txt-wrap">{{item.metadata.title}}</div>
+              <div class="collection txt-wrap">{{item.contract_id}}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -682,9 +686,6 @@
   .elastic-content{
     width:688px;
     margin:0 auto;
-    padding-top:60px;
-    max-height:100vh;
-    overflow-y:scroll;
     .title{
       font-family: D-DINExp-Bold;
       font-size: 24px;

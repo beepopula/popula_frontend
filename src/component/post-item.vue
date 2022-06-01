@@ -263,31 +263,32 @@
     <!-- Collectors layer -->
     <div class="elastic-layer" v-if="showCollectors && item.type=='nft'" @click.self="closeCollectorList()">
       <div class="edit-button close" @click="closeCollectorList()"></div>
-      <div class="elastic-content">
-        <div class="title">Collectors</div>
-        <div class="loading-box" v-if="isLoadCollectors">
-          <img class="white-loading" src="@/assets/images/common/loading.png"/>
-        </div>
-        <div id="collector-list" class="collector-list" v-else>
-          <template v-for="(user,index) in nft.collectorList">
-            <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
-              <template #reference>
-                <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click="redirectPage('/user-profile/'+user.account_id,false)">
-                  <img v-if="user.avatar" class="avatar" :src="user.avatar" />
-                  <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
-                  <div class="info">
-                    <div class="name txt-wrap">{{user.name || user.account_id}}</div>
-                    <div class="account txt-wrap">{{user.account_id}}</div>
+      <div class="layer-content">
+        <div class="elastic-content">
+          <div class="title">Collectors</div>
+          <div class="loading-box" v-if="isLoadCollectors">
+            <img class="white-loading" src="@/assets/images/common/loading.png"/>
+          </div>
+          <div id="collector-list" class="collector-list" v-else>
+            <template v-for="(user,index) in nft.collectorList">
+              <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
+                <template #reference>
+                  <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click="redirectPage('/user-profile/'+user.account_id,false)">
+                    <img v-if="user.avatar" class="avatar" :src="user.avatar" />
+                    <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+                    <div class="info">
+                      <div class="name txt-wrap">{{user.name || user.account_id}}</div>
+                      <div class="account txt-wrap">{{user.account_id}}</div>
+                    </div>
+                    <div class="number txt-wrap"><span>{{user.number}}</span>/{{nft.copies}}</div>
                   </div>
-                  <div class="number txt-wrap"><span>{{user.number}}</span>/{{nft.copies}}</div>
-                </div>
-              </template>
-              <template v-if="user.showUser">
-                <UserPopup :account="user.account_id" @login="showLogin=true"/>
-              </template>
-            </el-popover>
-          </template>
-          
+                </template>
+                <template v-if="user.showUser">
+                  <UserPopup :account="user.account_id" @login="showLogin=true"/>
+                </template>
+              </el-popover>
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -1165,9 +1166,6 @@ export default {
   .elastic-content{
     width:700px;
     margin:0 auto;
-    padding-top:60px;
-    max-height:100vh;
-    overflow-y:scroll;
     .title{
       font-family: D-DINExp-Bold;
       font-size: 24px;

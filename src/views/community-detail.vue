@@ -360,16 +360,18 @@
   <!-- members layer -->
   <div class="elastic-layer" v-if="showMembers" @click.self="closeMemberList()">
     <div class="edit-button close" @click="closeMemberList()"></div>
-    <div ref="memberLayer" class="all-members" @scroll="membersScroll()">
-      <div class="title">Members({{memberCount}})</div>
-      <div id="all-members-list" class="all-members-list" >
-        <template v-for="item in memberList">
-          <UserItem :item="item" :from="'memberList'"/>
-        </template>
-      </div>
-      <div class="no-more" v-if="isEndMember">
-        <template v-if="memberCount==0">No members</template>
-        <template v-else>No more members</template>
+    <div class="layer-content">
+      <div ref="memberLayer" class="all-members" @scroll="membersScroll()">
+        <div class="title">Members({{memberCount}})</div>
+        <div id="all-members-list" class="all-members-list" >
+          <template v-for="item in memberList">
+            <UserItem :item="item" :from="'memberList'"/>
+          </template>
+        </div>
+        <div class="no-more" v-if="isEndMember">
+          <template v-if="memberCount==0">No members</template>
+          <template v-else>No more members</template>
+        </div>
       </div>
     </div>
   </div>
@@ -1632,9 +1634,6 @@
   .all-members{
     width:706px;
     margin:0 auto;
-    padding:60px 10px 60px 0;
-    max-height:100vh;
-    overflow-y:scroll;
     .title{
       line-height:26px;
       font-family: D-DINExp-Bold;
