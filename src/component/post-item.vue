@@ -818,6 +818,7 @@ export default {
         height: 40px;
         border-radius:50%;
         cursor:pointer;
+        object-fit: cover;
         &.avatar-community{
           border-radius: 10px;
         }
@@ -1146,6 +1147,7 @@ export default {
           border-radius:50%;
           position:relative;
           z-index:3;
+          object-fit: cover;
           &.avatar1{
             left:-8px;
             z-index:2;
@@ -1207,6 +1209,7 @@ export default {
           width: 40px;
           height: 40px;
           border-radius: 50%;
+          object-fit: cover;
         }
         .info{
           margin-left:12px;
@@ -1377,6 +1380,7 @@ export default {
         border-radius:50%;
         position:relative;
         z-index:1;
+        object-fit: cover;
       }
       &.mint-users2{
         .avatar0{

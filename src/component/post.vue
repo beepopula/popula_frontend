@@ -1371,6 +1371,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         position:absolute;
         top:20px;
         left:20px;
+        object-fit: cover;
       }
       .images{
         display:flex;
@@ -1465,6 +1466,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             height: 18px;
             border-radius: 4px;
             margin-right:6px;
+            object-fit: cover;
           }
         }
         .pop-community-join{

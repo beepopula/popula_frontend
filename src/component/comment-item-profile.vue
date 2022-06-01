@@ -596,6 +596,7 @@ export default {
         height: 40px;
         border-radius:50%;
         cursor: pointer;
+        object-fit: cover;
       }
       .user-info{
         margin-left:12px;

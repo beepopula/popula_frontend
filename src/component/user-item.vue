@@ -126,6 +126,7 @@
         width: 90px;
         height: 90px;
         border-radius:50%;
+        object-fit: cover;
       }
       .info{
         margin-left:20px;

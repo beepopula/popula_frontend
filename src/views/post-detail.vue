@@ -383,6 +383,7 @@ export default {
         height: 90px;
         border-radius: 16px;
         cursor:pointer;
+        object-fit: cover;
       }
       .info{
         margin-left:30px;
@@ -453,6 +454,7 @@ export default {
           height: 80px;
           border-radius:50%;
           cursor:pointer;
+          object-fit: cover;
         }
       }
       .name{
@@ -526,6 +528,7 @@ export default {
             width:40px;
             height:40px;
             border-radius: 8px;
+            object-fit: cover;
           }
           .name{
             margin-top:12px;

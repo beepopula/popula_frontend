@@ -301,6 +301,7 @@ export default {
     position:absolute;
     top:40px;
     left:40px;
+    object-fit: cover;
   }
   .edit{
     margin-top:20px;

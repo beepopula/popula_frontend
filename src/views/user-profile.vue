@@ -522,6 +522,7 @@
             position: absolute;
             top:-40px;
             left:20px;
+            object-fit: cover;
           }
           .follow-button{
             position:absolute;
@@ -646,6 +647,7 @@
               width:40px;
               height:40px;
               border-radius: 8px;
+              object-fit: cover;
             }
             .name{
               margin-top:12px;
@@ -721,6 +723,7 @@
           width: 40px;
           height: 40px;
           border-radius: 10px;
+          object-fit: cover;
         }
         .name{
           width:124px;

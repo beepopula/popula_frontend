@@ -799,6 +799,7 @@
             width: 90px;
             height: 90px;
             border-radius: 16px;
+            object-fit: cover;
           }
           .info{
             display:flex;
@@ -1036,6 +1037,7 @@
               width: 40px;
               height: 40px;
               border-radius:50%;
+              object-fit: cover;
             }
             .creator-flag{
               position:absolute;
@@ -1202,6 +1204,7 @@
             width:40px;
             height:40px;
             border-radius:50%;
+            object-fit: cover;
           }
           .user-info{
             margin-left:12px;
@@ -1530,7 +1533,7 @@
               width:30px;
               height:30px;
               border-radius:50%;
-
+              object-fit: cover;
             }
             .name{
               margin-left:12px;
@@ -1626,6 +1629,7 @@
           width: 50px;
           height: 50px;
           border-radius:8px;
+          object-fit: cover;
         }
       }
     }

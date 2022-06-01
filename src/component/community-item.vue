@@ -168,6 +168,7 @@
         width:80px;
         height:80px;
         border-radius: 16px;
+        object-fit: cover;
       }
     }
     .info{
