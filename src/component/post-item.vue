@@ -537,8 +537,10 @@ export default {
     const checkAccess = async () => {
       const check_result = await checkCondition(props.item.access);
       state.access = check_result.access;
+      console.log(check_result,'----check_result ------');
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //comment
+        
         emit("changeAccess");
         //decrypt
         const result = await proxy.$axios.post.get_sign({
