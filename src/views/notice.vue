@@ -11,7 +11,7 @@
         <!-- list -->
         <div v-else class="list">
           <template v-for="item in list">
-            <div v-if="item.type=='comment' && item.data.count==0" class="comment-item" @click.self="">
+            <div v-if="item.type=='comment' && item.data.count==0" class="comment-item" @click.self="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
@@ -36,11 +36,14 @@
                 </div>
               </div>
               <div class="reply-user">Replying to you</div> 
-              <div class="text" @click="">
-                <pre ref="textDom"><div v-html="item.text"></div></pre>
+              <div v-if="item.methodName != 'add_encrypt_comment' || item.isAccess" class="text" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+                <pre><div v-html="item.text"></div></pre>
+              </div>
+              <div class="text-default" v-else @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+                <img src="@/assets/images/post-item/text-default.png"/>
               </div>
             </div>
-            <div v-else-if="item.type=='comment' && item.data.count>0" class="like-item">
+            <div v-else-if="item.type=='comment' && item.data.count>0" class="like-item" @click="redirectPage(item.url)">
               <div class="avatar-list">
                 <template v-for="user in item.data.likes">
                   <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
@@ -65,7 +68,7 @@
                 <template v-else>post</template>
               </div>
               <div class="text txt-wrap2">
-
+                {{item.text}}
               </div>
             </div>
             <div v-else-if="item.type=='follow'" class="follow-item" @click="redirectPage('/mine')">
@@ -145,35 +148,51 @@ export default {
 
     const handleData = async (data) => {
       const list = [];
-      for(let i = 0;i<data.length;i++){
+      for(let i = 0;i<data.length;i++){//data.length
         const item = data[i];
         if(item.type=='comment' && item.data.count==0){ //reply
           //time
           item.time = getTimer(item.createAt)
           //user
-          const userInfo = await proxy.$axios.profile.get_user_info({
-            accountId:item.accountId,
-          });
-          if(userInfo.success){
-            item.user = userInfo.data;
-          }
-          if(item.methoodName == 'add_encrypt_comment'){
-            checkAccess(item);
+          // const userInfo = await proxy.$axios.profile.get_user_info({
+          //   accountId:item.accountId,
+          // });
+          // if(userInfo.success){
+          //   item.user = userInfo.data;
+          // }
+          item.user = {}
+          if(item.methodName == 'add_encrypt_comment'){
+            const info = await checkAccess(item);
+            if(info.isAccess){
+              item.text = info.text;
+              item.isAccess = info.isAccess
+            }
+          }else{
+            item.text = item.comment.text;
           }
         }
-        if(item.type=='comment' && item.data.count>0){ //like
-          // const likes = [];
-          // const len = Math.min(item.data.count,10);
-          // for(let j = 0;j<len;j++ ){
-          //   const like_item = item.data.likes[j];
-          //   const userInfo = await proxy.$axios.profile.get_user_info({
-          //     accountId:like_item.accountId,
-          //   });
-          //   if(userInfo.success){
-          //     likes.push(userInfo.data);
-          //   }
-          // }
-          // item.likes = likes;
+        if(item.data.count>0){ //like
+          //url
+          if(item.type=="comment"){
+            item.url = `/detail/${item.comment.postId}?comment=${item.comment.target_hash}`
+          }else{
+            item.url = `/detail/${item.post.target_hash}`
+          }
+          //text
+          if(item.methodName == 'add_encrypt_comment' || item.methodName == 'add_encrypt_post'){
+            console.log(item);
+            const info = await checkAccess(item);
+            if(info.isAccess){
+              item.text = info.text;
+              item.isAccess = info.isAccess
+            }
+          }else{
+            if(item.type == 'comment'){
+              item.text = item.comment.text;
+            }else if(item.type == 'post'){
+              item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
+            }
+          }
         }
         if(item.type=='follow' && item.data.count>0){ //like
           // const followers = [];
@@ -197,37 +216,39 @@ export default {
     }
 
     const checkAccess = async (item) => {
-      const access = item.commentContent.access;
-      const encrypt_args = item.comment.encrypt_args;
-      const communityId = item.comment.receiverId;
-
-      const check_result = await checkCondition(access);
-      console.log(check_result,'----check_result ------');
-      if(check_result.is_access || store.getters.accountId==props.item.accountId){
-        //decrypt
-        let result = {}
-        if(item.post){
-          result = await proxy.$axios.post.get_sign({
-            postId:item.post.target_hash,
-            accountId:store.getters.accountId
-          });
-        }else{
-          result = await proxy.$axios.post.get_sign({
-            postId:item.comment.postId,
-            commentId :item.comment.target_hash,
-            accountId:store.getters.accountId
-          });
-        }
+      let encrypt_args = '';
+      let communityId = '';
+      let result = {}
+      if(item.type == 'post'){
+        encrypt_args = item.post.encrypt_args;
+        communityId = item.post.receiverId;
+        result = await proxy.$axios.post.get_sign({
+          postId:item.post.target_hash,
+          accountId:store.getters.accountId
+        });
+      }else{
+        encrypt_args = item.comment.encrypt_args;
+        communityId = item.comment.receiverId;
+        result = await proxy.$axios.post.get_sign({
+          postId:item.comment.postId,
+          commentId :item.comment.target_hash,
+          accountId:store.getters.accountId
+        });
+      }
+      if(result.success){
         const param = {
           cipher_text: JSON.parse(encrypt_args), 
           contract_id: communityId, 
           sign: result.data.text_sign
         }
         const res = await encryptionContract.decrypt(param);
-        item.text = res.text;
-        // state.images = Object.values(JSON.parse(res.imgs));
-        item.isAccess = true;
+        return {
+          text:res.text ? res.text : ((item.type == 'post' && item.post.blur_imgs.length>0) ? '[Images]' : ''),
+          isAccess:true
+        }
       }
+      // state.images = Object.values(JSON.parse(res.imgs));
+      return {isAccess:false}
     }
 
     //redirectPage
@@ -321,8 +342,6 @@ export default {
         }
         .reply-user{
           margin:10px 0;
-          position: relative;
-          top:10px;
           font-family: D-DINExp;
           font-size: 16px;
           color: rgba(255,255,255,0.50);
@@ -354,6 +373,12 @@ export default {
             text-align: justify;
             line-height: 26px;
             font-weight: 400;
+          }
+        }
+        .text-default{
+          margin-top:20px;
+          img{
+            width:100%;
           }
         }
       }
