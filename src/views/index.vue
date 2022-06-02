@@ -141,7 +141,7 @@
               trigger="hover"
               >
               <template #reference>
-                <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
+                <a class="media-item" target="_blank" href="https://twitter.com/beepopula">
                   <img src="@/assets/images/common/logo-twitter.png"/>
                   <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
                 </a>
