@@ -138,10 +138,11 @@ export default {
       state.isLoading = true;
       const res = await proxy.$axios.profile.get_user_notifications({
         accountId:store.getters.accountId,
-        lastTime:'',
+        lastTime:localStorage.getItem("notice_last_time") || '',
       });
       if(res.success){
         state.list = await handleData(res.data);
+        localStorage.setItem("notice_last_time",res.lastTime);
       }
       state.isLoading = false;
     }
@@ -153,13 +154,6 @@ export default {
         if(item.type=='comment' && item.data.count==0){ //reply
           //time
           item.time = getTimer(item.createAt)
-          //user
-          // const userInfo = await proxy.$axios.profile.get_user_info({
-          //   accountId:item.accountId,
-          // });
-          // if(userInfo.success){
-          //   item.user = userInfo.data;
-          // }
           item.user = {}
           if(item.methodName == 'add_encrypt_comment'){
             const info = await checkAccess(item);
@@ -170,8 +164,7 @@ export default {
           }else{
             item.text = item.comment.text;
           }
-        }
-        if(item.data.count>0){ //like
+        }else if(item.type!='follow' && item.data.count>0){ //like
           //url
           if(item.type=="comment"){
             item.url = `/detail/${item.comment.postId}?comment=${item.comment.target_hash}`
@@ -180,7 +173,6 @@ export default {
           }
           //text
           if(item.methodName == 'add_encrypt_comment' || item.methodName == 'add_encrypt_post'){
-            console.log(item);
             const info = await checkAccess(item);
             if(info.isAccess){
               item.text = info.text;
@@ -193,8 +185,7 @@ export default {
               item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
             }
           }
-        }
-        if(item.type=='follow' && item.data.count>0){ //like
+        }else if(item.type=='follow' && item.data.count>0){ //like
           // const followers = [];
           // const len = Math.min(item.data.count,10);
           // for(let j = 0;j<len;j++ ){
@@ -209,9 +200,7 @@ export default {
       
           // item.followers = followers;
         }
-        list.push(item);
       }
-      console.log(list,'----list-----');
       return list;
     }
 
