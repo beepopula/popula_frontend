@@ -9,14 +9,15 @@
           <img class="white-loading" src="@/assets/images/common/loading.png"/>
         </div>
         <!-- list -->
-        <div v-else class="list">
+        <div v-else-if="list.length>0" class="list">
           <template v-for="item in list">
-            <div v-if="item.type=='comment' && item.data.count==0" class="comment-item" @click.self="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+            <!-- reply -->
+            <div v-if="item.type=='comment' && item.data.count==0" class="comment-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
-                    <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click="redirectPage('/user-profile/'+item.accountId,false)"/>
-                    <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+item.accountId,false)"/>
+                    <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                    <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                   </template>
                   <template v-if="item.showUser">
                     <UserPopup :account="item.accountId"/>
@@ -24,9 +25,9 @@
                 </el-popover>
 
                 <div class="user-info">
-                  <div class="name" @click="redirectPage('/user-profile/'+item.accountId,false)">
+                  <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
                     {{item.user.name || item.accountId}}
-                  </div>
+                  </div> <br/>
                   <el-popover placement="bottom-start"  trigger="hover">
                     <template #reference>
                       <div class="createtime">{{item.time.showTime}}</div>
@@ -36,19 +37,38 @@
                 </div>
               </div>
               <div class="reply-user">Replying to you</div> 
-              <div v-if="item.methodName != 'add_encrypt_comment' || item.isAccess" class="text" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+              <div v-if="item.methodName != 'add_encrypt_comment' || item.isAccess" class="text">
                 <pre><div v-html="item.text"></div></pre>
               </div>
-              <div class="text-default" v-else @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+              <div class="text-default" v-else>
                 <img src="@/assets/images/post-item/text-default.png"/>
               </div>
             </div>
-            <div v-else-if="item.type=='comment' && item.data.count>0" class="like-item" @click="redirectPage(item.url)">
+
+            <!-- like -->
+            <div v-else-if="item.type != 'follow' && item.data.count>0" class="like-item" @click="redirectPage(item.url)">
               <div class="avatar-list">
-                <template v-for="user in item.data.likes">
-                  <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
-                  <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+                <template v-for="(user,index) in item.data.likes">
+                  <template v-if="index<10">
+                    <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
+                    <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+                  </template>
                 </template>
+
+                <div class="hide-list">
+                  <template v-for="(user,index) in item.data.likes">
+                    <template v-if="index<10">
+                      <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
+                        <template #reference>
+                          <div class="hide-item" @click.stop="redirectPage('/user-profile/'+user.accountId,false)"></div>
+                        </template>
+                        <template v-if="user.showUser">
+                          <UserPopup :account="user.accountId"/>
+                        </template>
+                      </el-popover>
+                    </template>
+                  </template>
+                </div>
               </div>
               <div class="intro">
                 <template v-if="item.data.count==1">
@@ -64,13 +84,15 @@
                   and {{item.data.count-1}} others
                 </template>
                 liked your 
-                <template v-if="item.comment.postId">reply</template>
-                <template v-else>post</template>
+                <template v-if="item.post">post</template>
+                <template v-else>reply</template>
               </div>
               <div class="text txt-wrap2">
                 {{item.text}}
               </div>
             </div>
+
+            <!-- folow -->
             <div v-else-if="item.type=='follow'" class="follow-item" @click="redirectPage('/mine')">
               <div class="avatar-list">
                 <template v-for="(user,index) in item.data.follow">
@@ -79,6 +101,21 @@
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                   </template>
                 </template>
+
+                <div class="hide-list">
+                  <template v-for="(user,index) in item.data.follow">
+                    <template v-if="index<10">
+                      <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
+                        <template #reference>
+                          <div class="hide-item" @click.stop="redirectPage('/user-profile/'+user.accountId,false)"></div>
+                        </template>
+                        <template v-if="user.showUser">
+                          <UserPopup :account="user.accountId"/>
+                        </template>
+                      </el-popover>
+                    </template>
+                  </template>
+                </div>
               </div>
               <div class="intro">
                 <template v-if="item.data.count==1">
@@ -97,6 +134,11 @@
               </div>
             </div>
           </template>
+        </div>
+
+        <div class="no-results"  v-else>
+          <img src="@/assets/images/common/emoji-null.png"/>
+          No data
         </div>
 
       </div>
@@ -138,11 +180,11 @@ export default {
       state.isLoading = true;
       const res = await proxy.$axios.profile.get_user_notifications({
         accountId:store.getters.accountId,
-        lastTime:localStorage.getItem("notice_last_time") || '',
+        // lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
       });
       if(res.success){
         state.list = await handleData(res.data);
-        localStorage.setItem("notice_last_time",res.lastTime);
+        localStorage.setItem("notice_last_time_"+store.getters.accountId,res.lastTime);
       }
       state.isLoading = false;
     }
@@ -185,21 +227,8 @@ export default {
               item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
             }
           }
-        }else if(item.type=='follow' && item.data.count>0){ //like
-          // const followers = [];
-          // const len = Math.min(item.data.count,10);
-          // for(let j = 0;j<len;j++ ){
-          //   const follow_item = item.data.follow[j];
-          //   const userInfo = await proxy.$axios.profile.get_user_info({
-          //     accountId:follow_item.accountId,
-          //   });
-          //   if(userInfo.success){
-          //     followers.push(userInfo.data);
-          //   }
-          // }
-      
-          // item.followers = followers;
         }
+        list.push(item);
       }
       return list;
     }
@@ -256,6 +285,7 @@ export default {
     return {
       ...toRefs(state),
       init,
+      redirectPage
     }
   },
   mounted(){
@@ -277,6 +307,8 @@ export default {
       line-height:22px;
     }
     .loading-box{
+      width:690px;
+      margin-top:20px;
       min-height:300px;
       display:flex;
       align-items:center;
@@ -294,6 +326,7 @@ export default {
       .comment-item{
         padding:30px 0;
         border-bottom:1px solid rgba(255,255,255,0.1);
+        cursor: pointer;
         .user{
           height:40px;
           display:flex;
@@ -303,12 +336,15 @@ export default {
             width: 40px;
             height: 40px;
             border-radius:50%;
-            cursor: pointer;
             object-fit: cover;
           }
           .user-info{
             margin-left:12px;
+            width:300px;
             .name{
+              display:inline-block;
+              width:auto;
+              max-width:300px;
               font-family: D-DINExp-Bold;
               height: 18px;
               line-height:18px;
@@ -317,9 +353,11 @@ export default {
               letter-spacing: 0;
               font-weight: 700;
               position: relative;
-              cursor: pointer;
             }
             .createtime{
+              display:inline-block;
+              width:auto;
+              max-width:300px;
               margin-top:4px;
               font-family: D-DINExp;
               font-size: 14px;
@@ -343,7 +381,7 @@ export default {
           }
         }
         .text{
-          margin-top:20px;
+          margin-top:10px;
           font-family: D-DINExp;
           font-size: 16px;
           color: #FFFFFF;
@@ -351,7 +389,6 @@ export default {
           text-align: justify;
           line-height: 26px;
           font-weight: 400;
-          cursor: pointer;
           pre{
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -376,6 +413,7 @@ export default {
         padding: 30px 0 30px 60px;
         background:url('@/assets/images/notice/icon-like.png') no-repeat left 30px;
         background-size:40px 40px;
+        cursor: pointer;
         .avatar-list{
           display: flex;
           height:40px;
@@ -397,6 +435,20 @@ export default {
             border-radius:50%;
             object-fit: cover;
             margin-right:16px;
+          }
+          .hide-list{
+            position:absolute;
+            top:0;
+            left:0;
+            height:40px;
+            display: flex;
+            z-index:2;
+            .hide-item{
+              width:40px;
+              height:40px;
+              border-radius:50%;
+              margin-right:16px;
+            }
           }
         }
         .intro{
@@ -435,6 +487,26 @@ export default {
         background-size:40px 40px;
       }
 
+    }
+    .no-results{
+      width:690px;
+      margin-top:20px;
+      padding:80px 0;
+      background: #28282D;
+      border-radius: 24px;
+      font-family: D-DINExp;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0;
+      text-align: center;
+      font-weight: 400;
+      line-height:16px;
+      img{
+        display:block;
+        width: 60px;
+        height: 60px;
+        margin:0 auto 12px;
+      }
     }
   }
 }
