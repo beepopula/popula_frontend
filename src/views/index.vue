@@ -20,7 +20,7 @@
             Happens
           </div>
           <div class="button-box">
-            <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
+            <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Launch Your Community</a>
           </div>
         </div>
       </div>
