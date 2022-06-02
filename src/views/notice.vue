@@ -72,15 +72,15 @@
               </div>
               <div class="intro">
                 <template v-if="item.data.count==1">
-                  <span>{{item.data.likes[0]['data']['name'] || item.data.likes[0]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.likes[0]['data']['account_id'],false)">{{item.data.likes[0]['data']['name'] || item.data.likes[0]['data']['account_id']}}</span>
                 </template>
                 <template v-if="item.data.count==2">
-                  <span>{{item.data.likes[0]['data']['name'] || item.data.likes[0]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.likes[0]['data']['account_id'],false)">{{item.data.likes[0]['data']['name'] || item.data.likes[0]['data']['account_id']}}</span>
                   and 
-                  <span>{{item.data.likes[1]['data']['name'] || item.data.likes[1]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.likes[1]['data']['account_id'],false)">{{item.data.likes[1]['data']['name'] || item.data.likes[1]['data']['account_id']}}</span>
                 </template>
                 <template v-if="item.data.count>2">
-                  <span>{{item.data.likes[0]['data']['name'] || item.data.likes[0]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.likes[0]['data']['account_id'],false)">{{item.data.likes[0]['data']['name'] || item.data.likes[0]['data']['account_id']}}</span>
                   and {{item.data.count-1}} others
                 </template>
                 liked your 
@@ -119,15 +119,15 @@
               </div>
               <div class="intro">
                 <template v-if="item.data.count==1">
-                  <span>{{item.data.follow[0]['data']['name'] || item.data.follow[0]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.follow[0]['data']['account_id'],false)">{{item.data.follow[0]['data']['name'] || item.data.follow[0]['data']['account_id']}}</span>
                 </template>
                 <template v-if="item.data.count==2">
-                  <span>{{item.data.follow[0]['data']['name'] || item.data.follow[0]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.follow[0]['data']['account_id'],false)">{{item.data.follow[0]['data']['name'] || item.data.follow[0]['data']['account_id']}}</span>
                   and 
-                  <span>{{item.data.follow[1]['data']['name'] || item.data.follow[1]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.follow[1]['data']['account_id'],false)">{{item.data.follow[1]['data']['name'] || item.data.follow[1]['data']['account_id']}}</span>
                 </template>
                 <template v-if="item.data.count>2">
-                  <span>{{item.data.follow[0]['data']['name'] || item.data.follow[0]['data']['account_id']}}</span>
+                  <span @click.stop="redirectPage('/user-profile/'+item.data.follow[0]['data']['account_id'],false)">{{item.data.follow[0]['data']['name'] || item.data.follow[0]['data']['account_id']}}</span>
                   and {{item.data.count-1}} others
                 </template>
                 followed you
@@ -191,12 +191,22 @@ export default {
 
     const handleData = async (data) => {
       const list = [];
-      for(let i = 0;i<data.length;i++){//data.length
+      const length = Math.min(data.length,100);
+      for(let i = 0;i<length;i++){//data.length
         const item = data[i];
         if(item.type=='comment' && item.data.count==0){ //reply
           //time
           item.time = getTimer(item.createAt)
+          
           item.user = {}
+          const res = await proxy.$axios.profile.get_user_info({
+            accountId:item.comment.accountId,
+            currentAccountId: store.getters.accountId || ''
+          });
+          if(res.success){
+            item.user = res.data;
+          }
+          //text
           if(item.methodName == 'add_encrypt_comment'){
             const info = await checkAccess(item);
             if(info.isAccess){
@@ -230,6 +240,7 @@ export default {
         }
         list.push(item);
       }
+      console.log(list,'----');
       return list;
     }
 
