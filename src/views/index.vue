@@ -12,7 +12,7 @@
           <div class="button-border" @click="$router.push('/explore')">
             <div class="button">Explore</div>
           </div>
-          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
+          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Launch Your Community</a>
         </div>
       </div>
     </div>
