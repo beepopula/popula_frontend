@@ -180,7 +180,7 @@ export default {
       state.isLoading = true;
       const res = await proxy.$axios.profile.get_user_notifications({
         accountId:store.getters.accountId,
-        // lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
+        lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
       });
       if(res.success){
         state.list = await handleData(res.data);
