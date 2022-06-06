@@ -26,7 +26,7 @@
     <!-- follow notice -->
     <div :class="['pop-box','pop-intro','pop-notice',$props.position]" v-if="showNotice">
       <div class="title">Notice</div>
-      <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on [Recent activity (<a href="https://wallet.testnet.near.org/" target="_blank">https://wallet.testnet.near.org/ </a>) ]</div>
+      <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on <a href="https://wallet.testnet.near.org/" target="_blank">Recent activity</a></div>
       <div class="button-box">
         <div class="mini-button-border button-cancle" @click.stop="showNotice=false">
           <div class="mini-button">Cancle</div>

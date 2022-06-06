@@ -456,6 +456,9 @@ export default {
           cursor:pointer;
           object-fit: cover;
         }
+        .follow-button{
+          position: relative;
+        }
       }
       .name{
         margin-top:20px;

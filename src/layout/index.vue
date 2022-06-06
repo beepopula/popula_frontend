@@ -376,6 +376,12 @@ export default {
       &.pop-notice{
         z-index:99;
         padding:30px;
+        .intro{
+          a{
+            display: inline;
+            color: rgba(255,255,255,1);
+          }
+        }
       }
       &.pop-hash{
         width:198px;
@@ -390,10 +396,9 @@ export default {
       }
       .intro{
         margin-top:8px;
-        opacity: 0.5;
         font-family: D-DINExp;
         font-size: 14px;
-        color: #FFFFFF;
+        color: rgba(255,255,255,0.5);
         letter-spacing: 0;
         text-align: left;
         line-height: 22px;
