@@ -9,6 +9,7 @@
         @keydown.capture="onCheck"
         @keyup.capture="onChange"
         @focus="checkLogin"
+        @click="onClick"
       />
       <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
       
@@ -414,6 +415,13 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           e.preventDefault();
         }
       }
+
+      const onClick = () => {
+        const selection = window.getSelection()
+        state.focusNode = selection.focusNode;
+        state.focusOffset = selection.focusOffset;
+        state.start_index = selection.focusOffset;
+      }
       const onChange = async (e) => {
         const selection = window.getSelection()
         const text = selection.extentNode.nodeValue;
@@ -422,22 +430,25 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.focusOffset = selection.focusOffset;
         let start = Math.max(selection.focusOffset-21,0);
         let start_index = null;
+        
         let str = "";
 
-        for(let i = selection.focusOffset;i>=start;i--){
+        for(let i = selection.focusOffset-1;i>=start;i--){
           if(text.substring(i,i+1)=="@"){
             start_index = i;
             break;
           }
-          if(i>0 && !(text.substring(i-1,i).trim())){
+          if(i!=selection.focusOffset-1 && !(text[i].trim())){
             break;
           }
         }
+        
 
         if(start_index!==null){
           let end = Math.min(start_index+21,text.length);
           let end_index = end;
-          for(let j = selection.focusOffset;j<end;j++){
+          const start = Math.max(selection.focusOffset-1,0)
+          for(let j = start;j<end;j++){
             if(text[j]==" " || text[j]=="@"){
               end_index = j;
               break;
@@ -453,6 +464,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             state.showUserList = false;
           }
         }else{
+          state.start_index = selection.focusOffset;
           state.showUserList = false;
         }
       }
@@ -600,46 +612,21 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //emoji
       const setEmoji = (emoji) => {
         if(checkLogin()){
-          // const selection = postInput.value;
-          // const text = selection.extentNode.nodeValue;
-          // console.log(selection,'00000');
-          // const left = text.substring(0,selection);
-          // const right = text.substring(selection);
-          // state.postForm.text = left + emoji + " " + right;
+          let selection = window.getSelection();
+          let range = selection.getRangeAt(0);
+          const container = state.focusNode//range.startContainer; 
+          const pos = state.start_index;//range.startOffset; 
+          //insert
+          range = document.createRange(); 
+          var cons = window.document.createTextNode(emoji); 
+          container.insertData(pos, cons.nodeValue); 
+          range.setEnd(container, pos + cons.nodeValue.length); 
+          range.setStart(container, pos + cons.nodeValue.length); 
+          state.start_index = pos + cons.nodeValue.length;
 
-          // state.postForm.text = postInput.value.textContent;
-
-          postInput.value.innerHTML = postInput.value.innerHTML + emoji + "&nbsp;";
           state.postForm.text = postInput.value.textContent;
-          // const selection = window.getSelection();
-          // const focusOffset = state.focusOffset;
-          // let node = state.focusNode;
-          // let range = window.getSelection().getRangeAt(0);
-          // range.setStart(state.focusNode, focusOffset);
-          // range.setEnd(state.focusNode, focusOffset+1);
-          // if (node === dom) {
-            // var textNode = document.createTextNode(emoji);
-            // range.setStart(state.focusNode, 1)
-            // range.setEnd(state.focusNode, 1);
-            // range.insertNode(textNode);
-            
-          // } else {
-          //     var text = node.textContent;
-          //     node.textContent = text.substr(0, focusOffset) +  emoji + text.substr(focusOffset);
-          //     var offset = (text.substr(0, focusOffset) + emoji).length;
-          //     if (node.nodeType != 3) {
-          //         node = node.childNodes[0];
-          //     }
-          //     range.setStart(node, offset);
-          //     range.setEnd(node, offset);
-          // }
-          
-
-          // const selection = postInput.value.$el.getElementsByTagName('textarea')[0].selectionStart;
-          // const left = state.postForm.text.substring(0,selection);
-          // const right = state.postForm.text.substring(selection);
-          // state.postForm.text = left + emoji + " " + right;
-          // state.postForm.text = state.postForm.text + emoji + " ";
+          selection.addRange(range); 
+          selection.collapseToEnd();
         }
       }
       const setGif = (gif) => {
@@ -1131,6 +1118,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // popUser,
         init,
         onCheck,
+        onClick,
         onChange,
         onSelectSubmit,
         postInput,
@@ -1235,6 +1223,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         font-weight: 400;
         border:0;
         text-align:justify;
+        -webkit-user-modify: read-write-plaintext-only;
         
       }
       .atFont{
