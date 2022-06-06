@@ -169,7 +169,7 @@
               trigger="hover"
               >
               <template #reference>
-                <a class="media-item" target="_blank" href="https://github.com/popula-io">
+                <a class="media-item" target="_blank" href="https://github.com/beepopula">
                   <img src="@/assets/images/common/logo-github.png"/>
                   <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
                 </a>
