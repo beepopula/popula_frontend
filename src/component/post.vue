@@ -65,9 +65,7 @@
         </div>
       </div>
 
-      <div @click="onFocus()">
-        <el-input v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
-      </div>
+      <el-input v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
       <!-- img-emoji-box -->
       <div class="img-emoji-box">
         <!-- upload-image -->
@@ -412,25 +410,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
 
       //@
-      const onFocus = () => {
-        if(checkLogin()){
-          postInput.value.focus();
-          if(document.support){
-            var range = document.selection.createRange();
-            this.last = range;
-            range.moveToElementText(el);
-            range.select();
-            document.selection.empty();
-          } else {
-            var range = document.createRange();
-            range.selectNodeContents(postInput.value);
-            range.collapse(false);
-            var sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-        }
-      }
       const onCheck = (e) => {
         if(postInput.value.textContent.length>=1000){
           e.preventDefault();
@@ -1149,7 +1128,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // popUser,
         init,
         onCheck,
-        onFocus,
         onClick,
         onChange,
         onSelectSubmit,
@@ -1256,7 +1234,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         border:0;
         text-align:justify;
         -webkit-user-modify: read-write-plaintext-only;
-        
+        padding-bottom:35px;
       }
       .atFont{
         font-family: D-DINExp;
@@ -1283,7 +1261,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       :deep(.el-textarea){
         position:static!important;
         height:24px;
-        margin-top:34px;
+   
         textarea{
           background: transparent;
           padding:0;
@@ -1406,7 +1384,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           height: 180px;
           position:relative;
           margin-right:35px;
-          margin-top:35px;
+          margin-bottom:35px;
           &.mr0{
             margin-right:0;
           }
