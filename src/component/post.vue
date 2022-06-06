@@ -412,28 +412,23 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
 
       //@
-      const Focus = () => {
-        postInput.value.focus();
-        if(document.support){
-          var range = document.selection.createRange();
-          this.last = range;
-          range.moveToElementText(el);
-          range.select();
-          document.selection.empty(); //取消选中
-        } else {
-          var range = document.createRange();
-          range.selectNodeContents(postInput.value);
-          range.collapse(false);
-          var sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      }
       const onFocus = () => {
-        console.log("onFocus---------")
         if(checkLogin()){
-          // postInput.value.focus();
-          Focus()
+          postInput.value.focus();
+          if(document.support){
+            var range = document.selection.createRange();
+            this.last = range;
+            range.moveToElementText(el);
+            range.select();
+            document.selection.empty();
+          } else {
+            var range = document.createRange();
+            range.selectNodeContents(postInput.value);
+            range.collapse(false);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
         }
       }
       const onCheck = (e) => {
@@ -447,6 +442,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.focusNode = selection.focusNode;
         state.focusOffset = selection.focusOffset;
         state.start_index = selection.focusOffset;
+        console.log(state.focusNode,state.focusOffset,state.start_index);
       }
       const onChange = async (e) => {
         const selection = window.getSelection()
@@ -638,26 +634,27 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //emoji
       const setEmoji = (emoji) => {
         if(checkLogin()){
-          if(!state.focusNode || !state.start_index){
-            onFocus();
+          if(postInput.value.textContent && state.focusNode){
+            let selection = window.getSelection();
+            let range = selection.getRangeAt(0);
+            console.log(state.focusNode,state.start_index);
+            const container = state.focusNode; 
+            const pos = state.start_index;
+            //insert
+            range = document.createRange(); 
+            var cons = window.document.createTextNode(emoji); 
+            container.insertData(pos, cons.nodeValue); 
+            range.setEnd(container, pos + cons.nodeValue.length); 
+            range.setStart(container, pos + cons.nodeValue.length); 
+            state.start_index = pos + cons.nodeValue.length;
+
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }else{
+            postInput.value.innerHTML = postInput.value.innerHTML + emoji;
           }
-          let selection = window.getSelection();
-          let range = selection.getRangeAt(0);
-          const container = state.focusNode; 
-          const pos = state.start_index;//range.startOffset; 
-          //insert
-          range = document.createRange(); 
-          var cons = window.document.createTextNode(emoji); 
-          container.insertData(pos, cons.nodeValue); 
-          range.setEnd(container, pos + cons.nodeValue.length); 
-          range.setStart(container, pos + cons.nodeValue.length); 
-          state.start_index = pos + cons.nodeValue.length;
-
           state.postForm.text = postInput.value.textContent;
-
-          range.collapse(false);
-          selection.removeAllRanges();
-          selection.addRange(range);
 
           // selection.addRange(range); 
           // selection.collapseToEnd();
