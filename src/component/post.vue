@@ -65,8 +65,9 @@
         </div>
       </div>
 
-      
-      <el-input @keyup="onKeyDown" v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
+      <div @click="onFocus()">
+        <el-input v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
+      </div>
       <!-- img-emoji-box -->
       <div class="img-emoji-box">
         <!-- upload-image -->
@@ -94,6 +95,7 @@
           />
         </div>
       </div>
+      
 
 
     </div>
@@ -410,6 +412,30 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
 
       //@
+      const Focus = () => {
+        postInput.value.focus();
+        if(document.support){
+          var range = document.selection.createRange();
+          this.last = range;
+          range.moveToElementText(el);
+          range.select();
+          document.selection.empty(); //取消选中
+        } else {
+          var range = document.createRange();
+          range.selectNodeContents(postInput.value);
+          range.collapse(false);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+      const onFocus = () => {
+        console.log("onFocus---------")
+        if(checkLogin()){
+          // postInput.value.focus();
+          Focus()
+        }
+      }
       const onCheck = (e) => {
         if(postInput.value.textContent.length>=1000){
           e.preventDefault();
@@ -612,9 +638,12 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //emoji
       const setEmoji = (emoji) => {
         if(checkLogin()){
+          if(!state.focusNode || !state.start_index){
+            onFocus();
+          }
           let selection = window.getSelection();
           let range = selection.getRangeAt(0);
-          const container = state.focusNode//range.startContainer; 
+          const container = state.focusNode; 
           const pos = state.start_index;//range.startOffset; 
           //insert
           range = document.createRange(); 
@@ -625,8 +654,13 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.start_index = pos + cons.nodeValue.length;
 
           state.postForm.text = postInput.value.textContent;
-          selection.addRange(range); 
-          selection.collapseToEnd();
+
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+
+          // selection.addRange(range); 
+          // selection.collapseToEnd();
         }
       }
       const setGif = (gif) => {
@@ -1118,6 +1152,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // popUser,
         init,
         onCheck,
+        onFocus,
         onClick,
         onChange,
         onSelectSubmit,
