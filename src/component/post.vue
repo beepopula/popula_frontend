@@ -11,7 +11,6 @@
         @focus="checkLogin"
       />
       <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
-      <el-input @keyup="onKeyDown" v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
       
       <div class="pop-user-box" :id="'pop-user'+location">
         <div v-show="showUserList" ref="popUser" class="user-list">
@@ -55,15 +54,18 @@
       <!-- avatar -->
       <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
       <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
+
+
       <!-- images -->
       <div class="images" >
         <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
-          <div class="delete-image" @click="handleRemove(index)"></div>
+          <div class="delete-image" @click.stop="handleRemove(index)"></div>
           <img :src="img" >
         </div>
       </div>
 
-
+      
+      <el-input @keyup="onKeyDown" v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
       <!-- img-emoji-box -->
       <div class="img-emoji-box">
         <!-- upload-image -->
@@ -91,6 +93,8 @@
           />
         </div>
       </div>
+
+
     </div>
     <div class="edit">
       <!-- community -->
