@@ -672,13 +672,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           usedCommunities.unshift(item);
           usedCommunities = deduplication(usedCommunities,'community');
           localStorage.setItem("usedCommunities",JSON.stringify(usedCommunities))
-        }else{
-          state.postForm.community= {
-            communityId:"",
-            avatar:"",
-            name:""
-          }
-          state.showCommunity = false;
         }
       }
 
