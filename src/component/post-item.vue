@@ -672,9 +672,6 @@ export default {
       nextTick(() => {
         copy_text.value.click();
       });
-      if(isShare){
-        await shareRecord();
-      }
     }
     const handleCopyFun = () => {
       const clipboard = new Clipboard('#copy_text')
