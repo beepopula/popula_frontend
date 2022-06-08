@@ -121,6 +121,7 @@ export default {
       const selection = commentInput.value.$el.getElementsByTagName('textarea')[0].selectionStart;
       const left = state.text.substring(0,selection);
       const right = state.text.substring(selection);
+      console.log(left,emoji,right,);
       state.text = left + emoji + " " + right;
       // state.text = state.text + emoji + " ";;
     }
@@ -248,6 +249,7 @@ export default {
 
 <style lang="scss" scoped>
 .comment{
+  width: 696px;
   padding:20px;
   background: #28282D;
   border-radius: 24px;
@@ -280,7 +282,7 @@ export default {
       font-weight: 400;
       border:0;
       resize:none;
-      text-align:justify;
+      word-break:break-word;
     }
     .el-input__count{
       background:transparent;

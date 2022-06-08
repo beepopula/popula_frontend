@@ -592,7 +592,6 @@ export default {
     }
 
     .suspend-elastic-layer{
-      overflow-y:scroll;
       .elastic-layer-content{
         position:absolute;
         top:50%;

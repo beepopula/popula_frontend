@@ -472,7 +472,6 @@ export default {
     }
 
     const initNft = async () => {
-      console.log(state.token_series_id)
       if(!state.token_series_id){return;}
       const nft_info = await nftContract.getSeries({token_series_id:state.token_series_id});
       const supply = await nftContract.getSupply({token_series_id:state.token_series_id});
@@ -537,7 +536,6 @@ export default {
     const checkAccess = async () => {
       const check_result = await checkCondition(props.item.access);
       state.access = check_result.access;
-      console.log(check_result,'----check_result ------');
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //comment
         

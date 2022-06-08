@@ -240,7 +240,6 @@ export default {
         }
         list.push(item);
       }
-      console.log(list,'----');
       return list;
     }
 

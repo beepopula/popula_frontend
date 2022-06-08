@@ -1,69 +1,72 @@
 <template>
   <div class="post" :id="'post'+location" :key="location">
-    <div class="postForm">
-      <!-- text -->
-      <div
-        class="div-input"
-        ref="postInput"
-        contenteditable
-        @keydown.capture="onCheck"
-        @keyup.capture="onChange"
-        @focus="checkLogin"
-        @click="onClick"
-      />
-      <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
-      
-      <div class="pop-user-box" :id="'pop-user'+location">
-        <div v-show="showUserList" ref="popUser" class="user-list">
-          <div class="loading-box" v-if="isLoaingUserList">
-            <img class="white-loading" src="@/assets/images/common/loading.png"/>
-          </div>
-          <template v-else-if="userList.length>0">
-            <template v-for="user in userList">
-                <template v-if="user.outer">
-                  <div class="user-item" @click="onSelectSubmit(user)">
-                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                    <div class="user-info">
-                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
-                    </div>
-                  </div>
-                </template>
-                <template v-else>
-                  <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
-                    <template #reference>
-                      <div class="user-item" @click="onSelectSubmit(user)">
-                        <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                        <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                        <div class="user-info">
-                          <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                          <div class="user-account  txt-wrap">{{user.account_id}}</div>
-                        </div>
+    <div class="post-form-box">
+      <div class="post-form">
+        <!-- text -->
+        <div
+          class="div-input"
+          ref="postInput"
+          contenteditable
+          @keydown.capture="onCheck"
+          @keyup.capture="onChange"
+          @focus="checkLogin"
+          @click="onClick"
+        />
+        <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
+        
+        <div class="pop-user-box" :id="'pop-user'+location">
+          <div v-show="showUserList" ref="popUser" class="user-list">
+            <div class="loading-box" v-if="isLoaingUserList">
+              <img class="white-loading" src="@/assets/images/common/loading.png"/>
+            </div>
+            <template v-else-if="userList.length>0">
+              <template v-for="user in userList">
+                  <template v-if="user.outer">
+                    <div class="user-item" @click="onSelectSubmit(user)">
+                      <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                      <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                      <div class="user-info">
+                        <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                        <div class="user-account  txt-wrap">{{user.account_id}}</div>
                       </div>
-                    </template>
-                    <template v-if="user.showCreateUser">
-                      <UserPopup :account="user.account_id" @login="showLogin=true"/>
-                    </template>
-                  </el-popover>
-                </template>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
+                      <template #reference>
+                        <div class="user-item" @click="onSelectSubmit(user)">
+                          <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                          <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                          <div class="user-info">
+                            <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                            <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                          </div>
+                        </div>
+                      </template>
+                      <template v-if="user.showCreateUser">
+                        <UserPopup :account="user.account_id" @login="showLogin=true"/>
+                      </template>
+                    </el-popover>
+                  </template>
+              </template>
             </template>
-          </template>
-          <div v-else class="nobody">Nobody yet.</div>
+            <div v-else class="nobody">Nobody yet.</div>
+          </div>
         </div>
-      </div>
-      <!-- avatar -->
-      <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
-      <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
+        <!-- avatar -->
+        <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
+        <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
 
 
-      <!-- images -->
-      <div class="images" >
-        <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
-          <div class="delete-image" @click.stop="handleRemove(index)"></div>
-          <img :src="img" >
+        <!-- images -->
+        <div class="images" >
+          <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
+            <div class="delete-image" @click.stop="handleRemove(index)"></div>
+            <img :src="img" >
+          </div>
         </div>
       </div>
+
 
       <el-input v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
       <!-- img-emoji-box -->
@@ -93,8 +96,6 @@
           />
         </div>
       </div>
-      
-
 
     </div>
     <div class="edit">
@@ -387,6 +388,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //community
         if(props.community){
           state.postForm.community = props.community
+          state.defaultCommunity = props.community
         }else{
           const res = await proxy.$axios.community.get_community_detail({
             accountId:"",
@@ -407,11 +409,33 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.postForm.nft.copies = nftInfo.copies;
           state.postForm.nft.mintPrice = nftInfo.mint_price;
         }
+        
+
+        //usedCommunity update
+        const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
+        const updateCommunities =  [];
+        for(let i = 0;i<usedCommunities.length;i++){
+          const community = usedCommunities[i];
+          const res = await proxy.$axios.community.get_community_detail({
+            accountId:"",
+            communityId: community.communityId,
+          });
+          if(res.success) {
+            const comm = {
+              avatar:res.data.avatar,
+              communityId:res.data.communityId,
+              name:res.data.name
+            }
+            updateCommunities.push(comm);
+          }
+        }
+        localStorage.setItem("usedCommunities",JSON.stringify(updateCommunities));
       }
 
       //@
       const onCheck = (e) => {
-        if(postInput.value.textContent.length>=1000){
+        console.log(e,'----e-----');
+        if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }
       }
@@ -421,7 +445,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.focusNode = selection.focusNode;
         state.focusOffset = selection.focusOffset;
         state.start_index = selection.focusOffset;
-        console.log(state.focusNode,state.focusOffset,state.start_index);
       }
       const onChange = async (e) => {
         const selection = window.getSelection()
@@ -616,7 +639,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           if(postInput.value.textContent && state.focusNode){
             let selection = window.getSelection();
             let range = selection.getRangeAt(0);
-            console.log(state.focusNode,state.start_index);
             const container = state.focusNode; 
             const pos = state.start_index;
             //insert
@@ -1053,7 +1075,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           },
           mint_price: state.postForm.nft.isPublicSale ? parseAmount(state.postForm.nft.mintPrice,24) : null, 
           ft_token_id: "near", 
-          notify_contract_id: store.state.nearConfig.MAIN_CONTRACT
+          notify_contract_id: state.postForm.community.communityId
         }
 
         let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
@@ -1174,7 +1196,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // const pop_nft = document.getElementById('pop-nft'+this.location);
         // // const pop_btn = document.getElementById('pop-button'+this.location);
         // if(this.showNftBox && ((pop_nft &&　!pop_nft.contains(e.target)) || (pop_notice &&　!pop_notice.contains(e.target)))) {
-        //     console.log("hhhhhhhh");
         //     this.showNftBox = false;
         // }
 
@@ -1200,20 +1221,32 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       display:none;
     }
     &#postsuspend{
-      width:696px;
-      .postForm{
-        max-height:50vh;
-        overflow-y:scroll;
+      .post-form-box{
+        padding:20px 0 20px 20px;
+        .post-form{
+          max-height: 50vh;
+          overflow-y: scroll;
+        }
+        .div-input{
+          padding-right:14px;
+          padding-bottom:0;
+        }
+        .image-item{
+          margin-top:35px;
+          margin-bottom: 0;
+        }
+        :deep(.el-textarea){
+          height:59px;
+          padding:35px 20px 0 0;
+        }
       }
     }
-    .postForm{
+    .post-form-box{
       border-radius: 10px;
       background: #36363C;
       padding:20px 20px 20px 20px;
       position:relative;
       .div-input{
-        max-height:30vh;
-        overflow-y:scroll;
         position:relative;
         z-index:3;
         padding-left:36px;
@@ -1225,7 +1258,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         letter-spacing: 0;
         font-weight: 400;
         border:0;
-        text-align:justify;
         -webkit-user-modify: read-write-plaintext-only;
         padding-bottom:35px;
       }
@@ -1254,7 +1286,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       :deep(.el-textarea){
         position:static!important;
         height:24px;
-   
+        overflow: hidden;
         textarea{
           background: transparent;
           padding:0;
