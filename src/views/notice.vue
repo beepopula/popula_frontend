@@ -37,9 +37,7 @@
                 </div>
               </div>
               <div class="reply-user">Replying to you</div> 
-              <div v-if="item.methodName != 'add_encrypt_comment' || item.isAccess" class="text">
-                <pre><div v-html="item.text"></div></pre>
-              </div>
+              <pre v-if="item.methodName != 'add_encrypt_comment' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
               <div class="text-default" v-else>
                 <img src="@/assets/images/post-item/text-default.png"/>
               </div>
@@ -87,9 +85,9 @@
                 <template v-if="item.post">post</template>
                 <template v-else>reply</template>
               </div>
-              <div class="text txt-wrap2">
-                {{item.text}}
-              </div>
+     
+              <pre class="text"><div v-html="item.text"></div></pre>
+  
             </div>
 
             <!-- folow -->
@@ -392,6 +390,8 @@ export default {
         }
         .text{
           margin-top:10px;
+          white-space: pre-wrap;
+          word-wrap: break-word;
           font-family: D-DINExp;
           font-size: 16px;
           color: #FFFFFF;
@@ -399,16 +399,8 @@ export default {
           text-align: justify;
           line-height: 26px;
           font-weight: 400;
-          pre{
-            white-space: pre-wrap;
+          div{
             word-wrap: break-word;
-            font-family: D-DINExp;
-            font-size: 16px;
-            color: #FFFFFF;
-            letter-spacing: 0;
-            text-align: justify;
-            line-height: 26px;
-            font-weight: 400;
           }
         }
         .text-default{
@@ -473,8 +465,14 @@ export default {
           display:flex;
           align-items: center;
           span{
+            display:inline-block;
+            max-width: 100px;
             color: rgba(255,255,255,1);
             margin:0 4px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            word-break: break-word;
           }
         }
         .text{
