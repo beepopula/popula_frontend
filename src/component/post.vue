@@ -985,7 +985,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           access,
           text_sign:res.text_sign,
           contract_id_sign:res.contract_id_sign,
-          blur_imgs:state.postForm.blur_imgs
+          blur_imgs:[...state.postForm.blur_imgs]
         }
         
         let result = {}
