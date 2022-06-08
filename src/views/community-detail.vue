@@ -571,8 +571,10 @@
               accessKey: accessKey.accessKey
             }]
           }
-          await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          // state.detail.data.isJoin = !state.detail.data.isJoin;
+          const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+          if(result){
+            state.detail.data.isJoin = !state.detail.data.isJoin;
+          }
         }
       }
 
@@ -602,6 +604,7 @@
       //getPosts
       const getPosts = async () => {
         state.isLoading = true;
+        console.log("33333333");
         const res = await proxy.$axios.post.get_post_list({
           type: state.currentTab,
           page:state.page,
@@ -631,7 +634,7 @@
 
       //handleScroll
       const handleScroll = async () => {
-        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd){
+        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd && state.currentTab){
           const res = await getPosts();
           state.postList[state.currentTab] = state.postList[state.currentTab].concat(res.data);
         }

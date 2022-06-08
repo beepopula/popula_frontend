@@ -583,7 +583,7 @@ export default {
     watch(
       () => textDom.value,
       (newVal) => {
-        if(!textBox || !textDom){return;}
+        if(!textBox || !textDom || !textBox.value || !textDom.value){return;}
         const textBoxHeight = textBox.value.getBoundingClientRect().height;
         const textDomHeight = textDom.value.getBoundingClientRect().height
         if(textBoxHeight>textDomHeight){

@@ -193,7 +193,7 @@ export default {
         const communityContract = await CommunityContract.new(props.communityId);
         result = await communityContract.addEncryptComment(param2,store.state.account,props.communityId);
       }else{
-        result = await mainContract.addEncryptComment(params2,store.state.account);
+        result = await mainContract.addEncryptComment(param2,store.state.account);
       }
       handleSuccess(result);
     }

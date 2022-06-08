@@ -978,6 +978,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           contract_id:state.postForm.community.communityId,
         }
         const res = await encryptionContract.encrypt(param1);
+        
         // addEncryptPost
         const param2 = {
           encrypt_args:JSON.stringify(res.cipher_text),
@@ -986,10 +987,12 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           contract_id_sign:res.contract_id_sign,
           blur_imgs:state.postForm.blur_imgs
         }
+        
         let result = {}
         if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
           result = await mainContract.addEncryptPost(param2,store.state.account);
         }else{
+          console.log(state.postForm.community.communityId,param2,'------------');
           const communityContract = await CommunityContract.new(state.postForm.community.communityId);
           // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
           result = await communityContract.addEncryptPost(param2,store.state.account,state.postForm.community.communityId);
@@ -1080,6 +1083,9 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
         let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
         const result = await nftContract.nftCreateSeries(params,deposit);
+        console.log(result,'hhhhh');
+        state.showNftBox = false;
+        handleSuccess(result);
       }
 
 

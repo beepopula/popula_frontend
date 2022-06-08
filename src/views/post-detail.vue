@@ -15,7 +15,7 @@
               <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
             </div>
           </div>
-          <div class="mini-button-border join-button" @click="changeJoinCommunity()">
+          <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT" class="mini-button-border join-button" @click="changeJoinCommunity()">
             <div class="mini-button" v-if="postCommunity.data.isJoin">  Joined  </div>
             <div class="mini-button" v-else>  Join  </div>
           </div>
@@ -231,18 +231,10 @@ export default {
             accessKey: accessKey.accessKey
           }]
         }
-
-        // const task_transaction = {
-        //   receiverId: state.postDetail.receiverId,
-        //   actions: [{
-        //     methodName: "join",
-        //     args: {},
-        //     deposit: "20000000000000000000000",
-        //     gas: '300000000000000'
-        //   }]
-        // }
-        await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-        // state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+        const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+        if(result){
+          state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+        }
       }
     }
 
