@@ -764,7 +764,11 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             }
         });
         if(!has_selected){
-          state.postForm.access.push(item);
+          state.postForm.access.push({
+            icon: item.icon,
+            symbol: item.symbol,
+            tokenId: item.tokenId,
+          });
           state.searchValue = "";
           //usedTokenList
           let usedTokenList = JSON.parse(localStorage.getItem("usedTokenList")) || [];
