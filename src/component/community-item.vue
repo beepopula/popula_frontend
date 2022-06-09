@@ -8,11 +8,11 @@
         <img v-else  class="avatar" src="@/assets/images/test/community.png">
       </div>
       <div class="item-token item-token-multiple3">
-        <!--
+ 
         <img class="token-icon token-icon0" src="@/assets/images/test/token_icon1.png"/>
         <img class="token-icon token-icon1" src="@/assets/images/test/token_icon2.png"/>
         <img class="token-icon token-icon2" src="@/assets/images/test/token_icon3.png"/>
-        -->
+
       </div>
       <div class="name txt-wrap" v-html="name"></div>
       <!--createUser-->
@@ -137,7 +137,7 @@
     margin-top:20px;
     margin-right:20px;
     width: 335px;
-    height: 394px;
+    height: 392px;
     background: #28282D;
     border-radius: 24px;
     overflow: hidden;
@@ -150,7 +150,7 @@
     }
     .cover{
       width: 335px;
-      height: 150px;
+      height: 160px;
       object-fit: cover;
     }
     .avatar-border{
@@ -159,8 +159,8 @@
       background:#28282D;
       border-radius: 20px;
       position:absolute;
-      top:132px;
-      left:20px;
+      top:126px;
+      left:16px;
       display:flex;
       align-items: center;
       justify-content:center;
@@ -172,7 +172,7 @@
       }
     }
     .info{
-      padding:16px 20px 20px;
+      padding:20px;
       .item-token{
         height:30px;
         display:flex;
@@ -217,7 +217,7 @@
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
-        margin-top:36px;
+        margin-top:16px;
         line-height: 20px;
       }
       .creator{

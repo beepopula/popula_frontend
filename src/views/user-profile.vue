@@ -69,13 +69,13 @@
               <PostItem :item="item"/>
             </template>
           </template>
-          <div class="no-more" v-if="isEnd">
-            <div class="no-results"  v-if="list[currentTab]['length'] == 0">
-              <img src="@/assets/images/common/emoji-null.png"/>
-              No data
-            </div>
-            <template v-else>No more</template>
+        </div>
+        <div class="no-more" v-if="isEnd">
+          <div class="no-results"  v-if="list[currentTab]['length'] == 0">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No data
           </div>
+          <template v-else>No more</template>
         </div>
       </div>
       <!-- right -->
@@ -583,6 +583,12 @@
             }
           }
         }
+      }
+      .list{
+        background: #28282D;
+        border-radius: 24px;
+        padding:0 20px;
+        margin-top:20px;
       }
       .no-results{
         padding:80px 0;

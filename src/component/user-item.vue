@@ -113,10 +113,12 @@
 
 <style lang="scss" scoped>
   .user-item{
-    margin-top:20px;
-    padding: 20px;
+    padding: 20px 0;
     background: #28282D;
-    border-radius: 24px;
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
     cursor: pointer;
     .user-info{
       display:flex;

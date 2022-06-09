@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete">
+  <div class="comment-item-box" v-if="!isBlocked && !hasDelete">
     <div :class="['comment-item',from=='elastic-layer' ? 'layer-comment-item' : '']" @click.self="showCommentLayer()">
       <!-- user -->
       <div class="user" v-if="$props.item.data">
@@ -603,6 +603,12 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .comment-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
   .comment-item{
     background: #28282D;
     border-radius: 24px;

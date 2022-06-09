@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete">
+  <div class="comment-item-box" v-if="!isBlocked && !hasDelete">
     <div :class="['comment-item']" @click.self="showCommentLayer()">
       <!-- user -->
       <div class="user" v-if="$props.item.data">
@@ -86,19 +86,6 @@
         <div class="info-left">
           <!-- status-landlord -->
           <div class="status" v-if="commentCount>0">replyed</div>
-          <!-- hash -->
-          <el-popover placement="bottom-start"  trigger="hover">
-            <template #reference>
-              <div class="hash">hash</div>
-            </template>
-            <div class="pop-box pop-intro pop-hash">
-              <div class="title">Near TX</div>
-              <div class="hash-txt">
-                <a :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
-                <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
-              </div>
-            </div>
-          </el-popover>
           <!-- gas -->
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>
@@ -107,6 +94,18 @@
             <div class="pop-box pop-intro">
               <div class="title">Gas fee</div>
               <div class="intro">Total Gas Fee occurred on this post, signalling the extent of popularity.</div>
+            </div>
+          </el-popover>
+          <!-- hash -->
+          <el-popover placement="bottom-start"  trigger="hover">
+            <template #reference>
+              <a class="hash" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">Tx</a>
+            </template>
+            <div class="pop-box pop-intro pop-hash">
+              <div class="hash-txt">
+                <a class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
+                <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
+              </div>
             </div>
           </el-popover>
         </div>
@@ -578,11 +577,16 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .comment-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
   .comment-item{
     background: #28282D;
     border-radius: 24px;
-    padding:20px;
-    margin-top: 20px;
+    padding:20px 0;
     &.layer-comment-item{
       padding:20px 0;
     }
@@ -691,39 +695,36 @@ export default {
       .info-left{
         display:flex;
         .status{
-          margin-right:12px;
-          padding:0 10px;
+          margin-right:30px;
+          width:60px;
           height: 24px;
-          line-height: 22px;
-          border: 1px solid rgba(254,210,60,0.2);
-          border-radius: 4px;
+          background: #36363C;
+          border-radius: 12px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
           font-family: PingFangSC-Regular;
           font-size: 12px;
-          color: #FED23C;
-          letter-spacing: 0;
-          text-align: center;
-          font-weight: 400;
-        }
-        .hash{
-          width: 48px;
-          height: 24px;
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 4px;
-          font-family: D-DINExp;
-          font-size: 12px;
-          line-height: 22px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 400;
-          display:flex;
-          justify-content: center;
-          cursor: pointer;
-          &:hover{
-            border: 1px solid rgba(255,255,255,1);
-          }
         }
-        .gas{
-          margin-left:20px;
+        .hash{
+          margin-left:30px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          line-height:24px;
+          color: rgba(255,255,255,0.5);
+          letter-spacing: 0;
+          font-weight: 400;
+          padding-right:16px;
+          background:url("@/assets/images/post-item/icon-jump.png") no-repeat right center;
+          background-size:12px 12px;
+          &:hover{
+            color: rgba(255,255,255,1);
+            background:url("@/assets/images/post-item/icon-jump-hover.png") no-repeat right center;
+            background-size:12px 12px;
+          }
         }
       }
       .info-right{

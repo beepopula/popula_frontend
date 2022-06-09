@@ -1,9 +1,9 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete" :key="item.target_hash">
+  <div class="post-item-box" v-if="!isBlocked && !hasDelete" :key="item.target_hash">
     <div class="post-item" ref="txtBox">
       <div class="user">
         <!-- community -->
-        <template v-if="community.communityId && from!='communityDetail'">
+        <template v-if="community.communityId && from!='community'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
               <img v-if="community.avatar"  class="avatar avatar-community" :src="community.avatar">
@@ -799,12 +799,20 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .post-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
+
   .post-item{
-    margin-top:20px;
+    padding:20px 0;
+    margin-top:0;
     background: #28282D;
     border-radius: 24px;
-    padding:20px;
     cursor: pointer;
+    
     .user{
       height:40px;
       display:flex;

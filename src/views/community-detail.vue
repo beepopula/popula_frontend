@@ -78,9 +78,11 @@
             <div class="unread-count" v-if="postCount.new">{{postCount.new}}</div>
           </div>
         </div>
-        <template v-for="item in postList[currentTab]">
-          <PostItem :item="item" :from="'communityDetail'"/>
-        </template>
+        <div class="post-list">
+          <template v-for="item in postList[currentTab]">
+            <PostItem :item="item" :from="'community'"/>
+          </template>
+        </div>
 
         <div class="no-more" v-if="isEnd">
           <template v-if="postList[currentTab]['length'] == 0">No posts</template>
@@ -1003,6 +1005,14 @@
   }
 
   .main-post{
+    .left{
+      .post-list{
+        background: #28282D;
+        border-radius: 24px;
+        padding:0 20px;
+        margin-top:20px;
+      }
+    }
     .right{
       .members{
         width: 320px;
@@ -1649,6 +1659,12 @@
       color: #FFFFFF;
       letter-spacing: 0;
       font-weight: 700;
+    }
+    .all-members-list{
+      background: #28282D;
+      border-radius: 24px;
+      padding:0 20px;
+      margin-top:20px;
     }
   }
 </style>

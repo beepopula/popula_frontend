@@ -332,7 +332,7 @@ export default {
         border:0;
       }
       .comment-item{
-        padding:30px 0;
+        padding:20px 0;
         border-bottom:1px solid rgba(255,255,255,0.1);
         cursor: pointer;
         .user{
@@ -412,7 +412,7 @@ export default {
       }
       .like-item,.follow-item{
         border-bottom:1px solid rgba(255,255,255,0.1);
-        padding: 30px 0 30px 60px;
+        padding: 20px 0 20px 60px;
         background:url('@/assets/images/notice/icon-like.png') no-repeat left 30px;
         background-size:40px 40px;
         cursor: pointer;

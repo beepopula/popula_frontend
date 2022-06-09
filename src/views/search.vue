@@ -307,7 +307,11 @@ export default {
       flex-wrap:wrap;
     }
     .post-list,.user-list{
-      padding-right:20px;
+      margin-right:20px;
+      background: #28282D;
+      border-radius: 24px;
+      padding:0 20px;
+      margin-top:20px;
     }
 
     .no-results{
