@@ -1236,15 +1236,15 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         }
         .div-input{
           padding-right:14px;
-          padding-bottom:0;
+          padding-bottom:20px;
         }
         .image-item{
-          margin-top:35px;
-          margin-bottom: 0;
+          margin-top:15px;
+          margin-bottom: 20px;
         }
         :deep(.el-textarea){
-          height:59px;
-          padding:35px 20px 0 0;
+          height:39px;
+          padding:15px 20px 0 0;
         }
       }
     }

@@ -1,6 +1,6 @@
 <template>
   <div class="post-item-box" v-if="!isBlocked && !hasDelete" :key="item.target_hash">
-    <div class="post-item" ref="txtBox">
+    <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox">
       <div class="user">
         <!-- community -->
         <template v-if="community.communityId && from!='community'">
@@ -812,7 +812,9 @@ export default {
     background: #28282D;
     border-radius: 24px;
     cursor: pointer;
-    
+    &.post-item-detail{
+      cursor: default;
+    }
     .user{
       height:40px;
       display:flex;
@@ -850,6 +852,7 @@ export default {
           display:flex;
           align-items: center;
           width:300px;
+          cursor: pointer;
           .username{
             color: rgba(255,255,255,1);
             display:flex;

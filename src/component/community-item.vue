@@ -8,11 +8,11 @@
         <img v-else  class="avatar" src="@/assets/images/test/community.png">
       </div>
       <div class="item-token item-token-multiple3">
- 
+        <!--
         <img class="token-icon token-icon0" src="@/assets/images/test/token_icon1.png"/>
         <img class="token-icon token-icon1" src="@/assets/images/test/token_icon2.png"/>
         <img class="token-icon token-icon2" src="@/assets/images/test/token_icon3.png"/>
-
+        -->
       </div>
       <div class="name txt-wrap" v-html="name"></div>
       <!--createUser-->
@@ -137,6 +137,7 @@
     margin-top:20px;
     margin-right:20px;
     width: 335px;
+    max-width:100%;
     height: 392px;
     background: #28282D;
     border-radius: 24px;
@@ -149,7 +150,7 @@
       transform:translateX(-1px);
     }
     .cover{
-      width: 335px;
+      width: 100%;
       height: 160px;
       object-fit: cover;
     }
