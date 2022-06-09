@@ -1,7 +1,11 @@
 <template>
   <div class="main-box">
-    <img v-if="detail.cover" class="bg" :src="detail.cover"/>
-    <img v-else class="bg" src="@/assets/images/community/bg.png"/>
+    <div v-if="detail.cover" class="bg-box" :style="'background-image:url('+detail.cover+');'">
+      <div class="bg-mask"></div>
+    </div>
+    <div v-else class="bg-box">
+      <div class="bg-mask"></div>
+    </div>
     <!-- Community info  -->
     <div class="community-info" v-if="detail.data">
       <div class="info-box">
@@ -777,16 +781,23 @@
 
 <style lang="scss" scoped>
   .main-box{
-    padding-top:150px;
+    padding-top:220px;
     position:relative;
-    .bg{
-      position:absolute;
-      top:0;
-      left:0;
-      width:100%;
+    .bg-box{
+      position: absolute;
+      top:80px;
+      left:50%;
+      width:100vw;
       height:300px;
-      object-fit: cover;
-      opacity: 0.36;
+      background:url('@/assets/images/community/bg.png') no-repeat center center;
+      background-size:cover;
+      transform:translateX(-50%);
+      .bg-mask{
+        width:100%;
+        height:100%;
+        background:url('@/assets/images/community/bg-mask.png') no-repeat center bottom;
+        background-size:cover;
+      }
     }
     .community-info{
       width: 1040px;
