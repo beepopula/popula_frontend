@@ -1,7 +1,59 @@
 <template>
   <div :class="['comment',from == 'list' ? 'comment-reply' : '']">
     <!-- text -->
-    <el-input ref="commentInput" v-model="text" @focus="checkLogin()" rows="1"  :autosize="true"  placeholder="Add a comment." maxlength="300"  type="textarea" :show-word-limit="text.trim().length>0" />
+    <div class="input-box">
+      <div
+        class="div-input"
+        ref="commentInput"
+        contenteditable
+        @keydown.capture="onCheck"
+        @keyup.capture="onChange"
+        @focus="checkLogin"
+        @click="onClick"
+      />
+      <div v-if="!text" class="placeholder">Add a comment.</div>
+      <div class="pop-user-box">
+        <div v-show="showUserList" ref="popUser" class="user-list">
+          <div class="loading-box" v-if="isLoaingUserList">
+            <img class="white-loading" src="@/assets/images/common/loading.png"/>
+          </div>
+          <template v-else-if="userList.length>0">
+            <template v-for="user in userList">
+                <template v-if="user.data">
+                  <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
+                    <template #reference>
+                      <div class="user-item" @click="onSelectSubmit(user)">
+                        <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                        <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                        <div class="user-info">
+                          <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                          <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                        </div>
+                      </div>
+                    </template>
+                    <template v-if="user.showCreateUser">
+                      <UserPopup :account="user.account_id" @login="showLogin=true"/>
+                    </template>
+                  </el-popover>
+                </template>
+                <template v-else>
+                  <div class="user-item" @click="onSelectSubmit(user)">
+                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                    <div class="user-info">
+                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                    </div>
+                  </div>
+                </template>
+            </template>
+          </template>
+          <div v-else class="nobody">Nobody yet.</div>
+        </div>
+      </div>
+
+      <el-input v-model="text" @focus="checkLogin()" rows="1"  :autosize="true"  placeholder="Add a comment." maxlength="300"  type="textarea" :show-word-limit="text.trim().length>0" />
+    </div>
     <!-- avatar -->
     <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
     <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
@@ -47,6 +99,7 @@ import { useStore } from 'vuex';
 import MainContract from "@/contract/MainContract";
 import CommunityContract from "@/contract/CommunityContract";
 import EncryptionContract from "@/contract/EncryptionContract";
+import UserPopup from '@/component/user-popup.vue';
 import LoginMask from "@/component/login-mask.vue";
 import DiscordPicker from 'vue3-discordpicker';
 export default {
@@ -73,6 +126,7 @@ export default {
     }
   },
   components: {
+    UserPopup,
     LoginMask,
     DiscordPicker
   },
@@ -88,6 +142,14 @@ export default {
       targetHash: props.targetHash,
       showNotice:false,
       showLogin:false,
+
+      focusNode:null,
+      focusOffset:null,
+      start_index:null,
+      end_index:null,
+      isLoaingUserList:false,
+      showUserList:false,
+      userList:[],
     })
 
     const commentInput = ref()
@@ -104,6 +166,128 @@ export default {
         commentInput.value.focus()
       }
     }
+    //@
+    const onCheck = (e) => {
+      if(commentInput.value.textContent.length>=300 && e.key != 'Backspace'){
+        e.preventDefault();
+      }
+    }
+    const onClick = () => {
+      const selection = window.getSelection()
+      state.focusNode = selection.focusNode;
+      state.focusOffset = selection.focusOffset;
+      state.start_index = selection.focusOffset;
+    }
+    const onChange = async (e) => {
+      const selection = window.getSelection()
+      const text = selection.extentNode.nodeValue;
+      state.text = commentInput.value.textContent;
+      state.focusNode = selection.focusNode;
+      state.focusOffset = selection.focusOffset;
+      let start = Math.max(selection.focusOffset-21,0);
+      let start_index = null;
+
+      for(let i = selection.focusOffset-1;i>=start;i--){
+        if(text.substring(i,i+1)=="@"){
+          start_index = i;
+          break;
+        }
+        if(i!=selection.focusOffset-1 && !(text[i].trim())){
+          break;
+        }
+      }
+      
+
+      if(start_index!==null){
+        let end = Math.min(start_index+21,text.length);
+        let end_index = end;
+        const start = Math.max(selection.focusOffset-1,0)
+        for(let j = start;j<end;j++){
+          if(text[j]==" " || text[j]=="@"){
+            end_index = j;
+            break;
+          }
+        }
+        const str = text.substring(start_index+1,end_index).trim();
+        if(str.length>2){
+          state.focusNode = selection.focusNode;
+          state.start_index = start_index;
+          state.end_index = end_index;
+          debounceInput(str);
+        }else{
+          state.showUserList = false;
+        }
+      }else{
+        state.start_index = selection.focusOffset;
+        state.showUserList = false;
+      }
+    }
+
+    //selectUser @
+    const searchUser = async (str) => {
+      state.showUserList = true;
+      state.isLoaingUserList = true;
+      const res = await proxy.$axios.post.at({
+        accountId:str,
+      });
+      if(res.success){
+        const list = [];
+        const len = Math.min(res.data.length,5)
+        for(let i =0;i<len;i++){
+          const user = await proxy.$axios.profile.get_user_info({
+            accountId:res.data[i]['account_id'],
+            currentAccountId: store.getters.accountId || ''
+          });
+          if(user.success){
+            list.push(user.data);
+            // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
+          }else{
+            list.push({account_id:res.data[i]['account_id']});
+          }
+        }
+        state.userList = list;
+      }
+      // console.log("1111111");
+      state.isLoaingUserList = false;
+    }
+    const debounce = (fn, delay) => {
+      let timeout;
+      return function(){
+        clearTimeout(timeout)
+        timeout = setTimeout(()=>{
+          fn.apply(this, arguments)
+        },delay)
+      }
+    }
+    const debounceInput = debounce(searchUser, 300);
+    const onSelectSubmit = (item) => {
+      let selection = window.getSelection();
+      let range = window.getSelection().getRangeAt(0);
+      
+      range.setStart(state.focusNode, state.start_index);
+      range.setEnd(state.focusNode, state.end_index);
+
+      range.deleteContents();
+
+      var spanNode1= document.createElement('span');
+      var spanNode2 = document.createElement('span');
+      spanNode1.className = 'atFont';
+      spanNode1.style="color:#FED23C;";
+      spanNode1.innerHTML = '@' + item.account_id;
+      spanNode1.contentEditable = false;
+      spanNode2.innerHTML = '&nbsp;';
+      var frag = document.createDocumentFragment(),
+        node,
+        lastNode;
+      frag.appendChild(spanNode1);
+      while ((node = spanNode2.firstChild)) {
+        lastNode = frag.appendChild(node);
+      }
+      range.insertNode(frag);
+      selection.extend(lastNode, 1);
+      selection.collapseToEnd();
+      state.showUserList = false;
+    }
 
     //checkLogin
     const checkLogin = () => {
@@ -118,15 +302,40 @@ export default {
 
     //emoji
     const setEmoji = (emoji) => {
-      const selection = commentInput.value.$el.getElementsByTagName('textarea')[0].selectionStart;
-      const left = state.text.substring(0,selection);
-      const right = state.text.substring(selection);
-      console.log(left,emoji,right,);
-      state.text = left + emoji + " " + right;
-      // state.text = state.text + emoji + " ";;
+      // const selection = commentInput.value.$el.getElementsByTagName('textarea')[0].selectionStart;
+      // const left = state.text.substring(0,selection);
+      // const right = state.text.substring(selection);
+      // console.log(left,emoji,right,);
+      // state.text = left + emoji + " " + right;
+
+      if(checkLogin()){
+        if(commentInput.value.textContent && state.focusNode && state.focusNode.insertData){
+          let selection = window.getSelection();
+          let range = selection.getRangeAt(0);
+          const container = state.focusNode; 
+          const pos = state.start_index;
+          //insert
+          range = document.createRange(); 
+          var cons = window.document.createTextNode(emoji); 
+          container.insertData(pos, cons.nodeValue); 
+          range.setEnd(container, pos + cons.nodeValue.length); 
+          range.setStart(container, pos + cons.nodeValue.length); 
+          state.start_index = pos + cons.nodeValue.length;
+
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }else{
+          commentInput.value.innerHTML = commentInput.value.innerHTML + emoji;
+        }
+        state.text = commentInput.value.textContent;
+
+        // selection.addRange(range); 
+        // selection.collapseToEnd();
+      }
     }
     const setGif = (gif) => {
-      state.text = state.text + emoji;
+      state.text = state.text + gif;
     }
 
     const confirmReply = () => {
@@ -155,8 +364,16 @@ export default {
     }
 
     const publicReply = async () => {
+      const options = [];
+      if(commentInput.value.innerHTML){
+        const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
+        let r= '';
+        while ((r= reg.exec(commentInput.value.innerHTML)) != null) {
+          options.push({At:r[1].trim().substring(1)});
+        }
+      }
       const params = {   
-        args:JSON.stringify({text: state.text}), 
+        args:JSON.stringify({text: commentInput.value.innerHTML,options}), 
         target_hash: state.targetHash,
       }
 
@@ -206,12 +423,22 @@ export default {
           message: "Comment Success",
           type: "success",
         });
+        resetInfo()
       } else {
         proxy.$Message({
           message: "Oops,something went wrong. Please try again or submit a report.",
           type: "error",
         });
       }
+    }
+
+    const resetInfo = () => {
+      commentInput.value.innerHTML = "";
+      state.text = "";
+      state.focusNode = null;
+      state.focusOffset = null;
+      state.start_index = null;
+      state.end_index = null;
     }
 
     //LoginMask
@@ -226,6 +453,10 @@ export default {
       ...toRefs(state),
       commentInput,
       init,
+      onCheck,
+      onClick,
+      onChange,
+      onSelectSubmit,
       checkLogin,
       setEmoji,
       setGif,
@@ -265,14 +496,134 @@ export default {
       left:20px;
     }
   }
+  .input-box{
+    position: relative;
+    background: #36363C;
+    border-radius: 10px;
+  }
+  .div-input{
+    position: relative;
+    z-index: 3;
+    font-family: D-DINExp;
+    font-size: 16px;
+    line-height:24px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    font-weight: 400;
+    border:0;
+    -webkit-user-modify: read-write-plaintext-only;
+    padding:20px 14px 40px 56px;
+  }s
+  .atFont{
+    font-family: D-DINExp;
+    font-size: 16px;
+    color: #FED23C;
+    letter-spacing: 0;
+    text-align: justify;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  .placeholder{
+    position:absolute;
+    top:20px;
+    left:56px;
+    opacity: 0.2;
+    font-family: D-DINExp;
+    font-size: 14px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    font-weight: 400;
+    line-height:24px;
+    z-index:1;
+  }
+  .pop-user-box{
+    position:relative;
+    top:-40px;
+    left:20px;
+    .user-list{
+      position:absolute;
+      top:0;
+      left:0;
+      z-index:20;
+      background: #000000;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0px 2px 30px 0px rgba(0,0,0,0.5);
+      border-radius: 10px;
+      width:200px;
+      .loading-box{
+        height:50px;
+        display:flex;
+        align-items: center;
+        justify-content:center;
+      }
+      .nobody{
+        height:50px;
+        display:flex;
+        align-items: center;
+        justify-content:center;
+        opacity: 0.5;
+        font-family: D-DINExp;
+        font-size: 14px;
+        color: #FFFFFF;
+        letter-spacing: 0;
+        text-align: center;
+        line-height: 14px;
+        font-weight: 400;
+      }
+      .user-item{
+        height:50px;
+        display:flex;
+        align-items: center;
+        padding:0 20px;
+        cursor:pointer;
+        &:hover{
+          background: rgba(40,40,45,0.5);
+        }
+        .user-avatar{
+          width:30px;
+          height:30px;
+          border-radius:50%;
+        }
+        .user-info{
+          margin-left:10px;
+          .user-name{
+            font-family: D-DINExp-Bold;
+            font-size: 14px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            line-height: 14px;
+            font-weight: 700;
+            width:90px;
+          }
+          .user-account{
+            margin-top:2px;
+            opacity: 0.5;
+            font-family: D-DINExp;
+            font-size: 14px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            line-height: 14px;
+            font-weight: 400;
+            width:90px;
+          }
+        }
+      }
+    }
+  }
   :deep(.el-textarea){
     border-radius: 10px;
-    background: #36363C;
+    background: transparent;
     max-height:30vh;
     overflow-y:scroll;
+    position:absolute;
+    width:55px;
+    height:20px;
+    bottom:15px;
+    right:15px;
     textarea{
+      display:none;
       background: transparent;
-      padding:20px 14px 20px 56px;
+      padding-right:14px;
       font-family: D-DINExp;
       font-size: 16px;
       line-height:20px;
@@ -292,8 +643,9 @@ export default {
       color: #FFFFFF;
       letter-spacing: 0;
       font-weight: 700;
-      bottom:15px;
-      right:15px;
+      display:inline;
+      right:0;
+      bottom:0;
     }
   }
   .avatar{

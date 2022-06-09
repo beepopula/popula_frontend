@@ -21,33 +21,33 @@
             </div>
             <template v-else-if="userList.length>0">
               <template v-for="user in userList">
-                  <template v-if="user.outer">
-                    <div class="user-item" @click="onSelectSubmit(user)">
-                      <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                      <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                      <div class="user-info">
-                        <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                        <div class="user-account  txt-wrap">{{user.account_id}}</div>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
-                      <template #reference>
-                        <div class="user-item" @click="onSelectSubmit(user)">
-                          <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                          <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                          <div class="user-info">
-                            <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                            <div class="user-account  txt-wrap">{{user.account_id}}</div>
-                          </div>
+                <template v-if="user.data">
+                  <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
+                    <template #reference>
+                      <div class="user-item" @click="onSelectSubmit(user)">
+                        <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                        <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                        <div class="user-info">
+                          <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                          <div class="user-account  txt-wrap">{{user.account_id}}</div>
                         </div>
-                      </template>
-                      <template v-if="user.showCreateUser">
-                        <UserPopup :account="user.account_id" @login="showLogin=true"/>
-                      </template>
-                    </el-popover>
-                  </template>
+                      </div>
+                    </template>
+                    <template v-if="user.showCreateUser">
+                      <UserPopup :account="user.account_id" @login="showLogin=true"/>
+                    </template>
+                  </el-popover>
+                </template>
+                <template v-else>
+                  <div class="user-item" @click="onSelectSubmit(user)">
+                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                    <div class="user-info">
+                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                    </div>
+                  </div>
+                </template>
               </template>
             </template>
             <div v-else class="nobody">Nobody yet.</div>
@@ -439,7 +439,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           e.preventDefault();
         }
       }
-
       const onClick = () => {
         const selection = window.getSelection()
         state.focusNode = selection.focusNode;
@@ -512,14 +511,13 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
               list.push(user.data);
               // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
             }else{
-              list.push({account_id:res.data[i]['account_id'],outer:true});
+              list.push({account_id:res.data[i]['account_id']});
             }
           }
           state.userList = list;
           state.isLoaingUserList = false;
         }
       }
-
       const debounce = (fn, delay) => {
         let timeout;
         return function(){
@@ -530,7 +528,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         }
       }
       const debounceInput = debounce(searchUser, 300)
-
       const onSelectSubmit = (item) => {
         let selection = window.getSelection();
         let range = window.getSelection().getRangeAt(0);
@@ -636,7 +633,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //emoji
       const setEmoji = (emoji) => {
         if(checkLogin()){
-          if(postInput.value.textContent && state.focusNode){
+          if(postInput.value.textContent && state.focusNode && state.focusNode.insertData){
             let selection = window.getSelection();
             let range = selection.getRangeAt(0);
             const container = state.focusNode; 
@@ -662,7 +659,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         }
       }
       const setGif = (gif) => {
-        state.postForm.text = state.postForm.text + emoji;
+        state.postForm.text = state.postForm.text + gif;
       }
 
       //showCommunityBox
