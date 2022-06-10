@@ -786,12 +786,11 @@
     .bg-box{
       position: absolute;
       top:80px;
-      left:50%;
+      left:0;
       width:100vw;
       height:300px;
       background:url('@/assets/images/community/bg.png') no-repeat center center;
       background-size:cover;
-      transform:translateX(-50%);
       .bg-mask{
         width:100%;
         height:100%;

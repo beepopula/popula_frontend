@@ -360,16 +360,7 @@ export default {
         return;
       }
       proxy.$Loading.showLoading({title: "Loading"});
-      if(props.methodName == "add_encrypt_post"){
-        await encryptReply();
-      }else{
-        await publicReply();
-      }
-      proxy.$Loading.hideLoading();
-      emit("comment");
-    }
-
-    const publicReply = async () => {
+      //options
       const options = [];
       if(commentInput.value.innerHTML){
         const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
@@ -378,6 +369,17 @@ export default {
           options.push({At:r[1].trim().substring(1)});
         }
       }
+      //submit
+      if(props.methodName == "add_encrypt_post"){
+        await encryptReply(options);
+      }else{
+        await publicReply(options);
+      }
+      proxy.$Loading.hideLoading();
+      emit("comment");
+    }
+
+    const publicReply = async (options) => {
       const params = {   
         args:JSON.stringify({text: commentInput.value.innerHTML,options}), 
         target_hash: state.targetHash,
@@ -393,7 +395,7 @@ export default {
       handleSuccess(result);
     }
 
-    const encryptReply = async () => {
+    const encryptReply = async (options) => {
       //encrypt
       const param1 = {
         plain_text:{
@@ -408,6 +410,7 @@ export default {
         text_sign:res.text_sign,
         contract_id_sign:res.contract_id_sign,
         target_hash: props.targetHash,
+        options
       }
 
       let result = {}
@@ -494,9 +497,12 @@ export default {
   &.comment-reply{
     width:650px;
     padding:20px 0 0 0;
+    .input-box{
+      background: #111113;
+    }
     :deep(.el-textarea){
       border-radius: 10px;
-      background: #111113;
+      background: transparent;
     }
     .avatar{
       left:20px;

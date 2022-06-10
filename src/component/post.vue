@@ -914,15 +914,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           return;
         }
         proxy.$Loading.showLoading({title: "Loading"});
-        if(state.postForm.access.length>0){
-          await handleBlur();
-          await encryptPost();
-        }else{
-          await publicPost();
-        }
-      }
-
-      const publicPost = async () => {
+        //options
         const options = [];
         if(postInput.value.innerHTML){
           const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
@@ -931,6 +923,16 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             options.push({At:r[1].trim().substring(1)});
           }
         }
+        //submit
+        if(state.postForm.access.length>0){
+          await handleBlur();
+          await encryptPost(options);
+        }else{
+          await publicPost(options);
+        }
+      }
+
+      const publicPost = async (options) => {
         const params = {   
           args:JSON.stringify({
             text:postInput.value.innerHTML,
@@ -948,7 +950,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         handleSuccess(result);
       }
 
-      const encryptPost = async (param) => {
+      const encryptPost = async (options) => {
         //encrypt
         // const conditions = [{
         //   FTCondition:{
@@ -990,7 +992,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           access,
           text_sign:res.text_sign,
           contract_id_sign:res.contract_id_sign,
-          blur_imgs:[...state.postForm.blur_imgs]
+          blur_imgs:[...state.postForm.blur_imgs],
+          options
         }
         
         let result = {}
