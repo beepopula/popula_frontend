@@ -11,12 +11,15 @@ export default class MainContract{
         viewMethods: [
         ],
         changeMethods: [
+            'add_content',
+            'add_encrypt_content',
             'add_post',
             'add_comment',
             'follow',
             'unfollow',
             'like',
-            'unlike'
+            'unlike',
+            'report'
         ]  // mint
     }
 
@@ -34,6 +37,16 @@ export default class MainContract{
     }
 
 
+    async addContent(param,account) {
+        const transaction = {
+            methodName: "add_content",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        };
+        return await this._signAndSendTransaction(transaction)
+    }
+
     async addPost(param,account) {
         const transaction = {
             methodName: "add_post",
@@ -47,6 +60,16 @@ export default class MainContract{
     async addComment(param,account) {
         const transaction = {
             methodName: "add_comment",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
+    }
+
+    async addEncryptContent(param) {
+        const transaction = {
+            methodName: "add_encrypt_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
@@ -88,6 +111,10 @@ export default class MainContract{
 
     async unlike(param){
         return await this.contract.unlike(param)
+    }
+
+    async report(param){
+        return await this.contract.report(param)
     }
 
     constructor(account){

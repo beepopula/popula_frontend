@@ -84,14 +84,25 @@
             return;
           }
           if(state.isLiking) {
-            return
+            return;
           }
           state.isLiking = true;
-          if(state.communityId){
-            const communityContract = await CommunityContract.new(state.communityId);
-            const res = state.isLiked ? await communityContract.unlike({target_hash:state.targetHash}) : await communityContract.like({target_hash:state.targetHash}) 
-          }else{
-            const res = state.isLiked ? await mainContract.unlike({target_hash:state.targetHash}) : await mainContract.like({target_hash:state.targetHash})
+          try{
+            if(state.communityId){
+              const communityContract = await CommunityContract.new(state.communityId);
+              const res = state.isLiked ? await communityContract.unlike({target_hash:state.targetHash}) : await communityContract.like({target_hash:state.targetHash}) 
+            }else{
+              const res = state.isLiked ? await mainContract.unlike({target_hash:state.targetHash}) : await mainContract.like({target_hash:state.targetHash})
+            }
+          }catch(e){
+            state.isLiking = false;
+            const message = state.isLiked ? 'Unlike Failed' : 'Like Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log("like error:"+e);
+            return;
           }
           state.likeCount = state.isLiked ? Number(state.likeCount)-1 : Number(state.likeCount)+1;
           state.likeActive = true;
@@ -100,17 +111,6 @@
             state.isLiked  = !state.isLiked;
             state.isLiking = false;
           },400)
-          // if(!state.isLiked){
-          //   state.likeActive = true;
-          //   setTimeout(()=>{
-          //     state.likeActive = false;
-          //     state.isLiked  = !state.isLiked;
-          //     state.isLiking = false;
-          //   },500)
-          // }else{
-          //   state.isLiked  = !state.isLiked;
-          //   state.isLiking = false;
-          // }
         }else{
           state.showLogin = true
         }

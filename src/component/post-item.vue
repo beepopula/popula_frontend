@@ -305,6 +305,7 @@
 import { ref, reactive, toRefs , nextTick, watch, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import MainContract from "@/contract/MainContract";
 import NftContract from "@/contract/NftContract";
 import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, parseAmount, checkCondition, getTimer} from "@/utils/util.js";
@@ -347,6 +348,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
+    const mainContract = new MainContract(store.state.account);
     const nftContract = new NftContract(store.state.account);
     const encryptionContract = new EncryptionContract(store.state.account);
 
@@ -726,6 +728,20 @@ export default {
     }
     const report = async () => {
       if(checkLogin()){
+        // try{
+        //   const result = await mainContract.report({target_hash:props.item.target_hash});
+        // }catch(e){
+        //   console.log("report error:"+e);
+        //   proxy.$Message({
+        //     message: "Report Failed",
+        //     type: "error",
+        //   });
+        //   return;
+        // }
+        // proxy.$Message({
+        //   message: "report success",
+        //   type: "success",
+        // });
         const res = await proxy.$axios.post.report({
           postId:props.item.target_hash,
           accountId:store.getters.accountId || ''
@@ -736,6 +752,7 @@ export default {
             type: "success",
           });
         }
+
       }
     }
     const block = async () => {

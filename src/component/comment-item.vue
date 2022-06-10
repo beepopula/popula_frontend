@@ -533,6 +533,20 @@ export default {
     }
     const report = async () => {
       if(checkLogin()){
+        // try{
+        //   const result = await mainContract.report({target_hash:props.item.target_hash});
+        // }catch(e){
+        //   console.log("report error:"+e);
+        //   proxy.$Message({
+        //     message: "Report Failed",
+        //     type: "error",
+        //   });
+        //   return;
+        // }
+        // proxy.$Message({
+        //   message: "report success",
+        //   type: "success",
+        // });
         const res = await proxy.$axios.post.report({
           commentId:props.item.target_hash,
           accountId:store.getters.accountId || ''

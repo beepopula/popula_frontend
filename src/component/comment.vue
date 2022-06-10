@@ -109,6 +109,10 @@ export default {
       type:String,
       value:""
     },
+    hierarchies:{
+      type:Object,
+      value:null
+    },
     targetHash:{
       type:String,
       value:""
@@ -360,28 +364,57 @@ export default {
         return;
       }
       proxy.$Loading.showLoading({title: "Loading"});
-      //options
-      const options = [];
-      if(commentInput.value.innerHTML){
-        const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
-        let r= '';
-        while ((r= reg.exec(commentInput.value.innerHTML)) != null) {
-          options.push({At:r[1].trim().substring(1)});
+
+      try{
+        let hierarchies = null;
+        //hierarchies
+        if(props.hierarchies && props.hierarchies.post_id){
+          if(props.hierarchies.comment_id){//level>2
+            hierarchies = {...props.hierarchies} 
+          }else{//level 2
+            hierarchies = {
+              post_id : props.hierarchies.post_id,
+              comment_id : props.targetHash
+            }
+          }
+        }else{//level 1
+          hierarchies = {post_id: props.targetHash}  
         }
+
+        //options
+        const options = [];
+        if(commentInput.value.innerHTML){
+          const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
+          let r= '';
+          while ((r= reg.exec(commentInput.value.innerHTML)) != null) {
+            options.push({At:r[1].trim().substring(1)});
+          }
+        }
+        //submit
+        if(props.methodName == "add_encrypt_post"){
+          await encryptReply(hierarchies,options);
+        }else{
+          await publicReply(hierarchies,options);
+        }
+      }catch(e){
+        proxy.$Loading.hideLoading();
+        proxy.$Message({
+          message: "Reply Failed",
+          type: "error",
+        });
+        console.log("reply error:"+e);
+        return;
       }
-      //submit
-      if(props.methodName == "add_encrypt_post"){
-        await encryptReply(options);
-      }else{
-        await publicReply(options);
-      }
+
       proxy.$Loading.hideLoading();
       emit("comment");
     }
 
-    const publicReply = async (options) => {
+    const publicReply = async (hierarchies,options) => {
       const params = {   
-        args:JSON.stringify({text: commentInput.value.innerHTML,options}), 
+        args:JSON.stringify({text: commentInput.value.innerHTML}), 
+        hierarchies,
+        options,
         target_hash: state.targetHash,
       }
 

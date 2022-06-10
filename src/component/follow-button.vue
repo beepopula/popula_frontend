@@ -114,7 +114,18 @@
             return;
           }
           state.isFollowing = true;
-          const res = state.isFollowed ? await mainContract.unfollow({account_id:props.accountId}) : await mainContract.follow({account_id:props.accountId})
+          try{
+            const res = state.isFollowed ? await mainContract.unfollow({account_id:props.accountId}) : await mainContract.follow({account_id:props.accountId})
+          }catch(e){
+            state.isFollowing = false;
+            const message = state.isFollowed ? 'Unfollow Failed' : 'Follow Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log("follow error:"+e);
+            return;
+          }
           state.isFollowed  = !state.isFollowed;
           state.isFollowing = false;
           emit('follow',{

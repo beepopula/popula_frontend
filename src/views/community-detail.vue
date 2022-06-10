@@ -557,29 +557,38 @@
         if(!store.getters.isLogin){
           state.showLogin = true
         }else{
-          const method = state.detail.data.isJoin ? 'quit' : 'join';
-          const taskTransaction = {
-            receiverId: route.params.id,
-            actions: [{
-              kind: "functionCall",
-              methodName: method,
-              args: {},
-              deposit: "20000000000000000000000",
-              gas: getGas().toString()
-            }]
-          }
-          const accessKey = await generateAccessKey(store.getters.accountId, route.params.id)
-          const accessKeyTransaction = {
-            receiverId: store.getters.accountId,
-            actions: [{
-              kind: "addKey",
-              publicKey: accessKey.publicKey,
-              accessKey: accessKey.accessKey
-            }]
-          }
-          const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          if(result){
-            state.detail.data.isJoin = !state.detail.data.isJoin;
+          try{
+            const method = state.detail.data.isJoin ? 'quit' : 'join';
+            const taskTransaction = {
+              receiverId: route.params.id,
+              actions: [{
+                kind: "functionCall",
+                methodName: method,
+                args: {},
+                deposit: "20000000000000000000000",
+                gas: getGas().toString()
+              }]
+            }
+            const accessKey = await generateAccessKey(store.getters.accountId, route.params.id)
+            const accessKeyTransaction = {
+              receiverId: store.getters.accountId,
+              actions: [{
+                kind: "addKey",
+                publicKey: accessKey.publicKey,
+                accessKey: accessKey.accessKey
+              }]
+            }
+            const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+            if(result){
+              state.detail.data.isJoin = !state.detail.data.isJoin;
+            }
+          }catch(e){
+            const message = state.detail.data.isJoin ? 'Quit Failed' : 'Join Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log(message+" error:"+e);
           }
         }
       }
@@ -610,7 +619,6 @@
       //getPosts
       const getPosts = async () => {
         state.isLoading = true;
-        console.log("33333333");
         const res = await proxy.$axios.post.get_post_list({
           type: state.currentTab,
           page:state.page,
