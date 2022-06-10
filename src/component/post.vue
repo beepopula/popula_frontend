@@ -554,6 +554,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         range.insertNode(frag);
         selection.extend(lastNode, 1);
         selection.collapseToEnd();
+        //reset
+        const sel = window.getSelection();
+        state.focusNode = sel.focusNode;
+        state.focusOffset = sel.focusOffset;
         state.showUserList = false;
       }
 
@@ -637,14 +641,14 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             let selection = window.getSelection();
             let range = selection.getRangeAt(0);
             const container = state.focusNode; 
-            const pos = state.start_index;
+            const pos = state.focusOffset;
             //insert
             range = document.createRange(); 
             var cons = window.document.createTextNode(emoji); 
             container.insertData(pos, cons.nodeValue); 
             range.setEnd(container, pos + cons.nodeValue.length); 
             range.setStart(container, pos + cons.nodeValue.length); 
-            state.start_index = pos + cons.nodeValue.length;
+            state.focusOffset = pos + cons.nodeValue.length;
 
             range.collapse(false);
             selection.removeAllRanges();

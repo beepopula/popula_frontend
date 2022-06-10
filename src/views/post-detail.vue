@@ -53,7 +53,7 @@
           </div>
           <div class="all-comments">
             <template v-for="item in comments[currentTab]">
-              <CommentItem :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
+              <CommentItem :level="1" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
             </template>
           </div>
 
@@ -254,7 +254,7 @@ export default {
       closeSuspendLayer();
       state.commentCount += 1;
       setTimeout(()=>{
-        changeTab(state.newTab);
+        changeTab('new');
       },1000);
     }
 

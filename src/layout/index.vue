@@ -484,9 +484,11 @@ export default {
     background: rgba(0,0,0,1);
     z-index:99;
     .layer-content{
+      overflow-x:hidden;
       overflow-y:scroll;
       padding:60px 10px 60px 0;
       max-height:100vh;
+      width:100%;
     }
     .edit-button{
       width: 50px;

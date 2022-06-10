@@ -1,7 +1,7 @@
 <template>
   <div :class="['comment',from == 'list' ? 'comment-reply' : '']">
     <!-- text -->
-    <div class="input-box">
+    <div :class="['input-box',text.trim().length>0 ? '' :'input-box-empty']">
       <div
         class="div-input"
         ref="commentInput"
@@ -52,12 +52,6 @@
         </div>
       </div>
 
-      <el-input v-model="text" @focus="checkLogin()" rows="1"  :autosize="true"  placeholder="Add a comment." maxlength="300"  type="textarea" :show-word-limit="text.trim().length>0" />
-    </div>
-    <!-- avatar -->
-    <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
-    <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
-    <div class="edit">
       <!-- emoji -->
       <div class="emoji-box" style="position:relative;">
         <discord-picker
@@ -68,6 +62,13 @@
           @gif="setGif"
         />
       </div>
+
+      <el-input v-model="text" @focus="checkLogin()" rows="1"  :autosize="true"  placeholder="Add a comment." maxlength="300"  type="textarea" :show-word-limit="text.trim().length>0" />
+    </div>
+    <!-- avatar -->
+    <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
+    <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
+    <div class="edit">
       <!-- reply button -->
       <div :id="'pop-reply-notice'+targetHash" :class="['mini-button-border','button-replay',!text.trim() ? 'disabled' : '']">
         <div class="mini-button" @click="reply()">Reply</div>
@@ -286,6 +287,10 @@ export default {
       range.insertNode(frag);
       selection.extend(lastNode, 1);
       selection.collapseToEnd();
+      //reset
+      const sel = window.getSelection();
+      state.focusNode = sel.focusNode;
+      state.focusOffset = sel.focusOffset;
       state.showUserList = false;
     }
 
@@ -313,14 +318,14 @@ export default {
           let selection = window.getSelection();
           let range = selection.getRangeAt(0);
           const container = state.focusNode; 
-          const pos = state.start_index;
+          const pos = state.focusOffset;
           //insert
           range = document.createRange(); 
           var cons = window.document.createTextNode(emoji); 
           container.insertData(pos, cons.nodeValue); 
           range.setEnd(container, pos + cons.nodeValue.length); 
           range.setStart(container, pos + cons.nodeValue.length); 
-          state.start_index = pos + cons.nodeValue.length;
+          state.focusOffset = pos + cons.nodeValue.length;
 
           range.collapse(false);
           selection.removeAllRanges();
@@ -354,12 +359,13 @@ export default {
         state.showNotice = true;
         return;
       }
-
+      proxy.$Loading.showLoading({title: "Loading"});
       if(props.methodName == "add_encrypt_post"){
         await encryptReply();
       }else{
         await publicReply();
       }
+      proxy.$Loading.hideLoading();
       emit("comment");
     }
 
@@ -500,6 +506,15 @@ export default {
     position: relative;
     background: #36363C;
     border-radius: 10px;
+    &.input-box-empty{
+      .div-input{
+        padding-bottom:20px;
+      }
+      .emoji-box{
+        left:auto;
+        right:-10px;
+      }
+    }
   }
   .div-input{
     position: relative;
@@ -512,8 +527,9 @@ export default {
     font-weight: 400;
     border:0;
     -webkit-user-modify: read-write-plaintext-only;
-    padding:20px 14px 40px 56px;
-  }s
+    padding:20px 14px 80px 56px;
+    
+  }
   .atFont{
     font-family: D-DINExp;
     font-size: 16px;
@@ -538,7 +554,7 @@ export default {
   }
   .pop-user-box{
     position:relative;
-    top:-40px;
+    top:-60px;
     left:20px;
     .user-list{
       position:absolute;
@@ -610,6 +626,11 @@ export default {
       }
     }
   }
+  .emoji-box{
+    position: absolute!important;
+    left:20px;
+    bottom:20px;
+  }
   :deep(.el-textarea){
     border-radius: 10px;
     background: transparent;
@@ -662,7 +683,7 @@ export default {
     height:36px;
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    justify-content:flex-end;
     :deep(.el-upload) {
       width: 24px;
       height: 24px;
