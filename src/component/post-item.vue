@@ -40,7 +40,10 @@
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
+            <div class="name txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">
+              {{user.name || user.account_id}}
+              <div class="user-flag co" v-if="community.accountId == user.account_id"></div>
+            </div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>
                 <div class="createtime">{{time.showTime}}</div>
@@ -218,7 +221,7 @@
             <template v-if="commentCount">{{commentCount}}</template>
             <template v-else>Reply</template>
           </div>
-          <Like :item="like"/>
+          <Like :item="like" :type="'post'"/>
         </div>
       </div>
 
@@ -246,6 +249,7 @@
       <div class="comment-box" v-if="from!='detail' && showCommentBox">
         <Comment 
           :targetHash="item.target_hash" 
+          :parentAccount="user.account_id"
           :communityId="item.receiverId" 
           :methodName="item.methodName" 
           :from="'list'"
@@ -857,6 +861,19 @@ export default {
           letter-spacing: 0;
           font-weight: 700;
           width:100%;
+          position: relative;
+          cursor: pointer;
+          .user-flag{
+            position:absolute;
+            top:2px;
+            right:-24px;
+            width: 20px;
+            height: 14px;
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+          }
         }
         .createtime{
           margin-top:4px;
@@ -1056,6 +1073,9 @@ export default {
           font-weight: 700;
           cursor: pointer;
           margin-right:30px;
+          padding-right:16px;
+          background: url('@/assets/images/post-item/icon-nft.png') no-repeat right center;
+          background-size: 12px 12px;
         }
         .hash{
           margin-left:30px;
@@ -1133,6 +1153,9 @@ export default {
         letter-spacing: 0;
         font-weight: 700;
         cursor: pointer;
+        padding-right:16px;
+        background: url('@/assets/images/post-item/icon-nft.png') no-repeat right center;
+        background-size: 12px 12px;
       }
       .intro-item{
         font-family: PingFangSC-Regular;

@@ -947,7 +947,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       const publicPost = async (options) => {
         const params = {   
           args:JSON.stringify({text:postInput.value.innerHTML,imgs:state.postForm.imgs}),
-          hierarchies:{target_hash:"",account_id:""},
+          hierarchies:[],
           options
         }
         let result = {}
@@ -961,13 +961,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
 
       const encryptPost = async (options) => {
-        //encrypt
-        // const conditions = [{
-        //   FTCondition:{
-        //     token_id:'33.token.bhc8521.testnet',
-        //     amount_to_access:parseAmount(1,24)
-        //   }
-        // }]
         const access = {
           relationship: "Or",
           conditions:[]
@@ -1000,10 +993,11 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         const param2 = {
           encrypt_args:JSON.stringify(res.cipher_text),
           access,
-          text_sign:res.text_sign,
-          contract_id_sign:res.contract_id_sign,
           blur_imgs:[...state.postForm.blur_imgs],
           options,
+          hierarchies:[],
+          text_sign:res.text_sign,
+          contract_id_sign:res.contract_id_sign,
           // nonce:res.nonce,
           // sign:res.text_sign,
         }

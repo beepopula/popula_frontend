@@ -110,8 +110,12 @@ export default {
       value:""
     },
     hierarchies:{
-      type:Object,
-      value:null
+      type:Array,
+      value:[]
+    },
+    parentAccount:{
+      type:String,
+      value:""
     },
     targetHash:{
       type:String,
@@ -366,21 +370,38 @@ export default {
       proxy.$Loading.showLoading({title: "Loading"});
 
       try{
-        let hierarchies = null;
+        const parent_hierarchies = props.hierarchies || [];
+        let hierarchies = [];
         //hierarchies
-        if(props.hierarchies && props.hierarchies.post_id){
-          if(props.hierarchies.comment_id){//level>2
-            hierarchies = {...props.hierarchies} 
-          }else{//level 2
-            hierarchies = {
-              post_id : props.hierarchies.post_id,
-              comment_id : props.targetHash
+        if(parent_hierarchies.length==0){//level 1
+          hierarchies = [
+            {
+              target_hash: props.targetHash,
+              account_id: props.parentAccount
+            },
+            // {
+            //   target_hash: 'bNw4SwipyY7s6fa3FBBTk155xTaTnXgY1TFfAg9qCiX',//props.targetHash,
+            //   account_id:'billkin.testnet'//props.parentAccount
+            // },
+            // {
+            //   target_hash: "8ExQhQKEb8c4XbxKUx6pC2wS3yKTGie9m2ZKcy9V8DM9",//props.targetHash,
+            //   account_id:'billkin.testnet'//props.parentAccount
+            // },
+          ]
+        }else if(parent_hierarchies.length==1){//level 2
+          hierarchies = [
+            ...parent_hierarchies,
+            {
+              comment_id : props.targetHash,
+              account_id : props.parentAccount,
             }
-          }
-        }else{//level 1
-          hierarchies = {post_id: props.targetHash}  
+          ]
+        }else if(parent_hierarchies.length==2){//level > 2
+          hierarchies = [
+            ...parent_hierarchies
+          ]
         }
-
+        // console.log(hierarchies); return;
         //options
         const options = [];
         if(commentInput.value.innerHTML){
@@ -423,12 +444,12 @@ export default {
         const communityContract = await CommunityContract.new(props.communityId);
         result = await communityContract.addComment(params,store.state.account,props.communityId);
       }else{
-        result = await mainContract.addComment(params,store.state.account);
+        result = await mainContract.addContent(params,store.state.account);
       }
       handleSuccess(result);
     }
 
-    const encryptReply = async (options) => {
+    const encryptReply = async (hierarchies,options) => {
       //encrypt
       const param1 = {
         plain_text:{
@@ -440,10 +461,13 @@ export default {
       // addEncryptComment
       const param2 = {
         encrypt_args:JSON.stringify(res.cipher_text), 
+        target_hash: props.targetHash,
+        options,
+        hierarchies,
         text_sign:res.text_sign,
         contract_id_sign:res.contract_id_sign,
-        target_hash: props.targetHash,
-        options
+        // nonce:res.nonce,
+        // sign:res.text_sign,
       }
 
       let result = {}
@@ -452,7 +476,7 @@ export default {
         const communityContract = await CommunityContract.new(props.communityId);
         result = await communityContract.addEncryptComment(param2,store.state.account,props.communityId);
       }else{
-        result = await mainContract.addEncryptComment(param2,store.state.account);
+        result = await mainContract.addEncryptContent(param2,store.state.account);
       }
       handleSuccess(result);
     }

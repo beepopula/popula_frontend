@@ -4,8 +4,16 @@
       <img v-if="detail.avatar" class="avatar" :src="detail.avatar"/>
       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
       <div class="info">
-        <div class="name txt-wrap" v-if="name" v-html="name"></div>
-        <div class="name txt-wrap" v-else v-html="accountId"></div>
+        <div :class="['name',item.data.type=='mod'?'name-mod':'']" v-if="name">
+          <div class="name-txt txt-wrap" v-html="name"></div>
+          <div class="user-flag co" v-if="detail.data.type=='creator'"></div>
+          <div class="user-flag mod" v-else-if="detail.data.type=='mod'"></div>
+        </div>
+        <div class="name txt-wrap" v-else>
+          <div class="name-txt txt-wrap" v-html="accountId"></div>
+          <div class="user-flag co" v-if="detail.data.type=='creator'"></div>
+          <div class="user-flag mod" v-else-if="detail.data.type=='mod'"></div>
+        </div>
         <div class="account txt-wrap" v-html="accountId"></div>
         <div class="total">
           <div class="total-item"><span>{{detail.data.follows}}</span> Followers</div>
@@ -134,12 +142,41 @@
         margin-left:20px;
         width:300px;
         .name{
-          line-height: 22px;
-          font-family: D-DINExp-Bold;
-          font-size: 20px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
+          display: inline-block;
+          position:relative;
+          height:20px;
+          &.name-mod{
+            .name-txt{
+              max-width:268px;
+            }
+          }
+          .name-txt{
+            display:inline-block;
+            max-width:276px;
+            line-height: 22px;
+            font-family: D-DINExp-Bold;
+            font-size: 20px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+          }
+          .user-flag{
+            position:absolute;
+            top:3px;
+            right:-24px;
+            width: 20px;
+            height: 14px;
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              right:-32px;
+              width: 28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
+            }
+          }
         }
         .account{
           margin-top:8px;

@@ -36,6 +36,8 @@
         <div style="margin-top:20px;"></div>
         <Comment 
           :targetHash="$route.params.id" 
+          :parentAccount="postDetail.accountId"
+          :hierarchies="[]"
           :communityId="postDetail.receiverId" 
           :methodName="postDetail.methodName"
           :focus="focusComment"
@@ -126,6 +128,8 @@
         <div class="elastic-layer-content">
           <Comment 
             :targetHash="$route.params.id" 
+            :parentAccount="postDetail.accountId"
+            :hierarchies="[]"
             :communityId="postDetail.receiverId" 
             :methodName="postDetail.methodName"
             @comment="comment()"

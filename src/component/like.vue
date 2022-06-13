@@ -31,6 +31,10 @@
       LoginMask
     },
     props:{
+      type:{
+        type:String,
+        value:''
+      },
       item:{
         type:Object,
         value:{}
@@ -88,11 +92,28 @@
           }
           state.isLiking = true;
           try{
+            //params
+            let params = {}
+            if(props.type == 'type'){
+              params= {
+                target_hash : state.targetHash
+              };
+            }else if(props.type == 'comment'){
+              params = {
+                target_hash : state.targetHash,
+                postId : props.item.postId,
+                commentId : props.item.commentId
+              }
+            }else{
+              throw new Error("please check content type");
+            }
+            
+            //contract 
             if(state.communityId){
               const communityContract = await CommunityContract.new(state.communityId);
-              const res = state.isLiked ? await communityContract.unlike({target_hash:state.targetHash}) : await communityContract.like({target_hash:state.targetHash}) 
+              const res = state.isLiked ? await communityContract.unlike(params) : await communityContract.like(params) 
             }else{
-              const res = state.isLiked ? await mainContract.unlike({target_hash:state.targetHash}) : await mainContract.like({target_hash:state.targetHash})
+              const res = state.isLiked ? await mainContract.unlike(params) : await mainContract.like(params)
             }
           }catch(e){
             state.isLiking = false;

@@ -18,9 +18,7 @@
         <div class="user-info">
           <div class="name" @click="redirectPage('/user-profile/'+item.accountId,false)">
             {{item.accountId}}
-            <!--
-            <div class="landlord-flag" v-if="post.accountId == item.accountId">landlord</div>
-            -->
+            <div class="user-flag po" v-if="post.accountId == item.accountId"></div>
           </div>
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>
@@ -132,7 +130,7 @@
             <template v-else>Reply</template>
           </div>
           <!-- like -->
-          <Like :item="like"/>
+          <Like :item="like" :type="'comment'"/>
         </div>
       </div>
 
@@ -140,6 +138,7 @@
       <div class="comment-box" v-if="from!='elastic-layer-parent' && showCommentBox">
         <Comment 
           :targetHash="item.target_hash" 
+          :parentAccount="item.accountId"
           :communityId="item.receiverId" 
           :methodName="post.methodName" 
           :from="'list'"
@@ -166,6 +165,7 @@
           </div>
           <Comment 
             :targetHash="item.target_hash" 
+            :parentAccount="item.accountId"
             :communityId="item.receiverId" 
             :methodName="post.methodName" 
             @comment="commentRefresh"
@@ -270,6 +270,8 @@ export default {
       //share & like & comment
       shareCount:props.item.data.shareCount,
       like:{
+        postId:props.post.target_hash,
+        commentId:'',  //---------------
         likeCount:props.item.data.likeCount,
         isLiked:props.item.data.isLike,
         targetHash:props.item.target_hash,
@@ -661,25 +663,16 @@ export default {
           font-weight: 700;
           position: relative;
           cursor: pointer;
-          .landlord-flag{
+          .user-flag{
             position:absolute;
-            top:1px;
-            right:-107px;
-            display:flex;
-            justify-content: center;
-            align-items: center;
-            width: 100px;
-            height: 32px;
-            font-family: D-DINExp;
-            font-size: 20px;
-            line-height:20px;
-            color: #FFFFFF;
-            letter-spacing: 0;
-            background: #ED1F5A;
-            border: 2px solid rgba(0,0,0,1);
-            border-radius: 8px;
-            transform-origin:left top;
-            transform:scale(0.5);
+            top:2px;
+            right:-24px;
+            width: 20px;
+            height: 14px;
+            &.po{
+              background:url("@/assets/images/common/po.png") no-repeat right center;
+              background-size:20px 14px;
+            }
           }
         }
         .createtime{
