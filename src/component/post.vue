@@ -328,7 +328,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         postForm: {
           text: "",
           imgs: [],
-          blur_imgs:[],
+          // blur_imgs:[],
           community:{
             communityId:"",
             name:"",
@@ -927,7 +927,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         let result;
         try{
           if(state.postForm.access.length>0){
-            await handleBlur();
+            // await handleBlur();
             result = await encryptPost(options);
           }else{
             result = await publicPost(options);
@@ -965,6 +965,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           relationship: "Or",
           conditions:[]
         }
+        //access
         for(let i=0;i<state.postForm.access.length;i++){
           const item = state.postForm.access[i];
           let decimals = item.decimals || 24;
@@ -993,7 +994,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         const param2 = {
           encrypt_args:JSON.stringify(res.cipher_text),
           access,
-          blur_imgs:[...state.postForm.blur_imgs],
+          // blur_imgs:[...state.postForm.blur_imgs],
           options,
           hierarchies:[],
           text_sign:res.text_sign,
@@ -1111,7 +1112,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.postForm = {
           text: "",
           imgs: [],
-          blur_imgs:[],
+          // blur_imgs:[],
           community:state.defaultCommunity,
           isPrivate:false,
           access:[],

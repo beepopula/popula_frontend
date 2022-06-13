@@ -80,26 +80,29 @@
           </div>
         </el-popover>
       </div>
-      <!-- token-list -->
-      <div class="token-list" v-if="item.methodName=='add_encrypt_post' && !isAccess && !isChecking">
-        <div class="token-item" v-for="item in access.conditions">
-          <img class="token-icon" :src="item.FTCondition.icon"/>
-          <div class="token-count">
-            <span class="balance">{{item.FTCondition.balance}} {{item.FTCondition.symbol}}</span>
-            <span class="total">/ {{item.FTCondition.amount_to_access}} {{item.FTCondition.symbol}}</span>
-          </div>
-          <!--
-          <div class="token-get" @click.stop="getToken(item.FTCondition.tokenId)">
-            How to get
-            <img class="more-arrow" src="@/assets/images/common/icon-arrow-right.png"/>
-          </div>
-          -->
-        </div>
-        <div class="token-tip">This is a token-gated content.</div>
+      <div v-if="item.methodName=='add_encrypt_post' && !isAccess" class="default-content">
+        This is a Tonken-gated contect.
       </div>
-      <!-- text -->
-      <div class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
-        <template v-if="(item.methodName=='add_post'|| item.type=='nft' || isAccess) && text">
+      <template v-else>
+        <!-- token-list -->
+        <!--
+        <div class="token-list" v-if="item.methodName=='add_encrypt_post' && !isAccess && !isChecking">
+          <div class="token-item" v-for="item in access.conditions">
+            <img class="token-icon" :src="item.FTCondition.icon"/>
+            <div class="token-count">
+              <span class="balance">{{item.FTCondition.balance}} {{item.FTCondition.symbol}}</span>
+              <span class="total">/ {{item.FTCondition.amount_to_access}} {{item.FTCondition.symbol}}</span>
+            </div>
+            <div class="token-get" @click.stop="getToken(item.FTCondition.tokenId)">
+              How to get
+              <img class="more-arrow" src="@/assets/images/common/icon-arrow-right.png"/>
+            </div>
+          </div>
+          <div class="token-tip">This is a token-gated content.</div>
+        </div>
+        -->
+        <!-- text -->
+        <div v-if="text" class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
           <pre v-if="from=='detail'"><div v-html="text"></div></pre>
           <div v-else class="text-ellipsis-wrapper">
             <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']">
@@ -108,31 +111,37 @@
               <pre ref="textDom"><div v-html="text"></div></pre>
             </div>
           </div>
-        </template>
 
-        <div v-else-if="text" class="default">
-          <img class="text-default" src="@/assets/images/post-item/text-default.png"/>
+          <!--
+          <div v-else-if="text" class="default">
+            <img class="text-default" src="@/assets/images/post-item/text-default.png"/>
+          </div>
+          -->
         </div>
-
-      </div>
-      <!-- images -->
-      <div v-if="(item.methodName=='add_post' || item.type=='nft' || isAccess) && images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-        <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
-      </div>
-      <div v-else-if="blur_imgs.length>0" :class="['images', 'images'+blur_imgs.length, blur_imgs.length>3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-        <div class="img" v-for="(img,index) in blur_imgs">
-          <img :src="img">
-          <div class="icon-lock"></div>
+        <!-- images -->
+        <!-- (item.methodName=='add_post' || item.type=='nft' || isAccess) &&  -->
+        <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
+          <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
         </div>
-      </div>
+        <!--
+        <div v-else-if="blur_imgs.length>0" :class="['images', 'images'+blur_imgs.length, blur_imgs.length>3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
+          <div class="img" v-for="(img,index) in blur_imgs">
+            <img :src="img">
+            <div class="icon-lock"></div>
+          </div>
+        </div>
+        -->
+      </template>
       <!-- bottom edit -->
       <div class="info-bottom">
         <div class="info-left">
           <!-- token -->
-          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_post' && isAccess">
+          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_post' && !isChecking">
             <template #reference>
               <div class="bottom-token-list">
-                <img v-for="item in access.conditions" class="token-icon" :src="item.FTCondition.icon"/>
+                <template v-for="item in access.conditions">
+                  <img  :class="['token-icon',item.FTCondition.access ? '' : 'token-icon-gray']" :src="item.FTCondition.icon"/>
+                </template>
               </div>
             </template>
             <div class="pop-box pop-intro pop-token-list">
@@ -142,9 +151,12 @@
                   <div class="token-symbol">{{item.FTCondition.symbol}}</div>
                 </div>
                 <div class="right-check">
-                  <div class="count">≥ {{item.FTCondition.amount_to_access}}</div>
+                  <div class="count">
+                    <span :class="[item.FTCondition.access ? '' : 'no-access']">{{item.FTCondition.balance}}</span>
+                     / {{item.FTCondition.amount_to_access}}
+                  </div>
                   <img v-if="item.FTCondition.access" class="check-status" src="@/assets/images/community/icon-right.png"/>
-                  <img v-else="item.FTCondition.access" class="check-status" src="@/assets/images/community/icon-error.png"/>
+                  <img v-else class="check-status" src="@/assets/images/community/icon-error.png"/>
                 </div>
               </div>
             </div>
@@ -390,7 +402,7 @@ export default {
       needWrap:true,
       //images
       images: props.item.type=="nft" ? [] : props.item.imgs ,
-      blur_imgs:props.item.blur_imgs || [],
+      // blur_imgs:props.item.blur_imgs || [],
       index:0,
       showPreview:false,
       //gas
@@ -911,6 +923,20 @@ export default {
         cursor:pointer;
       }
     }
+    .default-content{
+      padding: 120px 0 64px;
+      background: #36363C url('@/assets/images/post-item/icon-lock-gray.png') no-repeat center 64px;
+      background-size:40px 40px;
+      border-radius: 10px;
+      font-family: D-DINExp;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0;
+      text-align: center;
+      font-weight: 400;
+      line-height:16px;
+      margin-top:20px;
+    }
     .token-list{
       margin-top:20px;
       background: #36363C;
@@ -1062,6 +1088,12 @@ export default {
             width: 24px;
             height: 24px;
             border-radius:50%;
+            &.token-icon-gray{
+              opacity: 0.5;
+            }
+            &:last-child{
+              margin-right: 0;
+            }
           }
         }
         .nft{
@@ -1381,6 +1413,12 @@ export default {
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 700;
+          span{
+            color: rgba(255,255,255,1);
+            &.no-access{
+              color: #FF6868;
+            }
+          }
         }
         .check-status{
           margin-left:20px;

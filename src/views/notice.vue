@@ -269,7 +269,7 @@ export default {
         }
         const res = await encryptionContract.decrypt(param);
         return {
-          text:res.text ? res.text : ((item.type == 'post' && item.post.blur_imgs.length>0) ? '[Images]' : ''),
+          text:res.text ? res.text : '[Images]',
           isAccess:true
         }
       }
