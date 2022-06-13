@@ -110,7 +110,7 @@
                 <img v-if="item.avatar" class="avatar" :src="item.avatar">
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                 <div class="info">
-                  <div :class="['name',item.data.type=='mod'?'name-mod':'']">
+                  <div :class="['name','name-'+item.data.type]">
                     <span class="name-txt txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</span>
                     <div class="user-flag co" v-if="item.data.type=='creator'"></div>
                     <div class="user-flag mod" v-else-if="item.data.type=='mod'"></div>
@@ -1078,9 +1078,14 @@
             .info{
               margin-left:12px;
               .name{
-                display: inline-block;
-                position:relative;
                 height:20px;
+                display: flex;
+                align-items: center;
+                &.name-creator{
+                  .name-txt{
+                    max-width:76px;
+                  }
+                }
                 &.name-mod{
                   .name-txt{
                     max-width:68px;
@@ -1088,7 +1093,7 @@
                 }
                 .name-txt{
                   display:inline-block;
-                  max-width:76px;
+                  max-width:100px;
                   line-height: 20px;
                   font-family: D-DINExp-Bold;
                   font-size: 18px;
@@ -1097,9 +1102,7 @@
                   font-weight: 700;
                 }
                 .user-flag{
-                  position:absolute;
-                  top:3px;
-                  right:-24px;
+                  margin-left:4px;
                   width: 20px;
                   height: 14px;
                   &.co{
@@ -1107,7 +1110,6 @@
                     background-size:20px 14px;
                   }
                   &.mod{
-                    right:-32px;
                     width: 28px;
                     background:url("@/assets/images/common/mod.png") no-repeat right center;
                     background-size:28px 14px;

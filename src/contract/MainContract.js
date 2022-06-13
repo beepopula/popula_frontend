@@ -24,7 +24,7 @@ export default class MainContract{
     }
 
     async _signAndSendTransaction(transaction) {
-        const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas)]
+        const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas, transaction.deposit)]
         const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
         if (!checkReceiptsSuccess(result)) {
             return false
@@ -96,6 +96,15 @@ export default class MainContract{
         }
         return await this._signAndSendTransaction(transaction)
     }
+    async report(param){
+        const transaction = {
+            methodName: "report",
+            args: param,
+            deposit: "20000000000000000000000",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
+    }
 
     async follow(param){
         return await this.contract.follow(param)
@@ -111,10 +120,6 @@ export default class MainContract{
 
     async unlike(param){
         return await this.contract.unlike(param)
-    }
-
-    async report(param){
-        return await this.contract.report(param)
     }
 
     constructor(account){

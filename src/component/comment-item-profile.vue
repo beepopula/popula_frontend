@@ -17,8 +17,9 @@
         <!-- userinfo -->
         <div class="user-info">
           <div class="name" @click="redirectPage('/user-profile/'+item.accountId,false)">
-            {{item.accountId}}
-            <div class="user-flag po" v-if="post.accountId == item.accountId"></div>
+            <div class="name-txt txt-wrap">{{item.accountId}}</div>
+            <div class="user-flag co" v-if="$props.community.accountId == item.accountId"></div>
+            <div class="user-flag po" v-if="$props.post.accountId == item.accountId"></div>
           </div>
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>
@@ -139,6 +140,7 @@
         <Comment 
           :targetHash="item.target_hash" 
           :parentAccount="item.accountId"
+          :hierarchies="item.hierarchies"
           :communityId="item.receiverId" 
           :methodName="item.type=='encrypt'?'add_encrypt_post':'add_post'" 
           :from="'list'"
@@ -165,6 +167,7 @@
           <Comment 
             :targetHash="item.target_hash" 
             :parentAccount="item.accountId"
+            :hierarchies="item.hierarchies"
             :communityId="item.receiverId" 
             :methodName="post.methodName" 
             @comment="commentRefresh"
@@ -202,6 +205,8 @@
 import { ref, reactive, toRefs , watch, nextTick, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import MainContract from "@/contract/MainContract";
+import CommunityContract from "@/contract/CommunityContract";
 import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
@@ -236,6 +241,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
+    const mainContract = new MainContract(store.state.account);
     const encryptionContract = new EncryptionContract(store.state.account);
 
     const state = reactive({
@@ -260,8 +266,8 @@ export default {
       gasUsed:formatAmount(props.item.gas_used,24,4),
       //share & like & comment
       like:{
-        postId:props.post.target_hash,
-        commentId:'',  //---------------
+        hierarchies:props.item.hierarchies,
+        accountId:props.item.accountId,
         likeCount:props.item.data.likeCount,
         isLiked:props.item.data.isLike,
         targetHash:props.item.target_hash,
@@ -520,30 +526,44 @@ export default {
     }
     const report = async () => {
       if(checkLogin()){
-        // try{
-        //   const result = await mainContract.report({target_hash:props.item.target_hash});
-        // }catch(e){
-        //   console.log("report error:"+e);
-        //   proxy.$Message({
-        //     message: "Report Failed",
-        //     type: "error",
-        //   });
-        //   return;
-        // }
-        // proxy.$Message({
-        //   message: "report success",
-        //   type: "success",
-        // });
-        const res = await proxy.$axios.post.report({
-          commentId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
-          proxy.$Message({
-            message: "report success",
-            type: "success",
-          });
+        const params = {
+          hierarchies : [
+            ...props.item.hierarchies,
+            {
+              target_hash : props.item.target_hash,
+              account_id : props.item.accountId,
+            }
+          ]
         }
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.report(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.report(params);
+          }
+        }catch(e){
+          console.log("report error:"+e);
+          proxy.$Message({
+            message: "Report Failed",
+            type: "error",
+          });
+          return;
+        }
+        proxy.$Message({
+          message: "report success",
+          type: "success",
+        });
+        // const res = await proxy.$axios.post.report({
+        //   commentId:props.item.target_hash,
+        //   accountId:store.getters.accountId || ''
+        // });
+        // if(res.success){
+        //   proxy.$Message({
+        //     message: "report success",
+        //     type: "success",
+        //   });
+        // }
       }
     }
     const block = async () => {
@@ -621,24 +641,36 @@ export default {
       .user-info{
         margin-left:12px;
         .name{
-          font-family: D-DINExp-Bold;
           height: 18px;
-          line-height:18px;
-          font-size: 18px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
-          position: relative;
-          cursor: pointer;
+          display:flex;
+          align-items: center;
+          .name-txt{
+            max-width: 300px;
+            font-family: D-DINExp-Bold;
+            height: 18px;
+            line-height:18px;
+            font-size: 18px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            cursor: pointer;
+          }
           .user-flag{
-            position:absolute;
-            top:2px;
-            right:-24px;
+            margin-left:4px;
             width: 20px;
             height: 14px;
             &.po{
               background:url("@/assets/images/common/po.png") no-repeat right center;
               background-size:20px 14px;
+            }
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              width:28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
             }
           }
         }

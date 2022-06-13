@@ -1124,7 +1124,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             isPublicSale:false,
             mintPrice:10,
             copies:1000,
-            
           }
         };
         postInput.value.innerHTML = "";

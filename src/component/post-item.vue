@@ -3,7 +3,7 @@
     <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox">
       <div class="user">
         <!-- community -->
-        <template v-if="community.communityId && from!='community'">
+        <template v-if="community.communityId && from!='community' && from!='detail'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
               <img v-if="community.avatar"  class="avatar avatar-community" :src="community.avatar">
@@ -35,14 +35,14 @@
               <img v-if="user.avatar" class="avatar" :src="user.avatar" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
               <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
             </template>
-            <template v-if="showUser">
+            <template v-if="showUser && from!='detail'">
               <UserPopup :account="item.accountId" @login="showLogin=true"/>
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">
-              {{user.name || user.account_id}}
-              <div class="user-flag co" v-if="community.accountId == user.account_id"></div>
+            <div class="name" @click="redirectPage('/user-profile/'+user.account_id,false)">
+              <div class="name-txt txt-wrap">{{user.name || user.account_id}}</div>
+              <div class="user-flag co" v-if="community.accountId && community.accountId == user.account_id"></div>
             </div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>
@@ -323,6 +323,7 @@ import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
 import MainContract from "@/contract/MainContract";
 import NftContract from "@/contract/NftContract";
+import CommunityContract from "@/contract/CommunityContract";
 import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, parseAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
@@ -413,6 +414,7 @@ export default {
         likeCount:props.item.data.likeCount,
         isLiked:props.item.data.isLike,
         targetHash:props.item.target_hash,
+        accountId:props.item.accountId,
         communityId:(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT) ? "" : props.item.receiverId
       },
       //comment
@@ -744,30 +746,45 @@ export default {
     }
     const report = async () => {
       if(checkLogin()){
-        // try{
-        //   const result = await mainContract.report({target_hash:props.item.target_hash});
-        // }catch(e){
-        //   console.log("report error:"+e);
-        //   proxy.$Message({
-        //     message: "Report Failed",
-        //     type: "error",
-        //   });
-        //   return;
-        // }
-        // proxy.$Message({
-        //   message: "report success",
-        //   type: "success",
-        // });
-        const res = await proxy.$axios.post.report({
-          postId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
+        const params= {
+          // hierarchies : [{
+          //   target_hash: "657wqTLQN454nKzbU6pkueH2gsEUQZmupRwZB1AZ5dz9",
+          //   account_id: "billkin.testnet"
+          // }],
+          hierarchies : [{
+            target_hash : props.item.target_hash,
+            account_id : state.user.account_id,
+          }]
+        };
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.report(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.report(params);
+          }
+        }catch(e){
+          console.log("report error:"+e);
           proxy.$Message({
-            message: "report success",
-            type: "success",
+            message: "Report Failed",
+            type: "error",
           });
+          return;
         }
+        proxy.$Message({
+          message: "report success",
+          type: "success",
+        });
+        // const res = await proxy.$axios.post.report({
+        //   postId:props.item.target_hash,
+        //   accountId:store.getters.accountId || ''
+        // });
+        // if(res.success){
+        //   proxy.$Message({
+        //     message: "report success",
+        //     type: "success",
+        //   });
+        // }
 
       }
     }
@@ -867,23 +884,38 @@ export default {
         margin-left:12px;
         width:300px;
         .name{
+          height:20px;
+          display:flex;
+          align-items: center;
           font-family: D-DINExp-Bold;
           font-size: 18px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 700;
-          width:100%;
-          position: relative;
-          cursor: pointer;
+          max-width: 300px;
+          line-height:20px;
+          .name-txt{
+            max-width: 300px;
+            font-family: D-DINExp-Bold;
+            font-size: 18px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            line-height:20px;
+            cursor: pointer;
+          }
           .user-flag{
-            position:absolute;
-            top:2px;
-            right:-24px;
+            margin-left:4px;
             width: 20px;
             height: 14px;
             &.co{
               background:url("@/assets/images/common/co.png") no-repeat right center;
               background-size:20px 14px;
+            }
+            &.mod{
+              width:28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
             }
           }
         }

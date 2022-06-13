@@ -17,8 +17,9 @@
         <!-- userinfo -->
         <div class="user-info">
           <div class="name" @click="redirectPage('/user-profile/'+item.accountId,false)">
-            {{item.accountId}}
-            <div class="user-flag po" v-if="post.accountId == item.accountId"></div>
+            <div class="name-txt txt-wrap">{{item.accountId}}</div>
+            <div class="user-flag co" v-if="$props.community.accountId == item.accountId"></div>
+            <div class="user-flag po" v-if="$props.post.accountId == item.accountId"></div>
           </div>
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>
@@ -139,6 +140,7 @@
         <Comment 
           :targetHash="item.target_hash" 
           :parentAccount="item.accountId"
+          :hierarchies="item.hierarchies"
           :communityId="item.receiverId" 
           :methodName="post.methodName" 
           :from="'list'"
@@ -156,6 +158,7 @@
         <div class="child-comments-box">
           <div class="parent-comment">
             <CommentItem 
+              :community="$props.community"
               :post="post" 
               :item="item" 
               :commentC="commentCount" 
@@ -166,6 +169,7 @@
           <Comment 
             :targetHash="item.target_hash" 
             :parentAccount="item.accountId"
+            :hierarchies="item.hierarchies"
             :communityId="item.receiverId" 
             :methodName="post.methodName" 
             @comment="commentRefresh"
@@ -179,7 +183,7 @@
           </div>
           <div class="child-comments">
             <template v-for="item in commentList[currentTab]">
-              <CommentItem :level="$props.level+1" :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
+              <CommentItem :community="$props.community" :level="$props.level+1" :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
             </template>
           </div>
           <div class="no-more" v-if="isEnd">
@@ -203,6 +207,8 @@
 import { ref, reactive, toRefs , watch, nextTick, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import MainContract from "@/contract/MainContract";
+import CommunityContract from "@/contract/CommunityContract";
 import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
@@ -221,6 +227,10 @@ export default {
     from:{
       type:String,
       value:""
+    },
+    community:{
+      type:Object,
+      value:{}
     },
     post:{
       type:Object,
@@ -251,6 +261,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
+    const mainContract = new MainContract(store.state.account);
     const encryptionContract = new EncryptionContract(store.state.account);
 
     const state = reactive({
@@ -270,8 +281,8 @@ export default {
       //share & like & comment
       shareCount:props.item.data.shareCount,
       like:{
-        postId:props.post.target_hash,
-        commentId:'',  //---------------
+        hierarchies:props.item.hierarchies,
+        accountId:props.item.accountId,
         likeCount:props.item.data.likeCount,
         isLiked:props.item.data.isLike,
         targetHash:props.item.target_hash,
@@ -535,30 +546,56 @@ export default {
     }
     const report = async () => {
       if(checkLogin()){
-        // try{
-        //   const result = await mainContract.report({target_hash:props.item.target_hash});
-        // }catch(e){
-        //   console.log("report error:"+e);
-        //   proxy.$Message({
-        //     message: "Report Failed",
-        //     type: "error",
-        //   });
-        //   return;
-        // }
-        // proxy.$Message({
-        //   message: "report success",
-        //   type: "success",
-        // });
-        const res = await proxy.$axios.post.report({
-          commentId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
-          proxy.$Message({
-            message: "report success",
-            type: "success",
-          });
+        const params = {
+          hierarchies : [
+            // {
+            //   target_hash: "bNw4SwipyY7s6fa3FBBTk155xTaTnXgY1TFfAg9qCiX",
+            //   account_id: "billkin.testnet"
+            // },
+            // {
+            //   target_hash: "8ExQhQKEb8c4XbxKUx6pC2wS3yKTGie9m2ZKcy9V8DM9",
+            //   account_id: "billkin.testnet"
+            // },
+            // {
+            //   target_hash: "9D3gs6c6CGuckGmW8qx8vAoxiY3sn7o8K7ygknLpxARc",
+            //   account_id: "billkin.testnet"
+            // }
+            ...props.item.hierarchies,
+            {
+              target_hash : props.item.target_hash,
+              account_id : props.item.accountId,
+            }
+          ]
         }
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.report(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.report(params);
+          }
+        }catch(e){
+          console.log("report error:"+e);
+          proxy.$Message({
+            message: "Report Failed",
+            type: "error",
+          });
+          return;
+        }
+        proxy.$Message({
+          message: "report success",
+          type: "success",
+        });
+        // const res = await proxy.$axios.post.report({
+        //   commentId:props.item.target_hash,
+        //   accountId:store.getters.accountId || ''
+        // });
+        // if(res.success){
+        //   proxy.$Message({
+        //     message: "report success",
+        //     type: "success",
+        //   });
+        // }
       }
     }
     const block = async () => {
@@ -654,24 +691,36 @@ export default {
       .user-info{
         margin-left:12px;
         .name{
-          font-family: D-DINExp-Bold;
           height: 18px;
-          line-height:18px;
-          font-size: 18px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
-          position: relative;
-          cursor: pointer;
+          display:flex;
+          align-items: center;
+          .name-txt{
+            max-width: 300px;
+            font-family: D-DINExp-Bold;
+            height: 18px;
+            line-height:18px;
+            font-size: 18px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            cursor: pointer;
+          }
           .user-flag{
-            position:absolute;
-            top:2px;
-            right:-24px;
+            margin-left:4px;
             width: 20px;
             height: 14px;
             &.po{
               background:url("@/assets/images/common/po.png") no-repeat right center;
               background-size:20px 14px;
+            }
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              width:28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
             }
           }
         }

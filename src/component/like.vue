@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { reactive, toRefs, watch  } from "vue";
+  import { reactive, toRefs, watch, getCurrentInstance  } from "vue";
   import { useStore } from 'vuex';
   import MainContract from "@/contract/MainContract";
   import CommunityContract from "@/contract/CommunityContract";
@@ -42,6 +42,7 @@
     },
     setup(props,{ emit }) {
       const store = useStore();
+      const { proxy } = getCurrentInstance();
       const mainContract = new MainContract(store.state.account);
 
       //state
@@ -94,15 +95,24 @@
           try{
             //params
             let params = {}
-            if(props.type == 'type'){
+            if(props.type == 'post'){
               params= {
-                target_hash : state.targetHash
+                hierarchies : [
+                  {
+                    target_hash : props.item.targetHash,
+                    account_id : props.item.accountId,
+                  }
+                ]
               };
             }else if(props.type == 'comment'){
               params = {
-                target_hash : state.targetHash,
-                postId : props.item.postId,
-                commentId : props.item.commentId
+                hierarchies : [
+                  ...props.item.hierarchies,
+                  {
+                    target_hash : props.item.targetHash,
+                    account_id : props.item.accountId,
+                  }
+                ]
               }
             }else{
               throw new Error("please check content type");

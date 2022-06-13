@@ -55,7 +55,7 @@
           </div>
           <div class="all-comments">
             <template v-for="item in comments[currentTab]">
-              <CommentItem :level="1" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
+              <CommentItem :level="1" :community="postCommunity" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
             </template>
           </div>
 

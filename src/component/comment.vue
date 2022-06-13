@@ -392,7 +392,7 @@ export default {
           hierarchies = [
             ...parent_hierarchies,
             {
-              comment_id : props.targetHash,
+              target_hash : props.targetHash,
               account_id : props.parentAccount,
             }
           ]
