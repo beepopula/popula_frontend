@@ -442,7 +442,7 @@ export default {
       let result = {}
       if(props.communityId != store.state.nearConfig.MAIN_CONTRACT && props.communityId != store.state.nearConfig.NFT_CONTRACT){
         const communityContract = await CommunityContract.new(props.communityId);
-        result = await communityContract.addComment(params,store.state.account,props.communityId);
+        result = await communityContract.addContent(params,store.state.account,props.communityId);
       }else{
         result = await mainContract.addContent(params,store.state.account);
       }
@@ -451,34 +451,38 @@ export default {
 
     const encryptReply = async (hierarchies,options) => {
       //encrypt
-      const param1 = {
-        plain_text:{
-          text:state.text,
+      const res = await proxy.$axios.post.add_encrypt_content_sign({
+        content:{
+          text:state.text
         },
-        contract_id:props.communityId,
-      }
-      const res = await encryptionContract.encrypt(param1);
-      // addEncryptComment
-      const param2 = {
-        encrypt_args:JSON.stringify(res.cipher_text), 
-        target_hash: props.targetHash,
-        options,
-        hierarchies,
-        text_sign:res.text_sign,
-        contract_id_sign:res.contract_id_sign,
-        // nonce:res.nonce,
-        // sign:res.text_sign,
-      }
+        accountId:store.getters.accountId || ''
+      });
 
-      let result = {}
-      if(props.communityId != store.state.nearConfig.MAIN_CONTRACT && props.communityId != store.state.nearConfig.NFT_CONTRACT){
-        // const communityContract = new CommunityContract(store.state.account,props.communityId);
-        const communityContract = await CommunityContract.new(props.communityId);
-        result = await communityContract.addEncryptComment(param2,store.state.account,props.communityId);
+      if(res.success){
+        // addEncryptComment
+        const param2 = {
+          target_hash: props.targetHash,
+          options,
+          hierarchies,
+          // encrypt_args:JSON.stringify(res.cipher_text), 
+          // text_sign:res.text_sign,
+          // contract_id_sign:res.contract_id_sign,
+          encrypt_args:JSON.stringify(res.data.encode),
+          nonce:res.data.nonce,
+          sign:res.data.sign,
+        }
+        let result = {}
+        if(props.communityId != store.state.nearConfig.MAIN_CONTRACT && props.communityId != store.state.nearConfig.NFT_CONTRACT){
+          // const communityContract = new CommunityContract(store.state.account,props.communityId);
+          const communityContract = await CommunityContract.new(props.communityId);
+          result = await communityContract.addEncryptContent(param2,store.state.account,props.communityId);
+        }else{
+          result = await mainContract.addEncryptContent(param2,store.state.account);
+        }
+        handleSuccess(result);
       }else{
-        result = await mainContract.addEncryptContent(param2,store.state.account);
+        throw new Error("Encrypt Failed: " + res.message);
       }
-      handleSuccess(result);
     }
 
     //handleSuccess

@@ -730,27 +730,36 @@ export default {
     //edit
     const del = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.post.delete({
-          postId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-      
-        if(res.success){
+        const params= {
+          hierarchies : [{
+            target_hash : props.item.target_hash,
+            account_id : state.user.account_id,
+          }]
+        };
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.delContent(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.delContent(params);
+          }
+        }catch(e){
+          console.log("delete error:"+e);
           proxy.$Message({
-            message: "delete success",
-            type: "success",
+            message: "Delete Failed",
+            type: "error",
           });
-          state.hasDelete = true;
+          return;
         }
+        proxy.$Message({
+          message: "delete success",
+          type: "success",
+        });
       }
     }
     const report = async () => {
       if(checkLogin()){
         const params= {
-          // hierarchies : [{
-          //   target_hash: "657wqTLQN454nKzbU6pkueH2gsEUQZmupRwZB1AZ5dz9",
-          //   account_id: "billkin.testnet"
-          // }],
           hierarchies : [{
             target_hash : props.item.target_hash,
             account_id : state.user.account_id,
@@ -775,17 +784,6 @@ export default {
           message: "report success",
           type: "success",
         });
-        // const res = await proxy.$axios.post.report({
-        //   postId:props.item.target_hash,
-        //   accountId:store.getters.accountId || ''
-        // });
-        // if(res.success){
-        //   proxy.$Message({
-        //     message: "report success",
-        //     type: "success",
-        //   });
-        // }
-
       }
     }
     const block = async () => {

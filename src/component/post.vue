@@ -955,7 +955,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           result = await mainContract.addContent(params,store.state.account);
         }else{
           const communityContract = await CommunityContract.new(state.postForm.community.communityId);
-          result = await communityContract.addPost(params, state.postForm.community.communityId);
+          result = await communityContract.addContent(params, state.postForm.community.communityId);
         }
         return result;
       }
@@ -980,38 +980,40 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             }
           })
         }
-        //encrypt
-        const param1 = {
-          plain_text:{
+        const res = await proxy.$axios.post.add_encrypt_content_sign({
+          content:{
             text:postInput.value.innerHTML,
-            imgs:JSON.stringify({...state.postForm.imgs}),
+            imgs:state.postForm.imgs,
           },
-          contract_id:state.postForm.community.communityId,
-        }
-        const res = await encryptionContract.encrypt(param1);
-        
-        // addEncryptPost
-        const param2 = {
-          encrypt_args:JSON.stringify(res.cipher_text),
-          access,
-          // blur_imgs:[...state.postForm.blur_imgs],
-          options,
-          hierarchies:[],
-          text_sign:res.text_sign,
-          contract_id_sign:res.contract_id_sign,
-          // nonce:res.nonce,
-          // sign:res.text_sign,
-        }
-        
-        let result = {}
-        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
-          result = await mainContract.addEncryptContent(param2,store.state.account);
+          accountId:store.getters.accountId || ''
+        });
+
+        if(res.success){
+          // addEncryptPost
+          const param2 = {
+            access,
+            options,
+            hierarchies:[],
+            encrypt_args:JSON.stringify(res.data.encode),
+            nonce:res.data.nonce.toString(),
+            sign:res.data.sign,
+            // blur_imgs:[...state.postForm.blur_imgs],
+            // encrypt_args:JSON.stringify(res.cipher_text), 
+            // text_sign:res.text_sign,
+            // contract_id_sign:res.contract_id_sign,
+          }
+          let result = {}
+          if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
+            result = await mainContract.addEncryptContent(param2,store.state.account);
+          }else{
+            const communityContract = await CommunityContract.new(state.postForm.community.communityId);
+            // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
+            result = await communityContract.addEncryptContent(param2,store.state.account,state.postForm.community.communityId);
+          }
+          return result;
         }else{
-          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
-          // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
-          result = await communityContract.addEncryptPost(param2,store.state.account,state.postForm.community.communityId);
+          throw new Error("Encrypt Failed: " + res.message);
         }
-        return result;
       }
 
       const checkAccess = () => {

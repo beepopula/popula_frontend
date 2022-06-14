@@ -14,12 +14,12 @@ export default class CommunityContract{
         ],
         changeMethods: [
             'set_access',
-            'add_post',
-            'add_encrypt_post',
-            'add_comment',
-            'add_encrypt_comment',
+            'add_content',
+            'add_encrypt_content',
             'like',
-            'unlike'
+            'unlike',
+            'report',
+            'del_content'
         ]  // mint
     }
 
@@ -44,7 +44,7 @@ export default class CommunityContract{
             //TODO checkResult
             return true
         } else {
-            const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas)]
+            const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas, transaction.deposit)]
             const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
             if (!checkReceiptsSuccess(result)) {
                 return false
@@ -55,9 +55,9 @@ export default class CommunityContract{
         
     }
 
-    async addPost(param) {
+    async addContent(param) {
         const transaction = {
-            methodName: "add_post",
+            methodName: "add_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
@@ -65,9 +65,9 @@ export default class CommunityContract{
         return await this._signAndSendTransaction(transaction)
     }
 
-    async addComment(param) {
+    async addEncryptContent(param) {
         const transaction = {
-            methodName: "add_comment",
+            methodName: "add_encrypt_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
@@ -75,27 +75,25 @@ export default class CommunityContract{
         return await this._signAndSendTransaction(transaction)
     }
 
-
-    async addEncryptPost(param) {
+    async report(param){
         const transaction = {
-            methodName: "add_encrypt_post",
+            methodName: "like",
+            args: param,
+            deposit: "20000000000000000000000",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
+    }
+
+    async delContent(param){
+        const transaction = {
+            methodName: "del_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
         }
         return await this._signAndSendTransaction(transaction)
     }
-
-    async addEncryptComment(param) {
-        const transaction = {
-            methodName: "add_encrypt_comment",
-            args: param,
-            deposit: "0",
-            gas: "100000000000000"
-        }
-        return await this._signAndSendTransaction(transaction)
-    }
-
 
     async like(param){
         const transaction = {

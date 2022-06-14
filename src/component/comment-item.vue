@@ -531,35 +531,40 @@ export default {
     //edit
     const del = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.comment.delete({
-          commentId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
-          proxy.$Message({
-            message: "delete success",
-            type: "success",
-          });
-          state.hasDelete = true;
+        const params = {
+          hierarchies : [
+            ...props.item.hierarchies,
+            {
+              target_hash : props.item.target_hash,
+              account_id : props.item.accountId,
+            }
+          ]
         }
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.delContent(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.delContent(params);
+          }
+        }catch(e){
+          console.log("delete error:"+e);
+          proxy.$Message({
+            message: "Delete Failed",
+            type: "error",
+          });
+          return;
+        }
+        proxy.$Message({
+          message: "delete success",
+          type: "success",
+        });
       }
     }
     const report = async () => {
       if(checkLogin()){
         const params = {
           hierarchies : [
-            // {
-            //   target_hash: "bNw4SwipyY7s6fa3FBBTk155xTaTnXgY1TFfAg9qCiX",
-            //   account_id: "billkin.testnet"
-            // },
-            // {
-            //   target_hash: "8ExQhQKEb8c4XbxKUx6pC2wS3yKTGie9m2ZKcy9V8DM9",
-            //   account_id: "billkin.testnet"
-            // },
-            // {
-            //   target_hash: "9D3gs6c6CGuckGmW8qx8vAoxiY3sn7o8K7ygknLpxARc",
-            //   account_id: "billkin.testnet"
-            // }
             ...props.item.hierarchies,
             {
               target_hash : props.item.target_hash,
@@ -586,16 +591,6 @@ export default {
           message: "report success",
           type: "success",
         });
-        // const res = await proxy.$axios.post.report({
-        //   commentId:props.item.target_hash,
-        //   accountId:store.getters.accountId || ''
-        // });
-        // if(res.success){
-        //   proxy.$Message({
-        //     message: "report success",
-        //     type: "success",
-        //   });
-        // }
       }
     }
     const block = async () => {

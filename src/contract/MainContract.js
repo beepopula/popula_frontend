@@ -13,13 +13,12 @@ export default class MainContract{
         changeMethods: [
             'add_content',
             'add_encrypt_content',
-            'add_post',
-            'add_comment',
             'follow',
             'unfollow',
             'like',
             'unlike',
-            'report'
+            'report',
+            'del_content'
         ]  // mint
     }
 
@@ -47,26 +46,6 @@ export default class MainContract{
         return await this._signAndSendTransaction(transaction)
     }
 
-    async addPost(param,account) {
-        const transaction = {
-            methodName: "add_post",
-            args: param,
-            deposit: "0",
-            gas: "100000000000000"
-        };
-        return await this._signAndSendTransaction(transaction)
-    }
-
-    async addComment(param,account) {
-        const transaction = {
-            methodName: "add_comment",
-            args: param,
-            deposit: "0",
-            gas: "100000000000000"
-        }
-        return await this._signAndSendTransaction(transaction)
-    }
-
     async addEncryptContent(param) {
         const transaction = {
             methodName: "add_encrypt_content",
@@ -77,25 +56,6 @@ export default class MainContract{
         return await this._signAndSendTransaction(transaction)
     }
 
-    async addEncryptPost(param) {
-        const transaction = {
-            methodName: "add_encrypt_post",
-            args: param,
-            deposit: "0",
-            gas: "100000000000000"
-        }
-        return await this._signAndSendTransaction(transaction)
-    }
-
-    async addEncryptComment(param) {
-        const transaction = {
-            methodName: "add_encrypt_comment",
-            args: param,
-            deposit: "0",
-            gas: "100000000000000"
-        }
-        return await this._signAndSendTransaction(transaction)
-    }
     async report(param){
         const transaction = {
             methodName: "report",
@@ -104,6 +64,10 @@ export default class MainContract{
             gas: "100000000000000"
         }
         return await this._signAndSendTransaction(transaction)
+    }
+
+    async delContent(param){
+        return await this.contract.del_content(param)
     }
 
     async follow(param){
