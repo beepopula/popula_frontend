@@ -1,35 +1,27 @@
 <template>
   <div class="post" :id="'post'+location" :key="location">
-    <div class="postForm">
-      <!-- text -->
-      <div
-        class="div-input"
-        ref="postInput"
-        contenteditable
-        @keydown.capture="onCheck"
-        @keyup.capture="onChange"
-        @focus="checkLogin"
-      />
-      <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
-      
-      <div class="pop-user-box" :id="'pop-user'+location">
-        <div v-show="showUserList" ref="popUser" class="user-list">
-          <div class="loading-box" v-if="isLoaingUserList">
-            <img class="white-loading" src="@/assets/images/common/loading.png"/>
-          </div>
-          <template v-else-if="userList.length>0">
-            <template v-for="user in userList">
-                <template v-if="user.outer">
-                  <div class="user-item" @click="onSelectSubmit(user)">
-                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                    <div class="user-info">
-                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
-                    </div>
-                  </div>
-                </template>
-                <template v-else>
+    <div class="post-form-box">
+      <div class="post-form">
+        <!-- text -->
+        <div
+          class="div-input"
+          ref="postInput"
+          contenteditable
+          @keydown.capture="onCheck"
+          @keyup.capture="onChange"
+          @focus="checkLogin"
+          @click="onClick"
+        />
+        <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
+        
+        <div class="pop-user-box" :id="'pop-user'+location">
+          <div v-show="showUserList" ref="popUser" class="user-list">
+            <div class="loading-box" v-if="isLoaingUserList">
+              <img class="white-loading" src="@/assets/images/common/loading.png"/>
+            </div>
+            <template v-else-if="userList.length>0">
+              <template v-for="user in userList">
+                <template v-if="user.data">
                   <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
                     <template #reference>
                       <div class="user-item" @click="onSelectSubmit(user)">
@@ -46,24 +38,37 @@
                     </template>
                   </el-popover>
                 </template>
+                <template v-else>
+                  <div class="user-item" @click="onSelectSubmit(user)">
+                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                    <div class="user-info">
+                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                    </div>
+                  </div>
+                </template>
+              </template>
             </template>
-          </template>
-          <div v-else class="nobody">Nobody yet.</div>
+            <div v-else class="nobody">Nobody yet.</div>
+          </div>
         </div>
-      </div>
-      <!-- avatar -->
-      <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
-      <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
-      <!-- images -->
-      <div class="images" >
-        <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
-          <div class="delete-image" @click.stop="handleRemove(index)"></div>
-          <img :src="img" >
+        <!-- avatar -->
+        <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
+        <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
+
+
+        <!-- images -->
+        <div class="images" >
+          <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
+            <div class="delete-image" @click.stop="handleRemove(index)"></div>
+            <img :src="img" >
+          </div>
         </div>
       </div>
 
 
-      <el-input @keyup="onKeyDown" v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
+      <el-input v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
       <!-- img-emoji-box -->
       <div class="img-emoji-box">
         <!-- upload-image -->
@@ -91,6 +96,7 @@
           />
         </div>
       </div>
+
     </div>
     <div class="edit">
       <!-- community -->
@@ -247,7 +253,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         <!-- post notice -->
         <div class="pop-box pop-intro pop-notice" v-if="showNotice">
           <div class="title">Notice</div>
-          <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on [Recent activity (<a href="https://wallet.testnet.near.org/" target="_blank">https://wallet.testnet.near.org/ </a>) ]</div>
+          <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on <a href="https://wallet.testnet.near.org/" target="_blank">Recent activity</a></div>
           <div class="button-box">
             <div class="mini-button-border button-cancle" @click="showNotice=false">
               <div class="mini-button">Cancle</div>
@@ -382,6 +388,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //community
         if(props.community){
           state.postForm.community = props.community
+          state.defaultCommunity = props.community
         }else{
           const res = await proxy.$axios.community.get_community_detail({
             accountId:"",
@@ -402,13 +409,41 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.postForm.nft.copies = nftInfo.copies;
           state.postForm.nft.mintPrice = nftInfo.mint_price;
         }
+        
+
+        //usedCommunity update
+        const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
+        const updateCommunities =  [];
+        for(let i = 0;i<usedCommunities.length;i++){
+          const community = usedCommunities[i];
+          const res = await proxy.$axios.community.get_community_detail({
+            accountId:"",
+            communityId: community.communityId,
+          });
+          if(res.success) {
+            const comm = {
+              avatar:res.data.avatar,
+              communityId:res.data.communityId,
+              name:res.data.name
+            }
+            updateCommunities.push(comm);
+          }
+        }
+        localStorage.setItem("usedCommunities",JSON.stringify(updateCommunities));
       }
 
       //@
       const onCheck = (e) => {
-        if(postInput.value.textContent.length>=1000){
+        console.log(e,'----e-----');
+        if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }
+      }
+      const onClick = () => {
+        const selection = window.getSelection()
+        state.focusNode = selection.focusNode;
+        state.focusOffset = selection.focusOffset;
+        state.start_index = selection.focusOffset;
       }
       const onChange = async (e) => {
         const selection = window.getSelection()
@@ -418,22 +453,25 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.focusOffset = selection.focusOffset;
         let start = Math.max(selection.focusOffset-21,0);
         let start_index = null;
+        
         let str = "";
 
-        for(let i = selection.focusOffset;i>=start;i--){
+        for(let i = selection.focusOffset-1;i>=start;i--){
           if(text.substring(i,i+1)=="@"){
             start_index = i;
             break;
           }
-          if(i>0 && !(text.substring(i-1,i).trim())){
+          if(i!=selection.focusOffset-1 && !(text[i].trim())){
             break;
           }
         }
+        
 
         if(start_index!==null){
           let end = Math.min(start_index+21,text.length);
           let end_index = end;
-          for(let j = selection.focusOffset;j<end;j++){
+          const start = Math.max(selection.focusOffset-1,0)
+          for(let j = start;j<end;j++){
             if(text[j]==" " || text[j]=="@"){
               end_index = j;
               break;
@@ -449,6 +487,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             state.showUserList = false;
           }
         }else{
+          state.start_index = selection.focusOffset;
           state.showUserList = false;
         }
       }
@@ -472,14 +511,13 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
               list.push(user.data);
               // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
             }else{
-              list.push({account_id:res.data[i]['account_id'],outer:true});
+              list.push({account_id:res.data[i]['account_id']});
             }
           }
           state.userList = list;
           state.isLoaingUserList = false;
         }
       }
-
       const debounce = (fn, delay) => {
         let timeout;
         return function(){
@@ -490,7 +528,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         }
       }
       const debounceInput = debounce(searchUser, 300)
-
       const onSelectSubmit = (item) => {
         let selection = window.getSelection();
         let range = window.getSelection().getRangeAt(0);
@@ -517,6 +554,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         range.insertNode(frag);
         selection.extend(lastNode, 1);
         selection.collapseToEnd();
+        //reset
+        const sel = window.getSelection();
+        state.focusNode = sel.focusNode;
+        state.focusOffset = sel.focusOffset;
         state.showUserList = false;
       }
 
@@ -596,50 +637,33 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //emoji
       const setEmoji = (emoji) => {
         if(checkLogin()){
-          // const selection = postInput.value;
-          // const text = selection.extentNode.nodeValue;
-          // console.log(selection,'00000');
-          // const left = text.substring(0,selection);
-          // const right = text.substring(selection);
-          // state.postForm.text = left + emoji + " " + right;
+          if(postInput.value.textContent && state.focusNode && state.focusNode.insertData){
+            let selection = window.getSelection();
+            let range = selection.getRangeAt(0);
+            const container = state.focusNode; 
+            const pos = state.focusOffset;
+            //insert
+            range = document.createRange(); 
+            var cons = window.document.createTextNode(emoji); 
+            container.insertData(pos, cons.nodeValue); 
+            range.setEnd(container, pos + cons.nodeValue.length); 
+            range.setStart(container, pos + cons.nodeValue.length); 
+            state.focusOffset = pos + cons.nodeValue.length;
 
-          // state.postForm.text = postInput.value.textContent;
-
-          postInput.value.innerHTML = postInput.value.innerHTML + emoji + "&nbsp;";
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }else{
+            postInput.value.innerHTML = postInput.value.innerHTML + emoji;
+          }
           state.postForm.text = postInput.value.textContent;
-          // const selection = window.getSelection();
-          // const focusOffset = state.focusOffset;
-          // let node = state.focusNode;
-          // let range = window.getSelection().getRangeAt(0);
-          // range.setStart(state.focusNode, focusOffset);
-          // range.setEnd(state.focusNode, focusOffset+1);
-          // if (node === dom) {
-            // var textNode = document.createTextNode(emoji);
-            // range.setStart(state.focusNode, 1)
-            // range.setEnd(state.focusNode, 1);
-            // range.insertNode(textNode);
-            
-          // } else {
-          //     var text = node.textContent;
-          //     node.textContent = text.substr(0, focusOffset) +  emoji + text.substr(focusOffset);
-          //     var offset = (text.substr(0, focusOffset) + emoji).length;
-          //     if (node.nodeType != 3) {
-          //         node = node.childNodes[0];
-          //     }
-          //     range.setStart(node, offset);
-          //     range.setEnd(node, offset);
-          // }
-          
 
-          // const selection = postInput.value.$el.getElementsByTagName('textarea')[0].selectionStart;
-          // const left = state.postForm.text.substring(0,selection);
-          // const right = state.postForm.text.substring(selection);
-          // state.postForm.text = left + emoji + " " + right;
-          // state.postForm.text = state.postForm.text + emoji + " ";
+          // selection.addRange(range); 
+          // selection.collapseToEnd();
         }
       }
       const setGif = (gif) => {
-        state.postForm.text = state.postForm.text + emoji;
+        state.postForm.text = state.postForm.text + gif;
       }
 
       //showCommunityBox
@@ -671,13 +695,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           usedCommunities.unshift(item);
           usedCommunities = deduplication(usedCommunities,'community');
           localStorage.setItem("usedCommunities",JSON.stringify(usedCommunities))
-        }else{
-          state.postForm.community= {
-            communityId:"",
-            avatar:"",
-            name:""
-          }
-          state.showCommunity = false;
         }
       }
 
@@ -748,7 +765,11 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             }
         });
         if(!has_selected){
-          state.postForm.access.push(item);
+          state.postForm.access.push({
+            icon: item.icon,
+            symbol: item.symbol,
+            tokenId: item.tokenId,
+          });
           state.searchValue = "";
           //usedTokenList
           let usedTokenList = JSON.parse(localStorage.getItem("usedTokenList")) || [];
@@ -893,15 +914,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           return;
         }
         proxy.$Loading.showLoading({title: "Loading"});
-        if(state.postForm.access.length>0){
-          await handleBlur();
-          await encryptPost();
-        }else{
-          await publicPost();
-        }
-      }
-
-      const publicPost = async () => {
+        //options
         const options = [];
         if(postInput.value.innerHTML){
           const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
@@ -910,6 +923,16 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             options.push({At:r[1].trim().substring(1)});
           }
         }
+        //submit
+        if(state.postForm.access.length>0){
+          await handleBlur();
+          await encryptPost(options);
+        }else{
+          await publicPost(options);
+        }
+      }
+
+      const publicPost = async (options) => {
         const params = {   
           args:JSON.stringify({
             text:postInput.value.innerHTML,
@@ -927,7 +950,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         handleSuccess(result);
       }
 
-      const encryptPost = async (param) => {
+      const encryptPost = async (options) => {
         //encrypt
         // const conditions = [{
         //   FTCondition:{
@@ -962,18 +985,22 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           contract_id:state.postForm.community.communityId,
         }
         const res = await encryptionContract.encrypt(param1);
+        
         // addEncryptPost
         const param2 = {
           encrypt_args:JSON.stringify(res.cipher_text),
           access,
           text_sign:res.text_sign,
           contract_id_sign:res.contract_id_sign,
-          blur_imgs:state.postForm.blur_imgs
+          blur_imgs:[...state.postForm.blur_imgs],
+          options
         }
+        
         let result = {}
         if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
           result = await mainContract.addEncryptPost(param2,store.state.account);
         }else{
+          console.log(state.postForm.community.communityId,param2,'------------');
           const communityContract = await CommunityContract.new(state.postForm.community.communityId);
           // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
           result = await communityContract.addEncryptPost(param2,store.state.account,state.postForm.community.communityId);
@@ -1059,11 +1086,14 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           },
           mint_price: state.postForm.nft.isPublicSale ? parseAmount(state.postForm.nft.mintPrice,24) : null, 
           ft_token_id: "near", 
-          notify_contract_id: store.state.nearConfig.MAIN_CONTRACT
+          notify_contract_id: state.postForm.community.communityId
         }
 
         let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
         const result = await nftContract.nftCreateSeries(params,deposit);
+        console.log(result,'hhhhh');
+        state.showNftBox = false;
+        handleSuccess(result);
       }
 
 
@@ -1127,6 +1157,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // popUser,
         init,
         onCheck,
+        onClick,
         onChange,
         onSelectSubmit,
         postInput,
@@ -1179,7 +1210,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // const pop_nft = document.getElementById('pop-nft'+this.location);
         // // const pop_btn = document.getElementById('pop-button'+this.location);
         // if(this.showNftBox && ((pop_nft &&　!pop_nft.contains(e.target)) || (pop_notice &&　!pop_notice.contains(e.target)))) {
-        //     console.log("hhhhhhhh");
         //     this.showNftBox = false;
         // }
 
@@ -1205,20 +1235,32 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       display:none;
     }
     &#postsuspend{
-      width:696px;
-      .postForm{
-        max-height:50vh;
-        overflow-y:scroll;
+      .post-form-box{
+        padding:20px 0 20px 20px;
+        .post-form{
+          max-height: 50vh;
+          overflow-y: scroll;
+        }
+        .div-input{
+          padding-right:14px;
+          padding-bottom:20px;
+        }
+        .image-item{
+          margin-top:15px;
+          margin-bottom: 20px;
+        }
+        :deep(.el-textarea){
+          height:39px;
+          padding:15px 20px 0 0;
+        }
       }
     }
-    .postForm{
+    .post-form-box{
       border-radius: 10px;
       background: #36363C;
       padding:20px 20px 20px 20px;
       position:relative;
       .div-input{
-        max-height:30vh;
-        overflow-y:scroll;
         position:relative;
         z-index:3;
         padding-left:36px;
@@ -1230,8 +1272,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         letter-spacing: 0;
         font-weight: 400;
         border:0;
-        text-align:justify;
-        
+        -webkit-user-modify: read-write-plaintext-only;
+        padding-bottom:35px;
       }
       .atFont{
         font-family: D-DINExp;
@@ -1258,7 +1300,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       :deep(.el-textarea){
         position:static!important;
         height:24px;
-        margin-top:34px;
+        overflow: hidden;
         textarea{
           background: transparent;
           padding:0;
@@ -1381,7 +1423,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           height: 180px;
           position:relative;
           margin-right:35px;
-          margin-top:35px;
+          margin-bottom:35px;
           &.mr0{
             margin-right:0;
           }

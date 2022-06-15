@@ -1,5 +1,5 @@
 <template>
-  <div class="main-box" v-if="detail.data">
+  <div class="main-box">
     <div v-if="detail.cover" class="bg-box" :style="'background-image:url('+detail.cover+');'">
       <div class="bg-mask"></div>
     </div>
@@ -82,9 +82,11 @@
             <div class="unread-count" v-if="postCount.new">{{postCount.new}}</div>
           </div>
         </div>
-        <template v-for="item in postList[currentTab]">
-          <PostItem :item="item" :from="'communityDetail'"/>
-        </template>
+        <div class="post-list">
+          <template v-for="item in postList[currentTab]">
+            <PostItem :item="item" :from="'community'"/>
+          </template>
+        </div>
 
         <div class="no-more" v-if="isEnd">
           <template v-if="postList[currentTab]['length'] == 0">No posts</template>
@@ -575,8 +577,10 @@
               accessKey: accessKey.accessKey
             }]
           }
-          await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          // state.detail.data.isJoin = !state.detail.data.isJoin;
+          const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+          if(result){
+            state.detail.data.isJoin = !state.detail.data.isJoin;
+          }
         }
       }
 
@@ -606,6 +610,7 @@
       //getPosts
       const getPosts = async () => {
         state.isLoading = true;
+        console.log("33333333");
         const res = await proxy.$axios.post.get_post_list({
           type: state.currentTab,
           page:state.page,
@@ -635,7 +640,7 @@
 
       //handleScroll
       const handleScroll = async () => {
-        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd){
+        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd && state.currentTab){
           const res = await getPosts();
           state.postList[state.currentTab] = state.postList[state.currentTab].concat(res.data);
         }
@@ -776,17 +781,16 @@
 
 <style lang="scss" scoped>
   .main-box{
-    padding-top:150px;
+    padding-top:220px;
     position:relative;
     .bg-box{
       position: absolute;
-      top:0;
-      left:50%;
+      top:80px;
+      left:0;
       width:100vw;
       height:300px;
       background:url('@/assets/images/community/bg.png') no-repeat center center;
       background-size:cover;
-      transform:translateX(-50%);
       .bg-mask{
         width:100%;
         height:100%;
@@ -1011,6 +1015,14 @@
   }
 
   .main-post{
+    .left{
+      .post-list{
+        background: #28282D;
+        border-radius: 24px;
+        padding:0 20px;
+        margin-top:20px;
+      }
+    }
     .right{
       .members{
         width: 320px;
@@ -1657,6 +1669,12 @@
       color: #FFFFFF;
       letter-spacing: 0;
       font-weight: 700;
+    }
+    .all-members-list{
+      background: #28282D;
+      border-radius: 24px;
+      padding:0 20px;
+      margin-top:20px;
     }
   }
 </style>

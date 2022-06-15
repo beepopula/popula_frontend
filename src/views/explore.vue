@@ -17,9 +17,12 @@
             <div class="unread-count" v-if="postCount.follow">{{postCount.follow}}</div>
           </div>
         </div>
-        <template v-for="item in postList[currentTab]">
-          <PostItem :item="item"/>
-        </template>
+
+        <div class="post-list">
+          <template v-for="item in postList[currentTab]">
+            <PostItem :item="item"/>
+          </template>
+        </div>
 
         <div class="no-more" v-if="isEnd">
           <template v-if="postList[currentTab]['length'] == 0">No posts</template>
@@ -238,6 +241,12 @@ export default {
 .main {
   .left{
     padding-right:20px;
+    .post-list{
+      background: #28282D;
+      border-radius: 24px;
+      padding:0 20px;
+      margin-top:20px;
+    }
   }
   .right{
     .new-communities{

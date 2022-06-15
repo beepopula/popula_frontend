@@ -74,6 +74,15 @@ const routes = [
       //     redirectPage:'home',
       //   }
       // },
+      {
+        path: "/notice",
+        name: "Notice",
+        component: () => import("../views/notice.vue"),
+        meta:{
+          requireAuth:true,
+          redirectPage:'home',
+        }
+      },
     ],
   },
 ];

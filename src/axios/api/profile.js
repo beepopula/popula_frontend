@@ -21,4 +21,7 @@ export default {
   get_user_nfts(data) {
     return get("v1/communities/findLikelyNFTs", data);
   },
+  get_user_notifications(data) {
+    return get("v1/user/getNotifications", data);
+  },
 };

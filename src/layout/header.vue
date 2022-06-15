@@ -13,6 +13,8 @@
         <div :class="['right-nav-item','nav-hover',$route.path == '/explore' ? 'action' : '']" @click="redirectPage('/explore')"><span>Explore</span></div>
         <div v-if="false" :class="['right-nav-item','nav-hover',$route.path.indexOf('/create')>-1 ? 'action' : '']" @click="redirectPage('/create-list')"><span>Tools</span></div>
         <a v-if="false" class="right-nav-item nav-hover" target="_blank" href="https://www.notion.so/bepopula/FAQs-81506fb8e8ab4a68b837aee0decfb888"><span>Learn</span></a>
+        
+        <div :class="['notice',hasNotice && $route.path.indexOf('/notice') == -1 ?'has-notice':'']" v-if="store.getters.isLogin" @click="redirectPage('/notice')"></div>
         <div v-if="!store.getters.isLogin" class="user-login mini-button-border">
           <div class="mini-button" @click="showLoginMask">Sign in</div>
         </div>
@@ -67,7 +69,17 @@ export default {
       oldSearchWord:"",
       searchWord:"",
       showLogin:false,
+      hasNotice:false,
     })
+
+    const init = async () => {
+      if(route.path.indexOf('/notice') == -1){
+        const res = await initNotice();
+        if(res.success && res.data.length>0){
+          state.hasNotice  = true;
+        }
+      }
+    }
 
     watch(
 			() => route.path,
@@ -77,8 +89,22 @@ export default {
           state.oldSearchWord = ""
           store.commit("setSearchWord", state.searchWord);
         }
+        if(route.path.indexOf('/notice') == -1){
+          initNotice().then(res=>{
+            if(res.success && res.data.length>0){
+              state.hasNotice  = true;
+            }
+          })
+        }
 			}
 		);
+
+    const initNotice = async () => {
+      return await proxy.$axios.profile.get_user_notifications({
+        accountId:store.getters.accountId,
+        lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
+      })
+    }
 
     const search = () => {
       if(state.oldSearchWord == state.searchWord || !state.searchWord ){return}
@@ -136,6 +162,7 @@ export default {
 
     return {
       ...toRefs(state),
+      init,
       search,
       switchModel,
       store,
@@ -149,6 +176,9 @@ export default {
       closeLoginMask
     };
   },
+  mounted(){
+    this.init();
+  }
 };
 </script>
 
@@ -244,7 +274,7 @@ export default {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            margin:0 0 0 112px;
+            margin:0 0 0 30px;
           }
         }
 
@@ -263,6 +293,18 @@ export default {
             width: 12px;
             transition: .5s;
           }
+        }
+      }
+
+      .notice{
+        width:24px;
+        height:24px;
+        background:url('@/assets/images/notice/icon-notice.png') no-repeat center center;
+        background-size:cover;
+        margin-left:20px;
+        cursor: pointer;
+        &.has-notice{
+          background-image:url('@/assets/images/notice/icon-notice-msg.png');
         }
       }
 

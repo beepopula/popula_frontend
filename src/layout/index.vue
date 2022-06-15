@@ -376,6 +376,12 @@ export default {
       &.pop-notice{
         z-index:99;
         padding:30px;
+        .intro{
+          a{
+            display: inline;
+            color: rgba(255,255,255,1);
+          }
+        }
       }
       &.pop-hash{
         width:198px;
@@ -390,10 +396,9 @@ export default {
       }
       .intro{
         margin-top:8px;
-        opacity: 0.5;
         font-family: D-DINExp;
         font-size: 14px;
-        color: #FFFFFF;
+        color: rgba(255,255,255,0.5);
         letter-spacing: 0;
         text-align: left;
         line-height: 22px;
@@ -479,9 +484,11 @@ export default {
     background: rgba(0,0,0,1);
     z-index:99;
     .layer-content{
+      overflow-x:hidden;
       overflow-y:scroll;
       padding:60px 10px 60px 0;
       max-height:100vh;
+      width:100%;
     }
     .edit-button{
       width: 50px;
@@ -587,7 +594,6 @@ export default {
     }
 
     .suspend-elastic-layer{
-      overflow-y:scroll;
       .elastic-layer-content{
         position:absolute;
         top:50%;

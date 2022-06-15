@@ -1,9 +1,9 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete" :key="item.target_hash">
-    <div class="post-item" ref="txtBox">
+  <div class="post-item-box" v-if="!isBlocked && !hasDelete" :key="item.target_hash">
+    <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox">
       <div class="user">
         <!-- community -->
-        <template v-if="community.communityId && from!='communityDetail'">
+        <template v-if="community.communityId && from!='community'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
               <img v-if="community.avatar"  class="avatar avatar-community" :src="community.avatar">
@@ -472,7 +472,6 @@ export default {
     }
 
     const initNft = async () => {
-      console.log(state.token_series_id)
       if(!state.token_series_id){return;}
       const nft_info = await nftContract.getSeries({token_series_id:state.token_series_id});
       const supply = await nftContract.getSupply({token_series_id:state.token_series_id});
@@ -539,6 +538,7 @@ export default {
       state.access = check_result.access;
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //comment
+        
         emit("changeAccess");
         //decrypt
         const result = await proxy.$axios.post.get_sign({
@@ -583,7 +583,7 @@ export default {
     watch(
       () => textDom.value,
       (newVal) => {
-        if(!textBox || !textDom){return;}
+        if(!textBox || !textDom || !textBox.value || !textDom.value){return;}
         const textBoxHeight = textBox.value.getBoundingClientRect().height;
         const textDomHeight = textDom.value.getBoundingClientRect().height
         if(textBoxHeight>textDomHeight){
@@ -670,9 +670,6 @@ export default {
       nextTick(() => {
         copy_text.value.click();
       });
-      if(isShare){
-        await shareRecord();
-      }
     }
     const handleCopyFun = () => {
       const clipboard = new Clipboard('#copy_text')
@@ -802,12 +799,22 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .post-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
+
   .post-item{
-    margin-top:20px;
+    padding:20px 0;
+    margin-top:0;
     background: #28282D;
     border-radius: 24px;
-    padding:20px;
     cursor: pointer;
+    &.post-item-detail{
+      cursor: default;
+    }
     .user{
       height:40px;
       display:flex;
@@ -845,6 +852,7 @@ export default {
           display:flex;
           align-items: center;
           width:300px;
+          cursor: pointer;
           .username{
             color: rgba(255,255,255,1);
             display:flex;

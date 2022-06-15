@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete">
+  <div class="comment-item-box" v-if="!isBlocked && !hasDelete">
     <div :class="['comment-item',from=='elastic-layer' ? 'layer-comment-item' : '']" @click.self="showCommentLayer()">
       <!-- user -->
       <div class="user" v-if="$props.item.data">
@@ -161,6 +161,7 @@
               :item="item" 
               :commentC="commentCount" 
               :from="'elastic-layer-parent'"
+              :level="$props.level+1"
             />
           </div>
           <Comment 
@@ -178,7 +179,7 @@
           </div>
           <div class="child-comments">
             <template v-for="item in commentList[currentTab]">
-              <CommentItem :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
+              <CommentItem :level="$props.level+1" :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
             </template>
           </div>
           <div class="no-more" v-if="isEnd">
@@ -240,7 +241,11 @@ export default {
     hasBack:{
       type:Boolean,
       value:false
-    }
+    },
+    level:{
+      type:Number,
+      value:1
+    },
   },
   setup(props,{ emit }) {
     const store = useStore();
@@ -322,6 +327,7 @@ export default {
     )
 
     const init = async() => {
+      console.log(props.level);
       //filter blockList
       if(isInBlockList()) return;
       state.isBlocked = false;
@@ -374,6 +380,7 @@ export default {
     //comment
     const reply = () => {
       if(checkLogin()){
+        // if(props.level>=5){return}
         state.focusComment=true;
         state.showCommentBox=!state.showCommentBox;
       }
@@ -397,7 +404,7 @@ export default {
 
     //showCommentLayer
     const showCommentLayer = () => {
-      if(props.from=='elastic-layer-parent'){return;}
+      if(props.from=='elastic-layer-parent'){return;} // || props.level>=5
       document.getElementsByTagName('body')[0].classList.add("fixed");
       state.showCommentList = true;
       changeTab('hot');
@@ -458,9 +465,6 @@ export default {
       nextTick(() => {
         copy_text.value.click();
       });
-      if(isShare){
-        await shareRecord();
-      }
     }
     const handleCopyFun = () => {
       const clipboard = new Clipboard('#copy_text'+props.item.target_hash)
@@ -606,6 +610,12 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .comment-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
   .comment-item{
     background: #28282D;
     border-radius: 24px;

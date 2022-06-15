@@ -3,24 +3,25 @@
     <div class="main">
       <!-- left -->
       <div class="left">
-        <!-- Community -->
-        <div class="Community-info" v-if="postCommunity.data">
-          <img v-if="postCommunity.avatar" @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" :src="postCommunity.avatar"/>
-          <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/test/community.png"/>
-          <div class="info">
-            <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
-            <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
-            <div class="total">
-              <div class="total-item"><span>{{postCommunity.data.membersCount}}</span> Members</div>
-              <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
+        <div class="post-detail">
+          <!-- Community -->
+          <div class="Community-info" v-if="postCommunity.data">
+            <img v-if="postCommunity.avatar" @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" :src="postCommunity.avatar"/>
+            <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/test/community.png"/>
+            <div class="info">
+              <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
+              <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
+              <div class="total">
+                <div class="total-item"><span>{{postCommunity.data.membersCount}}</span> Members</div>
+                <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
+              </div>
+            </div>
+            <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT" class="mini-button-border join-button" @click="changeJoinCommunity()">
+              <div class="mini-button" v-if="postCommunity.data.isJoin">  Joined  </div>
+              <div class="mini-button" v-else>  Join  </div>
             </div>
           </div>
-          <div class="mini-button-border join-button" @click="changeJoinCommunity()">
-            <div class="mini-button" v-if="postCommunity.data.isJoin">  Joined  </div>
-            <div class="mini-button" v-else>  Join  </div>
-          </div>
-        </div>
-        <!-- PostItem  -->
+          <!-- PostItem  -->
           <template v-if="postDetail.target_hash">
             <PostItem 
               :item="postDetail" 
@@ -30,6 +31,7 @@
               @focus="focusComment=!focusComment"
             />
           </template>
+        </div>
         <!-- Comment  -->
         <div style="margin-top:20px;"></div>
         <Comment 
@@ -51,7 +53,7 @@
           </div>
           <div class="all-comments">
             <template v-for="item in comments[currentTab]">
-              <CommentItem :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
+              <CommentItem :level="1" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
             </template>
           </div>
 
@@ -231,18 +233,10 @@ export default {
             accessKey: accessKey.accessKey
           }]
         }
-
-        // const task_transaction = {
-        //   receiverId: state.postDetail.receiverId,
-        //   actions: [{
-        //     methodName: "join",
-        //     args: {},
-        //     deposit: "20000000000000000000000",
-        //     gas: '300000000000000'
-        //   }]
-        // }
-        await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-        // state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+        const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+        if(result){
+          state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+        }
       }
     }
 
@@ -260,7 +254,7 @@ export default {
       closeSuspendLayer();
       state.commentCount += 1;
       setTimeout(()=>{
-        changeTab(state.newTab);
+        changeTab('new');
       },1000);
     }
 
@@ -371,64 +365,68 @@ export default {
 .main {
   .left{
     padding-right:20px;
-    .Community-info{
+    .post-detail{
       background: #28282D;
       border-radius: 24px;
-      padding:20px;
-      display:flex;
-      align-items: center;
-      position: relative;
-      .avatar{
-        width: 90px;
-        height: 90px;
-        border-radius: 16px;
-        cursor:pointer;
-        object-fit: cover;
-      }
-      .info{
-        margin-left:30px;
-        .name{
-          line-height: 22px;
-          font-family: D-DINExp-Bold;
-          font-size: 20px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
+      padding:0 20px;
+      .Community-info{
+        background: #28282D;
+        padding:20px 0;
+        display:flex;
+        align-items: center;
+        position: relative;
+        .avatar{
+          width: 90px;
+          height: 90px;
+          border-radius: 16px;
           cursor:pointer;
+          object-fit: cover;
         }
-        .creator{
-          margin-top:8px;
-          opacity: 0.5;
-          font-family: D-DINExp;
-          font-size: 14px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 400;
-          cursor:pointer;
-        }
-        .total{
-          margin-top:20px;
-          display:flex; 
-          .total-item{
-            margin-right:30px;
+        .info{
+          margin-left:30px;
+          .name{
+            line-height: 22px;
+            font-family: D-DINExp-Bold;
+            font-size: 20px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            cursor:pointer;
+          }
+          .creator{
+            margin-top:8px;
+            opacity: 0.5;
             font-family: D-DINExp;
             font-size: 14px;
-            color: rgba(255,255,255,0.5);
+            color: #FFFFFF;
             letter-spacing: 0;
             font-weight: 400;
-            span{
-              font-size: 16px;
-              color: #FFFFFF;
+            cursor:pointer;
+          }
+          .total{
+            margin-top:20px;
+            display:flex; 
+            .total-item{
+              margin-right:30px;
+              font-family: D-DINExp;
+              font-size: 14px;
+              color: rgba(255,255,255,0.5);
               letter-spacing: 0;
-              font-weight: 700;
+              font-weight: 400;
+              span{
+                font-size: 16px;
+                color: #FFFFFF;
+                letter-spacing: 0;
+                font-weight: 700;
+              }
             }
           }
         }
-      }
-      .join-button{
-        position: absolute;
-        top:47px;
-        right:20px;
+        .join-button{
+          position: absolute;
+          top:47px;
+          right:20px;
+        }
       }
     }
 
@@ -455,6 +453,9 @@ export default {
           border-radius:50%;
           cursor:pointer;
           object-fit: cover;
+        }
+        .follow-button{
+          position: relative;
         }
       }
       .name{

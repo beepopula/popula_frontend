@@ -137,7 +137,8 @@
     margin-top:20px;
     margin-right:20px;
     width: 335px;
-    height: 394px;
+    max-width:100%;
+    height: 392px;
     background: #28282D;
     border-radius: 24px;
     overflow: hidden;
@@ -149,8 +150,8 @@
       transform:translateX(-1px);
     }
     .cover{
-      width: 335px;
-      height: 150px;
+      width: 100%;
+      height: 160px;
       object-fit: cover;
     }
     .avatar-border{
@@ -159,8 +160,8 @@
       background:#28282D;
       border-radius: 20px;
       position:absolute;
-      top:132px;
-      left:20px;
+      top:126px;
+      left:16px;
       display:flex;
       align-items: center;
       justify-content:center;
@@ -172,7 +173,7 @@
       }
     }
     .info{
-      padding:16px 20px 20px;
+      padding:20px;
       .item-token{
         height:30px;
         display:flex;
@@ -217,7 +218,7 @@
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
-        margin-top:36px;
+        margin-top:16px;
         line-height: 20px;
       }
       .creator{
