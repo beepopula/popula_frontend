@@ -39,13 +39,13 @@
           :parentAccount="postDetail.accountId"
           :hierarchies="[]"
           :communityId="postDetail.receiverId" 
-          :methodName="postDetail.methodName"
+          :postType="postDetail.type"
           :focus="focusComment"
           @comment="comment"
         />
 
         <!-- All Comments -->
-        <template v-if="postDetail.methodName!='add_encrypt_content' || isAccess">
+        <template v-if="postDetail.type!='encrypt' || isAccess">
           <div class="all-comments-title">
             <div class="font20">Comments({{commentCount}})</div>
             <div class="filter-menu">
@@ -131,7 +131,7 @@
             :parentAccount="postDetail.accountId"
             :hierarchies="[]"
             :communityId="postDetail.receiverId" 
-            :methodName="postDetail.methodName"
+            :postType="postDetail.type"
             @comment="comment()"
           />
         </div>

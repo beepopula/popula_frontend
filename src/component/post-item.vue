@@ -80,7 +80,7 @@
           </div>
         </el-popover>
       </div>
-      <div v-if="item.methodName=='add_encrypt_content' && !isAccess" class="default-content" @click="redirectPage('/detail/'+item.target_hash,false)">
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click="redirectPage('/detail/'+item.target_hash,false)">
         This is a Tonken-gated contect.
       </div>
       <template v-else>
@@ -110,7 +110,7 @@
       <div class="info-bottom">
         <div class="info-left">
           <!-- token -->
-          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_content' && !isChecking">
+          <el-popover placement="bottom-start"  trigger="hover" v-if="item.type=='encrypt' && !isChecking">
             <template #reference>
               <div class="bottom-token-list">
                 <template v-for="item in access.conditions">
@@ -237,7 +237,7 @@
           :targetHash="item.target_hash" 
           :parentAccount="user.account_id"
           :communityId="item.receiverId" 
-          :methodName="item.methodName" 
+          :postType="item.type"
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
@@ -448,7 +448,7 @@ export default {
         state.community = res.data.postCommunity;
       }
       //access
-      if(props.item.methodName=='add_encrypt_content'){
+      if(props.item.type=='encrypt'){
         checkAccess();
       }else{
         state.isChecking = false

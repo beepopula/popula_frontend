@@ -37,7 +37,7 @@
                 </div>
               </div>
               <div class="reply-user">Replying to you</div> 
-              <pre v-if="item.methodName != 'add_encrypt_content' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
+              <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
               <div class="text-default" v-else>
                 <img src="@/assets/images/post-item/text-default.png"/>
               </div>
@@ -205,7 +205,7 @@ export default {
             item.user = res.data;
           }
           //text
-          if(item.methodName == 'add_encrypt_content'){
+          if(item.type == 'encrypt'){
             const info = await checkAccess(item);
             if(info.isAccess){
               item.text = info.text;
@@ -222,7 +222,7 @@ export default {
             item.url = `/detail/${item.post.target_hash}`
           }
           //text
-          if(item.methodName == 'add_encrypt_content'){
+          if(item.type == 'encrypt'){
             const info = await checkAccess(item);
             if(info.isAccess){
               item.text = info.text;

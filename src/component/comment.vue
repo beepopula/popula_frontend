@@ -125,7 +125,7 @@ export default {
       type:String,
       value:""
     },
-    methodName:{
+    postType:{
       type:String,
       value:""
     },
@@ -412,7 +412,7 @@ export default {
           }
         }
         //submit
-        if(props.methodName == "add_encrypt_content"){
+        if(props.postType == "encrypt"){
           await encryptReply(hierarchies,options);
         }else{
           await publicReply(hierarchies,options);

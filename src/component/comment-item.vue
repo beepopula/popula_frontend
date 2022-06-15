@@ -142,7 +142,7 @@
           :parentAccount="item.accountId"
           :hierarchies="item.hierarchies"
           :communityId="item.receiverId" 
-          :methodName="post.methodName" 
+          :postType="post.type" 
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
@@ -171,7 +171,7 @@
             :parentAccount="item.accountId"
             :hierarchies="item.hierarchies"
             :communityId="item.receiverId" 
-            :methodName="post.methodName" 
+            :postType="post.type" 
             @comment="commentRefresh"
           />
           <div class="all-comments-title">
@@ -349,7 +349,7 @@ export default {
       state.time = getTimer(props.item.createAt)
       //text
       let text = "";
-      if(props.post.methodName != 'add_encrypt_content'){
+      if(props.post.type != 'encrypt'){
         text = props.item.text
       }else{
         //decrypt

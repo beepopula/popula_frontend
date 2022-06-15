@@ -171,7 +171,7 @@
             :parentAccount="item.accountId"
             :hierarchies="item.hierarchies"
             :communityId="item.receiverId" 
-            :methodName="post.methodName" 
+            :postType="post.type" 
             @comment="commentRefresh"
           />
           <div class="all-comments-title">
