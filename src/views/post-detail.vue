@@ -45,7 +45,7 @@
         />
 
         <!-- All Comments -->
-        <template v-if="postDetail.methodName!='add_encrypt_post' || isAccess">
+        <template v-if="postDetail.methodName!='add_encrypt_content' || isAccess">
           <div class="all-comments-title">
             <div class="font20">Comments({{commentCount}})</div>
             <div class="filter-menu">

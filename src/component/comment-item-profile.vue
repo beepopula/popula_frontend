@@ -144,7 +144,7 @@
           :parentAccount="item.accountId"
           :hierarchies="item.hierarchies"
           :communityId="item.receiverId" 
-          :methodName="item.type=='encrypt'?'add_encrypt_post':'add_post'" 
+          :methodName="item.type=='encrypt'?'add_encrypt_content':'add_content'" 
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
@@ -251,7 +251,7 @@ export default {
       post:{
         accountId:'',
         target_hash:props.item.postId,
-        methodName:props.item.type=='encrypt'?'add_encrypt_post':'add_post'
+        methodName:props.item.type=='encrypt'?'add_encrypt_content':'add_content'
       },
       //user
       user:props.item.user,
@@ -340,18 +340,13 @@ export default {
         text = props.item.text
       }else{
         //decrypt
-        const result = await proxy.$axios.post.get_sign({
-          postId:props.item.postId,
-          commentId :props.item.target_hash,
+        const res = await proxy.$axios.post.get_decode_content({
+          postId:props.item.target_hash,   //postId=>commentId
           accountId:store.getters.accountId
         });
-        const param = {
-          cipher_text: JSON.parse(props.item.encrypt_args), 
-          contract_id: props.item.receiverId, 
-          sign: result.data.text_sign
+        if(res.success){
+          text = res.data.text;
         }
-        const res = await encryptionContract.decrypt(param);
-        text = res.text;
       }
       state.text = text;
 
@@ -537,13 +532,14 @@ export default {
           });
           return;
         }
+        state.hasDelete = true;
         proxy.$Message({
           message: "delete success",
           type: "success",
         });
       }
     }
-    
+
     const report = async () => {
       if(checkLogin()){
         const params = {
@@ -574,16 +570,6 @@ export default {
           message: "report success",
           type: "success",
         });
-        // const res = await proxy.$axios.post.report({
-        //   commentId:props.item.target_hash,
-        //   accountId:store.getters.accountId || ''
-        // });
-        // if(res.success){
-        //   proxy.$Message({
-        //     message: "report success",
-        //     type: "success",
-        //   });
-        // }
       }
     }
     const block = async () => {

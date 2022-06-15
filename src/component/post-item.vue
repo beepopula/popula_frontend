@@ -80,27 +80,10 @@
           </div>
         </el-popover>
       </div>
-      <div v-if="item.methodName=='add_encrypt_post' && !isAccess" class="default-content">
+      <div v-if="item.methodName=='add_encrypt_content' && !isAccess" class="default-content" @click="redirectPage('/detail/'+item.target_hash,false)">
         This is a Tonken-gated contect.
       </div>
       <template v-else>
-        <!-- token-list -->
-        <!--
-        <div class="token-list" v-if="item.methodName=='add_encrypt_post' && !isAccess && !isChecking">
-          <div class="token-item" v-for="item in access.conditions">
-            <img class="token-icon" :src="item.FTCondition.icon"/>
-            <div class="token-count">
-              <span class="balance">{{item.FTCondition.balance}} {{item.FTCondition.symbol}}</span>
-              <span class="total">/ {{item.FTCondition.amount_to_access}} {{item.FTCondition.symbol}}</span>
-            </div>
-            <div class="token-get" @click.stop="getToken(item.FTCondition.tokenId)">
-              How to get
-              <img class="more-arrow" src="@/assets/images/common/icon-arrow-right.png"/>
-            </div>
-          </div>
-          <div class="token-tip">This is a token-gated content.</div>
-        </div>
-        -->
         <!-- text -->
         <div v-if="text" class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
           <pre v-if="from=='detail'"><div v-html="text"></div></pre>
@@ -119,24 +102,15 @@
           -->
         </div>
         <!-- images -->
-        <!-- (item.methodName=='add_post' || item.type=='nft' || isAccess) &&  -->
         <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
           <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
         </div>
-        <!--
-        <div v-else-if="blur_imgs.length>0" :class="['images', 'images'+blur_imgs.length, blur_imgs.length>3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-          <div class="img" v-for="(img,index) in blur_imgs">
-            <img :src="img">
-            <div class="icon-lock"></div>
-          </div>
-        </div>
-        -->
       </template>
       <!-- bottom edit -->
       <div class="info-bottom">
         <div class="info-left">
           <!-- token -->
-          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_post' && !isChecking">
+          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_content' && !isChecking">
             <template #reference>
               <div class="bottom-token-list">
                 <template v-for="item in access.conditions">
@@ -459,12 +433,7 @@ export default {
         state.text = state.text.replace(/<\/?.+?>/g, "").replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
         // state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
       }
-      // else{
-      //   const reg = RegExp(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/,"g");
-      //   state.text = state.text.replace(reg,(match)=>{
-      //     return `<span class='emoji'>${match}</span>`
-      //   })
-      // }
+
 
       //time
       state.time = getTimer(props.item.createAt)
@@ -479,7 +448,7 @@ export default {
         state.community = res.data.postCommunity;
       }
       //access
-      if(props.item.methodName=='add_encrypt_post'){
+      if(props.item.methodName=='add_encrypt_content'){
         checkAccess();
       }else{
         state.isChecking = false
@@ -558,27 +527,19 @@ export default {
       state.access = check_result.access;
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //comment
-        
         emit("changeAccess");
         //decrypt
-        const result = await proxy.$axios.post.get_sign({
+        const res = await proxy.$axios.post.get_decode_content({
           postId:props.item.target_hash,
-          accountId:store.getters.accountId
+          accountId:store.getters.accountId || ''
         });
-        const param = {
-          cipher_text: JSON.parse(props.item.encrypt_args), 
-          contract_id: state.community.communityId, 
-          sign: result.data.text_sign
-        }
-        const res = await encryptionContract.decrypt(param);
-        state.text = res.text;
-        if(props.searchWord){
-          const reg = RegExp(props.searchWord,"ig");
-          state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
-        }
-        state.images = Object.values(JSON.parse(res.imgs));
-        state.isAccess = check_result.is_access;
-        if(store.getters.accountId==props.item.accountId){
+        if(res.success){
+          state.text = res.data.text;
+          if(props.searchWord){
+            const reg = RegExp(props.searchWord,"ig");
+            state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
+          }
+          state.images = res.data.imgs;
           state.isAccess = true;
         }
       }
@@ -751,6 +712,7 @@ export default {
           });
           return;
         }
+        state.hasDelete = true;
         proxy.$Message({
           message: "delete success",
           type: "success",

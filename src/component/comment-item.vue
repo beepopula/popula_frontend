@@ -349,29 +349,19 @@ export default {
       state.time = getTimer(props.item.createAt)
       //text
       let text = "";
-      if(props.post.methodName != 'add_encrypt_post'){
+      if(props.post.methodName != 'add_encrypt_content'){
         text = props.item.text
       }else{
         //decrypt
-        const result = await proxy.$axios.post.get_sign({
-          postId:props.post.target_hash,
-          commentId :props.item.target_hash,
+        const res = await proxy.$axios.post.get_decode_content({
+          postId:props.item.target_hash,   //postId=>commentId
           accountId:store.getters.accountId
         });
-        const param = {
-          cipher_text: JSON.parse(props.item.encrypt_args), 
-          contract_id: props.item.receiverId, 
-          sign: result.data.text_sign
+        if(res.success){
+          text = res.data.text;
         }
-        const res = await encryptionContract.decrypt(param);
-        text = res.text;
       }
       state.text = text;
-
-      // const reg = RegExp(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/,"g");
-      // state.text = text.replace(reg,(match)=>{
-      //   return `<span class='emoji'>${match}</span>`
-      // })
 
       if(props.defaultComment == props.item.target_hash){
         showCommentLayer();
@@ -555,6 +545,7 @@ export default {
           });
           return;
         }
+        state.hasDelete = true;
         proxy.$Message({
           message: "delete success",
           type: "success",

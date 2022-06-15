@@ -994,7 +994,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             access,
             options,
             hierarchies:[],
-            encrypt_args:JSON.stringify(res.data.encode),
+            encrypt_args:res.data.encode,//JSON.stringify(res.data.encode),
             nonce:res.data.nonce.toString(),
             sign:res.data.sign,
             // blur_imgs:[...state.postForm.blur_imgs],

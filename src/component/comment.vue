@@ -412,7 +412,7 @@ export default {
           }
         }
         //submit
-        if(props.methodName == "add_encrypt_post"){
+        if(props.methodName == "add_encrypt_content"){
           await encryptReply(hierarchies,options);
         }else{
           await publicReply(hierarchies,options);
@@ -467,8 +467,8 @@ export default {
           // encrypt_args:JSON.stringify(res.cipher_text), 
           // text_sign:res.text_sign,
           // contract_id_sign:res.contract_id_sign,
-          encrypt_args:JSON.stringify(res.data.encode),
-          nonce:res.data.nonce,
+          encrypt_args:res.data.encode,
+          nonce:res.data.nonce.toString(),
           sign:res.data.sign,
         }
         let result = {}
@@ -550,7 +550,7 @@ export default {
 
 <style lang="scss" scoped>
 .comment{
-  width: 696px;
+  width: 690px;
   padding:20px;
   background: #28282D;
   border-radius: 24px;
