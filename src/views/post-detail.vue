@@ -33,7 +33,7 @@
           </template>
         </div>
         <!-- Comment  -->
-        <template v-if="postDetail.type!='encrypt' || isAccess">
+        <template v-if="postDetail.type!='encrypt' || isAccess || $store.getters.accountId==postDetail.accountId">
           <div style="margin-top:20px;"></div>
           <Comment 
             :targetHash="$route.params.id" 
@@ -209,7 +209,7 @@ export default {
         state.joinedCommunities = res.data.JoinedCommunities.slice(0,3);
       }
       //comment
-      if(state.postDetail.type!='encrypt' || state.isAccess){
+      if(state.postDetail.type!='encrypt' || state.isAccess || store.getters.accountId==state.postDetail.accountId){
         changeTab('hot');
       }
     };

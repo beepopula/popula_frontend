@@ -13,7 +13,6 @@
               <FollowButton 
                 :isFollow="user.data.isFollow" 
                 :accountId="user.account_id" 
-                :background="'#000'" 
                 @follow = "follow"
               />
             </div>

@@ -339,7 +339,6 @@ export default {
       //time
       state.time = getTimer(props.item.createAt)
       //text
-      let text = "";
       if(props.item.type !== 'encrypt'){
         state.text = props.item.text;
       }else{
@@ -350,8 +349,9 @@ export default {
     const checkAccess = async () => {
       let check_result = {}
       if(store.getters.accountId!=props.item.accountId){
-        // check_result = await checkCondition(props.item.access);
+        check_result = await checkCondition(props.item.access);
       }
+      console.log(props.item.target_hash,check_result);
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //decrypt
         const res = await proxy.$axios.post.get_decode_content({
