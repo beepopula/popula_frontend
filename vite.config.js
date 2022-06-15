@@ -47,4 +47,7 @@ export default defineConfig({
   compilerOptions: {
     types: ["node", "vite/client"],
   },
+  build: {
+    target: 'esnext'
+  }
 });

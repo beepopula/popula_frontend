@@ -5,6 +5,7 @@ import api from '@/axios/index.js';
 import { getMetadata } from "../contract/TokenContract";
 import { getQueryString, parseAmount } from "./util";
 import { getTxData, storeAccessKey } from "./transaction";
+import { Ceramic } from "./ceramic";
 
 
 
@@ -51,6 +52,7 @@ async function initSignIn() {
   // }
   store.commit("setAccount", account)
   store.commit("setSignedIn", true)
+  Ceramic.new()
   let res = await api.profile.get_user_info({accountId:store.getters.accountId})
   if (res.success) {
     store.commit("setProfile", res.data)
@@ -105,7 +107,7 @@ export async function init() {
     ...store.state.nearConfig,
   });
   // 
-  //store.commit("setNear", near);
+  store.commit("setNear", near);
   const walletConnection = new nearAPI.WalletConnection(near, "popula")
   store.commit("setWalletConnection", walletConnection);
   await initSenderWallet(keyStore, walletConnection)
