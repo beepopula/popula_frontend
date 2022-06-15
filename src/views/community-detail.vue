@@ -779,13 +779,14 @@
     padding-top:150px;
     position:relative;
     .bg-box{
-      position: fixed;
+      position: absolute;
       top:0;
-      left:0;
-      width:100%;
+      left:50%;
+      width:100vw;
       height:300px;
       background:url('@/assets/images/community/bg.png') no-repeat center center;
       background-size:cover;
+      transform:translateX(-50%);
       .bg-mask{
         width:100%;
         height:100%;
