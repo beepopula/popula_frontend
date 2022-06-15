@@ -205,7 +205,7 @@ export default {
             item.user = res.data;
           }
           //text
-          if(item.type == 'encrypt'){
+          if(item.comment.type == 'encrypt'){
             const info = await checkAccess(item);
             if(info.isAccess){
               item.text = info.text;
@@ -222,19 +222,28 @@ export default {
             item.url = `/detail/${item.post.target_hash}`
           }
           //text
-          if(item.type == 'encrypt'){
-            const info = await checkAccess(item);
-            if(info.isAccess){
-              item.text = info.text;
-              item.isAccess = info.isAccess
-            }
-          }else{
-            if(item.type == 'comment'){
+          if(item.type == 'comment'){
+            if(item.comment.type== 'encrypt'){
+              const info = await checkAccess(item);
+              if(info.isAccess){
+                item.text = info.text;
+                item.isAccess = info.isAccess
+              }
+            }else{
               item.text = item.comment.text;
-            }else if(item.type == 'post'){
+            }
+          }else if(item.type == 'post'){
+            if(item.post.type== 'encrypt'){
+              const info = await checkAccess(item);
+              if(info.isAccess){
+                item.text = info.text;
+                item.isAccess = info.isAccess
+              }
+            }else{
               item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
             }
           }
+          
         }
         list.push(item);
       }
