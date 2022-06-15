@@ -52,7 +52,7 @@ async function initSignIn() {
   // }
   store.commit("setAccount", account)
   store.commit("setSignedIn", true)
-  Ceramic.new()
+  //Ceramic.new()
   let res = await api.profile.get_user_info({accountId:store.getters.accountId})
   if (res.success) {
     store.commit("setProfile", res.data)
