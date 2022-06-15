@@ -33,19 +33,19 @@
           </template>
         </div>
         <!-- Comment  -->
-        <div style="margin-top:20px;"></div>
-        <Comment 
-          :targetHash="$route.params.id" 
-          :parentAccount="postDetail.accountId"
-          :hierarchies="[]"
-          :communityId="postDetail.receiverId" 
-          :postType="postDetail.type"
-          :focus="focusComment"
-          @comment="comment"
-        />
-
-        <!-- All Comments -->
         <template v-if="postDetail.type!='encrypt' || isAccess">
+          <div style="margin-top:20px;"></div>
+          <Comment 
+            :targetHash="$route.params.id" 
+            :parentAccount="postDetail.accountId"
+            :hierarchies="[]"
+            :communityId="postDetail.receiverId" 
+            :postType="postDetail.type"
+            :focus="focusComment"
+            @comment="comment"
+          />
+
+          <!-- All Comments -->
           <div class="all-comments-title">
             <div class="font20">Comments({{commentCount}})</div>
             <div class="filter-menu">
@@ -118,7 +118,7 @@
     <!-- suspend -->
     <div class="suspend">
       <div id="backTop" class="back-top" @click="backTop()"></div>
-      <div class="button-box" @click="popUp()">
+      <div class="button-box" v-if="postDetail.type!='encrypt' || isAccess"  @click="popUp()">
         <div class="button">
           <img src="@/assets/images/post-item/icon-comment.png"/>
         </div>
@@ -209,7 +209,9 @@ export default {
         state.joinedCommunities = res.data.JoinedCommunities.slice(0,3);
       }
       //comment
-      changeTab('hot');
+      if(state.postDetail.type!='encrypt' || state.isAccess){
+        changeTab('hot');
+      }
     };
 
     //changeJoinCommunity

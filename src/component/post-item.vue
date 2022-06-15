@@ -81,7 +81,7 @@
         </el-popover>
       </div>
       <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click="redirectPage('/detail/'+item.target_hash,false)">
-        This is a Tonken-gated contect.
+        This is a Tonken-gated content.
       </div>
       <template v-else>
         <!-- text -->
@@ -434,7 +434,6 @@ export default {
         // state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
       }
 
-
       //time
       state.time = getTimer(props.item.createAt)
       //detail
@@ -624,6 +623,10 @@ export default {
 
     const reply = () => {
       if(checkLogin()){
+        if(props.item.type=='encrypt' && !state.isAccess){
+          proxy.$Message({message: "You do not have permission to comment on the current post"});
+          return;
+        }
         //post List
         state.focusComment = true;
         state.showCommentBox=!state.showCommentBox;

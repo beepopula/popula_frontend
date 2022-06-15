@@ -90,7 +90,7 @@
   
             </div>
 
-            <!-- folow -->
+            <!-- follow -->
             <div v-else-if="item.type=='follow'" class="follow-item" @click="redirectPage('/mine')">
               <div class="avatar-list">
                 <template v-for="(user,index) in item.data.follow">
@@ -242,38 +242,18 @@ export default {
     }
 
     const checkAccess = async (item) => {
-      let encrypt_args = '';
-      let communityId = '';
-      let result = {}
-      if(item.type == 'post'){
-        encrypt_args = item.post.encrypt_args;
-        communityId = item.post.receiverId;
-        result = await proxy.$axios.post.get_sign({
-          postId:item.post.target_hash,
-          accountId:store.getters.accountId
-        });
-      }else{
-        encrypt_args = item.comment.encrypt_args;
-        communityId = item.comment.receiverId;
-        result = await proxy.$axios.post.get_sign({
-          postId:item.comment.postId,
-          commentId :item.comment.target_hash,
-          accountId:store.getters.accountId
-        });
-      }
-      if(result.success){
-        const param = {
-          cipher_text: JSON.parse(encrypt_args), 
-          contract_id: communityId, 
-          sign: result.data.text_sign
-        }
-        const res = await encryptionContract.decrypt(param);
+      //decrypt
+      const postId = item.type == 'post' ? item.post.target_hash : item.comment.target_hash;
+      const res = await proxy.$axios.post.get_decode_content({
+        postId,
+        accountId:store.getters.accountId
+      });
+      if(res.success){
         return {
-          text:res.text ? res.text : '[Images]',
+          text:res.data.text ? res.data.text : '[Images]',
           isAccess:true
         }
       }
-      // state.images = Object.values(JSON.parse(res.imgs));
       return {isAccess:false}
     }
 
@@ -413,7 +393,7 @@ export default {
       .like-item,.follow-item{
         border-bottom:1px solid rgba(255,255,255,0.1);
         padding: 20px 0 20px 60px;
-        background:url('@/assets/images/notice/icon-like.png') no-repeat left 30px;
+        background:url('@/assets/images/notice/icon-like.png') no-repeat left 20px;
         background-size:40px 40px;
         cursor: pointer;
         .avatar-list{

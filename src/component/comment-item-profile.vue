@@ -74,7 +74,10 @@
       
 
       <!-- text -->
-      <div class="text text-ellipsis-wrapper" @click="showCommentLayer()">
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" >
+        This is a Tonken-gated content.
+      </div>
+      <div v-else class="text text-ellipsis-wrapper" @click="showCommentLayer()">
         <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']" :style="textStyleObject">
           <!--<pre>{{text}}</pre>-->
           <label class="btn" @click.stop="showall = !showall"></label>
@@ -144,7 +147,7 @@
           :parentAccount="item.accountId"
           :hierarchies="item.hierarchies"
           :communityId="item.receiverId" 
-          :methodName="item.type=='encrypt'?'add_encrypt_content':'add_content'" 
+          :postType="item.type"
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
@@ -261,6 +264,7 @@ export default {
         showTime:"",
         hoverTime:""
       },
+      isAccess:false,
       //text
       text:"",
       needWrap:true,
@@ -337,23 +341,29 @@ export default {
       //text
       let text = "";
       if(props.item.type !== 'encrypt'){
-        text = props.item.text
+        state.text = props.item.text;
       }else{
+        checkAccess();
+      }
+    }
+
+    const checkAccess = async () => {
+      let check_result = {}
+      if(store.getters.accountId!=props.item.accountId){
+        // check_result = await checkCondition(props.item.access);
+      }
+      if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //decrypt
         const res = await proxy.$axios.post.get_decode_content({
-          postId:props.item.target_hash,   //postId=>commentId
-          accountId:store.getters.accountId
+          postId:props.item.target_hash,
+          accountId:store.getters.accountId || ''
         });
         if(res.success){
-          text = res.data.text;
+          state.text = res.data.text;
+          state.isAccess = true;
         }
       }
-      state.text = text;
-
-      // const reg = RegExp(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/,"g");
-      // state.text = text.replace(reg,(match)=>{
-      //   return `<span class='emoji'>${match}</span>`
-      // })
+      state.isChecking = false
     }
 
     const isInBlockList = () => {
@@ -371,6 +381,10 @@ export default {
     //comment
     const reply = () => {
       if(checkLogin()){
+        if(props.item.type=='encrypt' && !state.isAccess){
+          proxy.$Message({message: "You do not have permission to comment on the current post"});
+          return;
+        }
         state.focusComment=true;
         state.showCommentBox=!state.showCommentBox;
       }
@@ -710,6 +724,20 @@ export default {
         color: #0084FF;
         cursor: pointer;
       }
+    }
+    .default-content{
+      padding: 120px 0 64px;
+      background: #36363C url('@/assets/images/post-item/icon-lock-gray.png') no-repeat center 64px;
+      background-size:40px 40px;
+      border-radius: 10px;
+      font-family: D-DINExp;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0;
+      text-align: center;
+      font-weight: 400;
+      line-height:16px;
+      margin-top:20px;
     }
     .text{
       margin-top:20px;

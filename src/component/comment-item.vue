@@ -349,7 +349,7 @@ export default {
       state.time = getTimer(props.item.createAt)
       //text
       let text = "";
-      if(props.post.type != 'encrypt'){
+      if(props.item.type != 'encrypt'){
         text = props.item.text
       }else{
         //decrypt
@@ -362,6 +362,7 @@ export default {
         }
       }
       state.text = text;
+
 
       if(props.defaultComment == props.item.target_hash){
         showCommentLayer();
