@@ -33,17 +33,19 @@
           </template>
         </div>
         <!-- Comment  -->
-        <div style="margin-top:20px;"></div>
-        <Comment 
-          :targetHash="$route.params.id" 
-          :communityId="postDetail.receiverId" 
-          :methodName="postDetail.methodName"
-          :focus="focusComment"
-          @comment="comment"
-        />
+        <template v-if="postDetail.type!='encrypt' || isAccess">
+          <div style="margin-top:20px;"></div>
+          <Comment 
+            :targetHash="$route.params.id" 
+            :parentAccount="postDetail.accountId"
+            :hierarchies="[]"
+            :communityId="postDetail.receiverId" 
+            :postType="postDetail.type"
+            :focus="focusComment"
+            @comment="comment"
+          />
 
-        <!-- All Comments -->
-        <template v-if="postDetail.methodName!='add_encrypt_post' || isAccess">
+          <!-- All Comments -->
           <div class="all-comments-title">
             <div class="font20">Comments({{commentCount}})</div>
             <div class="filter-menu">
@@ -53,7 +55,7 @@
           </div>
           <div class="all-comments">
             <template v-for="item in comments[currentTab]">
-              <CommentItem :level="1" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
+              <CommentItem :level="1" :community="postCommunity" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
             </template>
           </div>
 
@@ -116,7 +118,7 @@
     <!-- suspend -->
     <div class="suspend">
       <div id="backTop" class="back-top" @click="backTop()"></div>
-      <div class="button-box" @click="popUp()">
+      <div class="button-box" v-if="postDetail.type!='encrypt' || isAccess"  @click="popUp()">
         <div class="button">
           <img src="@/assets/images/post-item/icon-comment.png"/>
         </div>
@@ -126,8 +128,10 @@
         <div class="elastic-layer-content">
           <Comment 
             :targetHash="$route.params.id" 
+            :parentAccount="postDetail.accountId"
+            :hierarchies="[]"
             :communityId="postDetail.receiverId" 
-            :methodName="postDetail.methodName"
+            :postType="postDetail.type"
             @comment="comment()"
           />
         </div>
@@ -205,7 +209,9 @@ export default {
         state.joinedCommunities = res.data.JoinedCommunities.slice(0,3);
       }
       //comment
-      changeTab('hot');
+      if(state.postDetail.type!='encrypt' || state.isAccess){
+        changeTab('hot');
+      }
     };
 
     //changeJoinCommunity
@@ -213,29 +219,38 @@ export default {
       if(!store.getters.isLogin){
         state.showLogin = true
       }else{
-        const method = state.postCommunity.data.isJoin ? 'quit' : 'join';
-        const taskTransaction = {
-          receiverId: state.postDetail.receiverId,
-          actions: [{
-            kind: "functionCall",
-            methodName: method,
-            args: {},
-            deposit: "20000000000000000000000",
-            gas: getGas().toString()
-          }]
-        }
-        const accessKey = await generateAccessKey(store.getters.accountId, state.postDetail.receiverId)
-        const accessKeyTransaction = {
-          receiverId: store.getters.accountId,
-          actions: [{
-            kind: "addKey",
-            publicKey: accessKey.publicKey,
-            accessKey: accessKey.accessKey
-          }]
-        }
-        const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-        if(result){
-          state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+        try{
+          const method = state.postCommunity.data.isJoin ? 'quit' : 'join';
+          const taskTransaction = {
+            receiverId: state.postDetail.receiverId,
+            actions: [{
+              kind: "functionCall",
+              methodName: method,
+              args: {},
+              deposit: "20000000000000000000000",
+              gas: getGas().toString()
+            }]
+          }
+          const accessKey = await generateAccessKey(store.getters.accountId, state.postDetail.receiverId)
+          const accessKeyTransaction = {
+            receiverId: store.getters.accountId,
+            actions: [{
+              kind: "addKey",
+              publicKey: accessKey.publicKey,
+              accessKey: accessKey.accessKey
+            }]
+          }
+          const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+          if(result){
+            state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+          }
+        }catch(e){
+          const message = state.postCommunity.data.isJoin ? 'Quit Failed' : 'Join Failed';
+          proxy.$Message({
+            message,
+            type: "error",
+          });
+          console.log(message+" error:"+e);
         }
       }
     }

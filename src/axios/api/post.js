@@ -29,6 +29,12 @@ export default {
   get_post_detail(data) {
     return get("v1/post/detail", data);
   },
+  add_encrypt_content_sign(data) {
+    return post("v1/post/addEncryptContentSign", data);
+  },
+  get_decode_content(data) {
+    return post("v1/post/getDeCodeContent", data);
+  },
   delete(data) {
     return post("v1/post/delete", data);
   },

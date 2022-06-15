@@ -109,6 +109,14 @@ export default {
       type:String,
       value:""
     },
+    hierarchies:{
+      type:Array,
+      value:[]
+    },
+    parentAccount:{
+      type:String,
+      value:""
+    },
     targetHash:{
       type:String,
       value:""
@@ -117,7 +125,7 @@ export default {
       type:String,
       value:""
     },
-    methodName:{
+    postType:{
       type:String,
       value:""
     },
@@ -360,68 +368,121 @@ export default {
         return;
       }
       proxy.$Loading.showLoading({title: "Loading"});
-      //options
-      const options = [];
-      if(commentInput.value.innerHTML){
-        const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
-        let r= '';
-        while ((r= reg.exec(commentInput.value.innerHTML)) != null) {
-          options.push({At:r[1].trim().substring(1)});
+
+      try{
+        const parent_hierarchies = props.hierarchies || [];
+        let hierarchies = [];
+        //hierarchies
+        if(parent_hierarchies.length==0){//level 1
+          hierarchies = [
+            {
+              target_hash: props.targetHash,
+              account_id: props.parentAccount
+            },
+            // {
+            //   target_hash: 'bNw4SwipyY7s6fa3FBBTk155xTaTnXgY1TFfAg9qCiX',//props.targetHash,
+            //   account_id:'billkin.testnet'//props.parentAccount
+            // },
+            // {
+            //   target_hash: "8ExQhQKEb8c4XbxKUx6pC2wS3yKTGie9m2ZKcy9V8DM9",//props.targetHash,
+            //   account_id:'billkin.testnet'//props.parentAccount
+            // },
+          ]
+        }else if(parent_hierarchies.length==1){//level 2
+          hierarchies = [
+            ...parent_hierarchies,
+            {
+              target_hash : props.targetHash,
+              account_id : props.parentAccount,
+            }
+          ]
+        }else if(parent_hierarchies.length==2){//level > 2
+          hierarchies = [
+            ...parent_hierarchies
+          ]
         }
+        // console.log(hierarchies); return;
+        //options
+        const options = [];
+        if(commentInput.value.innerHTML){
+          const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
+          let r= '';
+          while ((r= reg.exec(commentInput.value.innerHTML)) != null) {
+            options.push({At:r[1].trim().substring(1)});
+          }
+        }
+        //submit
+        if(props.postType == "encrypt"){
+          await encryptReply(hierarchies,options);
+        }else{
+          await publicReply(hierarchies,options);
+        }
+      }catch(e){
+        proxy.$Loading.hideLoading();
+        proxy.$Message({
+          message: "Reply Failed",
+          type: "error",
+        });
+        console.log("reply error:"+e);
+        return;
       }
-      //submit
-      if(props.methodName == "add_encrypt_post"){
-        await encryptReply(options);
-      }else{
-        await publicReply(options);
-      }
+
       proxy.$Loading.hideLoading();
       emit("comment");
     }
 
-    const publicReply = async (options) => {
+    const publicReply = async (hierarchies,options) => {
       const params = {   
-        args:JSON.stringify({text: commentInput.value.innerHTML,options}), 
+        args:JSON.stringify({text: commentInput.value.innerHTML}), 
+        hierarchies,
+        options,
         target_hash: state.targetHash,
       }
 
       let result = {}
       if(props.communityId != store.state.nearConfig.MAIN_CONTRACT && props.communityId != store.state.nearConfig.NFT_CONTRACT){
         const communityContract = await CommunityContract.new(props.communityId);
-        result = await communityContract.addComment(params,store.state.account,props.communityId);
+        result = await communityContract.addContent(params,store.state.account,props.communityId);
       }else{
-        result = await mainContract.addComment(params,store.state.account);
+        result = await mainContract.addContent(params,store.state.account);
       }
       handleSuccess(result);
     }
 
-    const encryptReply = async (options) => {
+    const encryptReply = async (hierarchies,options) => {
       //encrypt
-      const param1 = {
-        plain_text:{
-          text:state.text,
+      const res = await proxy.$axios.post.add_encrypt_content_sign({
+        content:{
+          text:state.text
         },
-        contract_id:props.communityId,
-      }
-      const res = await encryptionContract.encrypt(param1);
-      // addEncryptComment
-      const param2 = {
-        encrypt_args:JSON.stringify(res.cipher_text), 
-        text_sign:res.text_sign,
-        contract_id_sign:res.contract_id_sign,
-        target_hash: props.targetHash,
-        options
-      }
+        accountId:store.getters.accountId || ''
+      });
 
-      let result = {}
-      if(props.communityId != store.state.nearConfig.MAIN_CONTRACT && props.communityId != store.state.nearConfig.NFT_CONTRACT){
-        // const communityContract = new CommunityContract(store.state.account,props.communityId);
-        const communityContract = await CommunityContract.new(props.communityId);
-        result = await communityContract.addEncryptComment(param2,store.state.account,props.communityId);
+      if(res.success){
+        // addEncryptComment
+        const param2 = {
+          target_hash: props.targetHash,
+          options,
+          hierarchies,
+          // encrypt_args:JSON.stringify(res.cipher_text), 
+          // text_sign:res.text_sign,
+          // contract_id_sign:res.contract_id_sign,
+          encrypt_args:res.data.encode,
+          nonce:res.data.nonce.toString(),
+          sign:res.data.sign,
+        }
+        let result = {}
+        if(props.communityId != store.state.nearConfig.MAIN_CONTRACT && props.communityId != store.state.nearConfig.NFT_CONTRACT){
+          // const communityContract = new CommunityContract(store.state.account,props.communityId);
+          const communityContract = await CommunityContract.new(props.communityId);
+          result = await communityContract.addEncryptContent(param2,store.state.account,props.communityId);
+        }else{
+          result = await mainContract.addEncryptContent(param2,store.state.account);
+        }
+        handleSuccess(result);
       }else{
-        result = await mainContract.addEncryptComment(param2,store.state.account);
+        throw new Error("Encrypt Failed: " + res.message);
       }
-      handleSuccess(result);
     }
 
     //handleSuccess
@@ -489,7 +550,7 @@ export default {
 
 <style lang="scss" scoped>
 .comment{
-  width: 696px;
+  width: 690px;
   padding:20px;
   background: #28282D;
   border-radius: 24px;

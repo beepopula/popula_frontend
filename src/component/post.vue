@@ -328,7 +328,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         postForm: {
           text: "",
           imgs: [],
-          blur_imgs:[],
+          // blur_imgs:[],
           community:{
             communityId:"",
             name:"",
@@ -924,44 +924,48 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }
         }
         //submit
-        if(state.postForm.access.length>0){
-          await handleBlur();
-          await encryptPost(options);
-        }else{
-          await publicPost(options);
-        }
-      }
-
-      const publicPost = async (options) => {
-        const params = {   
-          args:JSON.stringify({
-            text:postInput.value.innerHTML,
-            imgs:state.postForm.imgs,
-            options
-          }), 
-        }
-        let result = {}
-        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
-          result = await mainContract.addPost(params,store.state.account);
-        }else{
-          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
-          result = await communityContract.addPost(params, state.postForm.community.communityId);
+        let result;
+        try{
+          if(state.postForm.access.length>0){
+            // await handleBlur();
+            result = await encryptPost(options);
+          }else{
+            result = await publicPost(options);
+          }
+        }catch(e){
+          console.log("post error:"+e);
+          proxy.$Message({
+            message: "Post Failed",
+            type: "error",
+          });
+          proxy.$Loading.hideLoading();
+          return;
         }
         handleSuccess(result);
       }
 
+      const publicPost = async (options) => {
+        const params = {   
+          args:JSON.stringify({text:postInput.value.innerHTML,imgs:state.postForm.imgs}),
+          hierarchies:[],
+          options
+        }
+        let result = {}
+        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
+          result = await mainContract.addContent(params,store.state.account);
+        }else{
+          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
+          result = await communityContract.addContent(params, state.postForm.community.communityId);
+        }
+        return result;
+      }
+
       const encryptPost = async (options) => {
-        //encrypt
-        // const conditions = [{
-        //   FTCondition:{
-        //     token_id:'33.token.bhc8521.testnet',
-        //     amount_to_access:parseAmount(1,24)
-        //   }
-        // }]
         const access = {
           relationship: "Or",
           conditions:[]
         }
+        //access
         for(let i=0;i<state.postForm.access.length;i++){
           const item = state.postForm.access[i];
           let decimals = item.decimals || 24;
@@ -976,36 +980,40 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             }
           })
         }
-        //encrypt
-        const param1 = {
-          plain_text:{
+        const res = await proxy.$axios.post.add_encrypt_content_sign({
+          content:{
             text:postInput.value.innerHTML,
-            imgs:JSON.stringify({...state.postForm.imgs}),
+            imgs:state.postForm.imgs,
           },
-          contract_id:state.postForm.community.communityId,
-        }
-        const res = await encryptionContract.encrypt(param1);
-        
-        // addEncryptPost
-        const param2 = {
-          encrypt_args:JSON.stringify(res.cipher_text),
-          access,
-          text_sign:res.text_sign,
-          contract_id_sign:res.contract_id_sign,
-          blur_imgs:[...state.postForm.blur_imgs],
-          options
-        }
-        
-        let result = {}
-        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
-          result = await mainContract.addEncryptPost(param2,store.state.account);
+          accountId:store.getters.accountId || ''
+        });
+
+        if(res.success){
+          // addEncryptPost
+          const param2 = {
+            access,
+            options,
+            hierarchies:[],
+            encrypt_args:res.data.encode,//JSON.stringify(res.data.encode),
+            nonce:res.data.nonce.toString(),
+            sign:res.data.sign,
+            // blur_imgs:[...state.postForm.blur_imgs],
+            // encrypt_args:JSON.stringify(res.cipher_text), 
+            // text_sign:res.text_sign,
+            // contract_id_sign:res.contract_id_sign,
+          }
+          let result = {}
+          if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
+            result = await mainContract.addEncryptContent(param2,store.state.account);
+          }else{
+            const communityContract = await CommunityContract.new(state.postForm.community.communityId);
+            // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
+            result = await communityContract.addEncryptContent(param2,store.state.account,state.postForm.community.communityId);
+          }
+          return result;
         }else{
-          console.log(state.postForm.community.communityId,param2,'------------');
-          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
-          // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
-          result = await communityContract.addEncryptPost(param2,store.state.account,state.postForm.community.communityId);
+          throw new Error("Encrypt Failed: " + res.message);
         }
-        handleSuccess(result);
       }
 
       const checkAccess = () => {
@@ -1055,43 +1063,47 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
         proxy.$Loading.showLoading({title: "Loading"});
 
-
-        //cover
-        let cover = state.postForm.nft.isAutoGenerated ? "" : state.postForm.nft.cover;
-        let coverBase64 = state.postForm.nft.isAutoGenerated ?  state.postForm.nft.defalutCover : state.postForm.nft.coverBase64;
-        if(state.postForm.nft.isAutoGenerated){
-          const data = await upload(state.postForm.nft.defalutCoverFile);
-          cover = data;
+        try{
+          //cover
+          let cover = state.postForm.nft.isAutoGenerated ? "" : state.postForm.nft.cover;
+          let coverBase64 = state.postForm.nft.isAutoGenerated ?  state.postForm.nft.defalutCover : state.postForm.nft.coverBase64;
+          if(state.postForm.nft.isAutoGenerated){
+            const data = await upload(state.postForm.nft.defalutCoverFile);
+            cover = data;
+          }
+          //record param
+          if(state.postForm.nft.isPublicSale){
+            localStorage.setItem('nftSetting',JSON.stringify({
+              mint_price:state.postForm.nft.mintPrice,
+              copies:Number(state.postForm.nft.copies)
+            }))
+          }
+          //create
+          const params = {
+            creator_id: store.getters.accountId,
+            token_metadata: {
+              title: "popula",
+              description: postInput.value.innerHTML,
+              media: cover,
+              media_hash: js_sha256.sha256(coverBase64),
+              copies:state.postForm.nft.isPublicSale ? Number(state.postForm.nft.copies) : 1,
+              extra:JSON.stringify({...state.postForm.imgs})
+            },
+            mint_price: state.postForm.nft.isPublicSale ? parseAmount(state.postForm.nft.mintPrice,24) : null, 
+            ft_token_id: "near", 
+            notify_contract_id: state.postForm.community.communityId
+          }
+          let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
+          const result = await nftContract.nftCreateSeries(params,deposit);
+        }catch(e){
+          proxy.$Loading.hideLoading();
+          proxy.$Message({
+            message: "Post NFT Failed",
+            type: "error",
+          });
+          console.log("post nft error:"+e);
+          return;
         }
-
-        //record param
-        if(state.postForm.nft.isPublicSale){
-          localStorage.setItem('nftSetting',JSON.stringify({
-            mint_price:state.postForm.nft.mintPrice,
-            copies:Number(state.postForm.nft.copies)
-          }))
-        }
-
-
-        //create
-        const params = {
-          creator_id: store.getters.accountId,
-          token_metadata: {
-            title: "popula",
-            description: postInput.value.innerHTML,
-            media: cover,
-            media_hash: js_sha256.sha256(coverBase64),
-            copies:state.postForm.nft.isPublicSale ? Number(state.postForm.nft.copies) : 1,
-            extra:JSON.stringify({...state.postForm.imgs})
-          },
-          mint_price: state.postForm.nft.isPublicSale ? parseAmount(state.postForm.nft.mintPrice,24) : null, 
-          ft_token_id: "near", 
-          notify_contract_id: state.postForm.community.communityId
-        }
-
-        let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
-        const result = await nftContract.nftCreateSeries(params,deposit);
-        console.log(result,'hhhhh');
         state.showNftBox = false;
         handleSuccess(result);
       }
@@ -1102,7 +1114,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.postForm = {
           text: "",
           imgs: [],
-          blur_imgs:[],
+          // blur_imgs:[],
           community:state.defaultCommunity,
           isPrivate:false,
           access:[],
@@ -1114,7 +1126,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             isPublicSale:false,
             mintPrice:10,
             copies:1000,
-            
           }
         };
         postInput.value.innerHTML = "";

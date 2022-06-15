@@ -225,7 +225,7 @@
           like:0,
         },
         page:0,
-        limit:5,
+        limit:10,
         isEnd:false,
         isLoading:false,
         //community
@@ -393,7 +393,7 @@
 
       //handleScroll
       const handleScroll = async () => {
-        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd){
+        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd && state.currentTab){
           const res = await getList();
           state.list[state.currentTab] = state.list[state.currentTab].concat(res.data);
         }

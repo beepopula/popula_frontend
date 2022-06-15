@@ -109,9 +109,12 @@
               <div class="members-item" v-if="item" @click="redirectPage('/user-profile/'+item.account_id,false)">
                 <img v-if="item.avatar" class="avatar" :src="item.avatar">
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
-                <div class="creator-flag" v-if="item.data.type=='creator'">creator</div>
                 <div class="info">
-                  <div class="name txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</div>
+                  <div :class="['name','name-'+item.data.type]">
+                    <span class="name-txt txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</span>
+                    <div class="user-flag co" v-if="item.data.type=='creator'"></div>
+                    <div class="user-flag mod" v-else-if="item.data.type=='mod'"></div>
+                  </div>
                   <div class="account txt-wrap">{{item.account_id}}</div>
                 </div>
                 <!-- follow -->
@@ -557,29 +560,38 @@
         if(!store.getters.isLogin){
           state.showLogin = true
         }else{
-          const method = state.detail.data.isJoin ? 'quit' : 'join';
-          const taskTransaction = {
-            receiverId: route.params.id,
-            actions: [{
-              kind: "functionCall",
-              methodName: method,
-              args: {},
-              deposit: "20000000000000000000000",
-              gas: getGas().toString()
-            }]
-          }
-          const accessKey = await generateAccessKey(store.getters.accountId, route.params.id)
-          const accessKeyTransaction = {
-            receiverId: store.getters.accountId,
-            actions: [{
-              kind: "addKey",
-              publicKey: accessKey.publicKey,
-              accessKey: accessKey.accessKey
-            }]
-          }
-          const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          if(result){
-            state.detail.data.isJoin = !state.detail.data.isJoin;
+          try{
+            const method = state.detail.data.isJoin ? 'quit' : 'join';
+            const taskTransaction = {
+              receiverId: route.params.id,
+              actions: [{
+                kind: "functionCall",
+                methodName: method,
+                args: {},
+                deposit: "20000000000000000000000",
+                gas: getGas().toString()
+              }]
+            }
+            const accessKey = await generateAccessKey(store.getters.accountId, route.params.id)
+            const accessKeyTransaction = {
+              receiverId: store.getters.accountId,
+              actions: [{
+                kind: "addKey",
+                publicKey: accessKey.publicKey,
+                accessKey: accessKey.accessKey
+              }]
+            }
+            const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+            if(result){
+              state.detail.data.isJoin = !state.detail.data.isJoin;
+            }
+          }catch(e){
+            const message = state.detail.data.isJoin ? 'Quit Failed' : 'Join Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log(message+" error:"+e);
           }
         }
       }
@@ -610,7 +622,6 @@
       //getPosts
       const getPosts = async () => {
         state.isLoading = true;
-        console.log("33333333");
         const res = await proxy.$axios.post.get_post_list({
           type: state.currentTab,
           page:state.page,
@@ -1056,6 +1067,7 @@
             margin-top:30px;
             display:flex;
             position:relative;
+            align-items: center;
             cursor:pointer;
             .avatar{
               width: 40px;
@@ -1063,39 +1075,46 @@
               border-radius:50%;
               object-fit: cover;
             }
-            .creator-flag{
-              position:absolute;
-              bottom:-12px;
-              left:0;
-              display:flex;
-              justify-content: center;
-              align-items: center;
-              width: 80px;
-              height: 32px;
-              font-family: D-DINExp;
-              font-size: 20px;
-              line-height:20px;
-              color: #FFFFFF;
-              letter-spacing: 0;
-              background: #ED1F5A;
-              border: 2px solid rgba(0,0,0,1);
-              border-radius: 8px;
-              transform-origin:left bottom;
-              transform:scale(0.5);
-            }
             .info{
               margin-left:12px;
-              display:flex;
-              flex-direction: column;
-              justify-content: center;
               .name{
-                width:100px;
-                line-height: 19px;
-                font-family: D-DINExp-Bold;
-                font-size: 18px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                font-weight: 700;
+                height:20px;
+                display: flex;
+                align-items: center;
+                &.name-creator{
+                  .name-txt{
+                    max-width:76px;
+                  }
+                }
+                &.name-mod{
+                  .name-txt{
+                    max-width:68px;
+                  }
+                }
+                .name-txt{
+                  display:inline-block;
+                  max-width:100px;
+                  line-height: 20px;
+                  font-family: D-DINExp-Bold;
+                  font-size: 18px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  font-weight: 700;
+                }
+                .user-flag{
+                  margin-left:4px;
+                  width: 20px;
+                  height: 14px;
+                  &.co{
+                    background:url("@/assets/images/common/co.png") no-repeat right center;
+                    background-size:20px 14px;
+                  }
+                  &.mod{
+                    width: 28px;
+                    background:url("@/assets/images/common/mod.png") no-repeat right center;
+                    background-size:28px 14px;
+                  }
+                }
               }
               .account{
                 width:100px;

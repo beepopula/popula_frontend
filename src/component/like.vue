@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { reactive, toRefs, watch  } from "vue";
+  import { reactive, toRefs, watch, getCurrentInstance  } from "vue";
   import { useStore } from 'vuex';
   import MainContract from "@/contract/MainContract";
   import CommunityContract from "@/contract/CommunityContract";
@@ -31,6 +31,10 @@
       LoginMask
     },
     props:{
+      type:{
+        type:String,
+        value:''
+      },
       item:{
         type:Object,
         value:{}
@@ -38,6 +42,7 @@
     },
     setup(props,{ emit }) {
       const store = useStore();
+      const { proxy } = getCurrentInstance();
       const mainContract = new MainContract(store.state.account);
 
       //state
@@ -84,14 +89,51 @@
             return;
           }
           if(state.isLiking) {
-            return
+            return;
           }
           state.isLiking = true;
-          if(state.communityId){
-            const communityContract = await CommunityContract.new(state.communityId);
-            const res = state.isLiked ? await communityContract.unlike({target_hash:state.targetHash}) : await communityContract.like({target_hash:state.targetHash}) 
-          }else{
-            const res = state.isLiked ? await mainContract.unlike({target_hash:state.targetHash}) : await mainContract.like({target_hash:state.targetHash})
+          try{
+            //params
+            let params = {}
+            if(props.type == 'post'){
+              params= {
+                hierarchies : [
+                  {
+                    target_hash : props.item.targetHash,
+                    account_id : props.item.accountId,
+                  }
+                ]
+              };
+            }else if(props.type == 'comment'){
+              params = {
+                hierarchies : [
+                  ...props.item.hierarchies,
+                  {
+                    target_hash : props.item.targetHash,
+                    account_id : props.item.accountId,
+                  }
+                ]
+              }
+            }else{
+              throw new Error("please check content type");
+            }
+            
+            //contract 
+            if(state.communityId){
+              const communityContract = await CommunityContract.new(state.communityId);
+              const res = state.isLiked ? await communityContract.unlike(params) : await communityContract.like(params) 
+            }else{
+              const res = state.isLiked ? await mainContract.unlike(params) : await mainContract.like(params)
+            }
+          }catch(e){
+            state.isLiking = false;
+            const message = state.isLiked ? 'Unlike Failed' : 'Like Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log("like error:"+e);
+            return;
           }
           state.likeCount = state.isLiked ? Number(state.likeCount)-1 : Number(state.likeCount)+1;
           state.likeActive = true;
@@ -100,17 +142,6 @@
             state.isLiked  = !state.isLiked;
             state.isLiking = false;
           },400)
-          // if(!state.isLiked){
-          //   state.likeActive = true;
-          //   setTimeout(()=>{
-          //     state.likeActive = false;
-          //     state.isLiked  = !state.isLiked;
-          //     state.isLiking = false;
-          //   },500)
-          // }else{
-          //   state.isLiked  = !state.isLiked;
-          //   state.isLiking = false;
-          // }
         }else{
           state.showLogin = true
         }

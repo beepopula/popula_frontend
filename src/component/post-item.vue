@@ -3,7 +3,7 @@
     <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox">
       <div class="user">
         <!-- community -->
-        <template v-if="community.communityId && from!='community'">
+        <template v-if="community.communityId && from!='community' && from!='detail'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
               <img v-if="community.avatar"  class="avatar avatar-community" :src="community.avatar">
@@ -35,12 +35,15 @@
               <img v-if="user.avatar" class="avatar" :src="user.avatar" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
               <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
             </template>
-            <template v-if="showUser">
+            <template v-if="showUser && from!='detail'">
               <UserPopup :account="item.accountId" @login="showLogin=true"/>
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
+            <div class="name" @click="redirectPage('/user-profile/'+user.account_id,false)">
+              <div class="name-txt txt-wrap">{{user.name || user.account_id}}</div>
+              <div class="user-flag co" v-if="community.accountId && community.accountId == user.account_id"></div>
+            </div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>
                 <div class="createtime">{{time.showTime}}</div>
@@ -77,26 +80,12 @@
           </div>
         </el-popover>
       </div>
-      <!-- token-list -->
-      <div class="token-list" v-if="item.methodName=='add_encrypt_post' && !isAccess && !isChecking">
-        <div class="token-item" v-for="item in access.conditions">
-          <img class="token-icon" :src="item.FTCondition.icon"/>
-          <div class="token-count">
-            <span class="balance">{{item.FTCondition.balance}} {{item.FTCondition.symbol}}</span>
-            <span class="total">/ {{item.FTCondition.amount_to_access}} {{item.FTCondition.symbol}}</span>
-          </div>
-          <!--
-          <div class="token-get" @click.stop="getToken(item.FTCondition.tokenId)">
-            How to get
-            <img class="more-arrow" src="@/assets/images/common/icon-arrow-right.png"/>
-          </div>
-          -->
-        </div>
-        <div class="token-tip">This is a token-gated content.</div>
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click="redirectPage('/detail/'+item.target_hash,false)">
+        This is a Tonken-gated content.
       </div>
-      <!-- text -->
-      <div class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
-        <template v-if="(item.methodName=='add_post'|| item.type=='nft' || isAccess) && text">
+      <template v-else>
+        <!-- text -->
+        <div v-if="text" class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
           <pre v-if="from=='detail'"><div v-html="text"></div></pre>
           <div v-else class="text-ellipsis-wrapper">
             <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']">
@@ -105,31 +94,28 @@
               <pre ref="textDom"><div v-html="text"></div></pre>
             </div>
           </div>
-        </template>
 
-        <div v-else-if="text" class="default">
-          <img class="text-default" src="@/assets/images/post-item/text-default.png"/>
+          <!--
+          <div v-else-if="text" class="default">
+            <img class="text-default" src="@/assets/images/post-item/text-default.png"/>
+          </div>
+          -->
         </div>
-
-      </div>
-      <!-- images -->
-      <div v-if="(item.methodName=='add_post' || item.type=='nft' || isAccess) && images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-        <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
-      </div>
-      <div v-else-if="blur_imgs.length>0" :class="['images', 'images'+blur_imgs.length, blur_imgs.length>3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-        <div class="img" v-for="(img,index) in blur_imgs">
-          <img :src="img">
-          <div class="icon-lock"></div>
+        <!-- images -->
+        <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
+          <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
         </div>
-      </div>
+      </template>
       <!-- bottom edit -->
       <div class="info-bottom">
         <div class="info-left">
           <!-- token -->
-          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_post' && isAccess">
+          <el-popover placement="bottom-start"  trigger="hover" v-if="item.type=='encrypt' && !isChecking">
             <template #reference>
               <div class="bottom-token-list">
-                <img v-for="item in access.conditions" class="token-icon" :src="item.FTCondition.icon"/>
+                <template v-for="item in access.conditions">
+                  <img  :class="['token-icon',item.FTCondition.access ? '' : 'token-icon-gray']" :src="item.FTCondition.icon"/>
+                </template>
               </div>
             </template>
             <div class="pop-box pop-intro pop-token-list">
@@ -139,9 +125,12 @@
                   <div class="token-symbol">{{item.FTCondition.symbol}}</div>
                 </div>
                 <div class="right-check">
-                  <div class="count">≥ {{item.FTCondition.amount_to_access}}</div>
+                  <div class="count">
+                    <span :class="[item.FTCondition.access ? '' : 'no-access']">{{item.FTCondition.balance}}</span>
+                     / {{item.FTCondition.amount_to_access}}
+                  </div>
                   <img v-if="item.FTCondition.access" class="check-status" src="@/assets/images/community/icon-right.png"/>
-                  <img v-else="item.FTCondition.access" class="check-status" src="@/assets/images/community/icon-error.png"/>
+                  <img v-else class="check-status" src="@/assets/images/community/icon-error.png"/>
                 </div>
               </div>
             </div>
@@ -218,7 +207,7 @@
             <template v-if="commentCount">{{commentCount}}</template>
             <template v-else>Reply</template>
           </div>
-          <Like :item="like"/>
+          <Like :item="like" :type="'post'"/>
         </div>
       </div>
 
@@ -246,8 +235,9 @@
       <div class="comment-box" v-if="from!='detail' && showCommentBox">
         <Comment 
           :targetHash="item.target_hash" 
+          :parentAccount="user.account_id"
           :communityId="item.receiverId" 
-          :methodName="item.methodName" 
+          :postType="item.type"
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
@@ -305,7 +295,9 @@
 import { ref, reactive, toRefs , nextTick, watch, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import MainContract from "@/contract/MainContract";
 import NftContract from "@/contract/NftContract";
+import CommunityContract from "@/contract/CommunityContract";
 import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, parseAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
@@ -347,6 +339,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
+    const mainContract = new MainContract(store.state.account);
     const nftContract = new NftContract(store.state.account);
     const encryptionContract = new EncryptionContract(store.state.account);
 
@@ -384,7 +377,7 @@ export default {
       needWrap:true,
       //images
       images: props.item.type=="nft" ? [] : props.item.imgs ,
-      blur_imgs:props.item.blur_imgs || [],
+      // blur_imgs:props.item.blur_imgs || [],
       index:0,
       showPreview:false,
       //gas
@@ -395,6 +388,7 @@ export default {
         likeCount:props.item.data.likeCount,
         isLiked:props.item.data.isLike,
         targetHash:props.item.target_hash,
+        accountId:props.item.accountId,
         communityId:(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT) ? "" : props.item.receiverId
       },
       //comment
@@ -439,12 +433,6 @@ export default {
         state.text = state.text.replace(/<\/?.+?>/g, "").replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
         // state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
       }
-      // else{
-      //   const reg = RegExp(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/,"g");
-      //   state.text = state.text.replace(reg,(match)=>{
-      //     return `<span class='emoji'>${match}</span>`
-      //   })
-      // }
 
       //time
       state.time = getTimer(props.item.createAt)
@@ -459,7 +447,7 @@ export default {
         state.community = res.data.postCommunity;
       }
       //access
-      if(props.item.methodName=='add_encrypt_post'){
+      if(props.item.type=='encrypt'){
         checkAccess();
       }else{
         state.isChecking = false
@@ -538,27 +526,19 @@ export default {
       state.access = check_result.access;
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //comment
-        
         emit("changeAccess");
         //decrypt
-        const result = await proxy.$axios.post.get_sign({
+        const res = await proxy.$axios.post.get_decode_content({
           postId:props.item.target_hash,
-          accountId:store.getters.accountId
+          accountId:store.getters.accountId || ''
         });
-        const param = {
-          cipher_text: JSON.parse(props.item.encrypt_args), 
-          contract_id: state.community.communityId, 
-          sign: result.data.text_sign
-        }
-        const res = await encryptionContract.decrypt(param);
-        state.text = res.text;
-        if(props.searchWord){
-          const reg = RegExp(props.searchWord,"ig");
-          state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
-        }
-        state.images = Object.values(JSON.parse(res.imgs));
-        state.isAccess = check_result.is_access;
-        if(store.getters.accountId==props.item.accountId){
+        if(res.success){
+          state.text = res.data.text;
+          if(props.searchWord){
+            const reg = RegExp(props.searchWord,"ig");
+            state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
+          }
+          state.images = res.data.imgs;
           state.isAccess = true;
         }
       }
@@ -643,6 +623,10 @@ export default {
 
     const reply = () => {
       if(checkLogin()){
+        if(props.item.type=='encrypt' && !state.isAccess){
+          proxy.$Message({message: "You do not have permission to comment on the current post"});
+          return;
+        }
         //post List
         state.focusComment = true;
         state.showCommentBox=!state.showCommentBox;
@@ -710,32 +694,61 @@ export default {
     //edit
     const del = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.post.delete({
-          postId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-      
-        if(res.success){
+        const params= {
+          hierarchies : [{
+            target_hash : props.item.target_hash,
+            account_id : state.user.account_id,
+          }]
+        };
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.delContent(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.delContent(params);
+          }
+        }catch(e){
+          console.log("delete error:"+e);
           proxy.$Message({
-            message: "delete success",
-            type: "success",
+            message: "Delete Failed",
+            type: "error",
           });
-          state.hasDelete = true;
+          return;
         }
+        state.hasDelete = true;
+        proxy.$Message({
+          message: "delete success",
+          type: "success",
+        });
       }
     }
     const report = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.post.report({
-          postId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
+        const params= {
+          hierarchies : [{
+            target_hash : props.item.target_hash,
+            account_id : state.user.account_id,
+          }]
+        };
+        try{
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            const result = await mainContract.report(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            const result = await communityContract.report(params);
+          }
+        }catch(e){
+          console.log("report error:"+e);
           proxy.$Message({
-            message: "report success",
-            type: "success",
+            message: "Report Failed",
+            type: "error",
           });
+          return;
         }
+        proxy.$Message({
+          message: "report success",
+          type: "success",
+        });
       }
     }
     const block = async () => {
@@ -834,12 +847,40 @@ export default {
         margin-left:12px;
         width:300px;
         .name{
+          height:20px;
+          display:flex;
+          align-items: center;
           font-family: D-DINExp-Bold;
           font-size: 18px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 700;
-          width:100%;
+          max-width: 300px;
+          line-height:20px;
+          .name-txt{
+            max-width: 300px;
+            font-family: D-DINExp-Bold;
+            font-size: 18px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            line-height:20px;
+            cursor: pointer;
+          }
+          .user-flag{
+            margin-left:4px;
+            width: 20px;
+            height: 14px;
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              width:28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
+            }
+          }
         }
         .createtime{
           margin-top:4px;
@@ -876,6 +917,20 @@ export default {
         right:0;
         cursor:pointer;
       }
+    }
+    .default-content{
+      padding: 120px 0 64px;
+      background: #36363C url('@/assets/images/post-item/icon-lock-gray.png') no-repeat center 64px;
+      background-size:40px 40px;
+      border-radius: 10px;
+      font-family: D-DINExp;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0;
+      text-align: center;
+      font-weight: 400;
+      line-height:16px;
+      margin-top:20px;
     }
     .token-list{
       margin-top:20px;
@@ -1028,6 +1083,12 @@ export default {
             width: 24px;
             height: 24px;
             border-radius:50%;
+            &.token-icon-gray{
+              opacity: 0.5;
+            }
+            &:last-child{
+              margin-right: 0;
+            }
           }
         }
         .nft{
@@ -1039,6 +1100,9 @@ export default {
           font-weight: 700;
           cursor: pointer;
           margin-right:30px;
+          padding-right:16px;
+          background: url('@/assets/images/post-item/icon-nft.png') no-repeat right center;
+          background-size: 12px 12px;
         }
         .hash{
           margin-left:30px;
@@ -1116,6 +1180,9 @@ export default {
         letter-spacing: 0;
         font-weight: 700;
         cursor: pointer;
+        padding-right:16px;
+        background: url('@/assets/images/post-item/icon-nft.png') no-repeat right center;
+        background-size: 12px 12px;
       }
       .intro-item{
         font-family: PingFangSC-Regular;
@@ -1341,6 +1408,12 @@ export default {
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 700;
+          span{
+            color: rgba(255,255,255,1);
+            &.no-access{
+              color: #FF6868;
+            }
+          }
         }
         .check-status{
           margin-left:20px;
