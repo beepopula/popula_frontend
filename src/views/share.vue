@@ -20,20 +20,23 @@ export default {
       const args = JSON.parse(parmsJson)['args'];
       //storage
       const postInfo = JSON.parse(localStorage.getItem("postInfo")) || [];
-      // console.log(args,args.inviter_id ,store.getters.accountId , postInfo.indexOf(parmsJson));
-      if(args.inviter_id && args.inviter_id!=store.getters.accountId && postInfo.indexOf(parmsJson)==-1){
-        let recorded = true;
+      console.log(args,args.inviter_id ,store.getters.accountId , postInfo.indexOf(route.params.id));
+      if(args.inviter_id && args.inviter_id!=store.getters.accountId && postInfo.indexOf(route.params.id)==-1){
         if(store.getters.accountId){
           const check_params = {
             ...args,
             account_id:store.getters.accountId
           }
-          recorded = await store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_viewed", check_params); 
-        }
-        if(!recorded){
-          localStorage.setItem("postInfo",JSON.stringify(postInfo.concat(parmsJson)));
+          const recorded = await store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_viewed", check_params); 
+          console.log(check_params,recorded);
+          if(!recorded){
+            localStorage.setItem("postInfo",JSON.stringify(postInfo.concat(route.params.id)));
+          }
+        }else{
+          localStorage.setItem("postInfo",JSON.stringify(postInfo.concat(route.params.id)));
         }
       }
+      return;
       //router
       const hierarchies = args.hierarchies;
       const len = hierarchies.length;
