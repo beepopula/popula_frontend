@@ -120,7 +120,7 @@
               <div class="share">35</div>
             </template>
             <div class="pop-box pop-edit">
-              <div class="pop-edit-item">
+              <div class="pop-edit-item" @click="shareTwitter()">
                 <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
                 Twitter
               </div>
@@ -220,6 +220,7 @@ import CommentItem from '@/component/comment-item.vue';
 import UserPopup from '@/component/user-popup.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
+import * as bs58 from 'bs58';
 export default {
   components: {
     Comment,
@@ -462,10 +463,23 @@ export default {
       }
     }
 
+    //shareLink
+    const getShareLink = () => {
+      const argsJson = JSON.stringify({
+        hierarchies:[
+          ...props.item.hierarchies,
+          {target_hash:props.item.target_hash,account_id : props.item.accountId}
+        ],
+        invitor:store.getters.accountId || ''
+      })
+      const signature = bs58.encode(Buffer.from(argsJson));
+      return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
     //share -> handleCopy
     const copy_text = ref()
     const triggerCopy = (str,isShare) => {
-      state.copyText = isShare ? `${window.location.protocol}//${window.location.host}/detail/${props.item.postId}?comment=${props.item.target_hash}` : str;
+      state.copyText = isShare ? getShareLink() : str;
       nextTick(() => {
         copy_text.value.click();
       });
@@ -602,6 +616,10 @@ export default {
       }
     }
 
+    const shareTwitter = async () => {
+      window.open('https://twitter.com/intent/tweet?text='+getShareLink());
+    }
+
 
     return {
       ...toRefs(state),
@@ -624,7 +642,8 @@ export default {
       redirectPage,
       del,
       report,
-      block
+      block,
+      shareTwitter
     };
   },
   mounted(){

@@ -27,7 +27,7 @@
               :item="postDetail" 
               :commentC="commentCount" 
               :from="'detail'" 
-              @changeAccess="isAccess=true"
+              @changeAccess="isAccess=true;changeTab('hot');"
               @focus="focusComment=!focusComment"
             />
           </template>

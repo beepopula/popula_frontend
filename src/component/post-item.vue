@@ -307,7 +307,8 @@ import ImagePreview from '@/component/image-preview.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
 import Comment from '@/component/comment.vue';
-import BN from 'bn.js'
+import BN from 'bn.js';
+import * as bs58 from 'bs58';
 export default {
   components: {
     CommunityItem,
@@ -396,6 +397,7 @@ export default {
       showCommentBox:false,
       addCount:false,
       //other
+
       copyText:"",
       showall:false,
       showLogin:false,
@@ -594,22 +596,10 @@ export default {
       }
     };
 
-    //shareRecord
-    const shareRecord = async () => {
-      const res = await proxy.$axios.post.share_record({
-        target_hash:props.item.target_hash,
-        accountId:store.getters.accountId
-      });
-      if(res.success){
-        state.shareCount = parseInt(state.shareCount) + 1;
-      }
+    const shareTwitter = async () => {
+      window.open('https://twitter.com/intent/tweet?text='+getShareLink());
     }
-
-    const shareTwitter = async (str) => {
-      await shareRecord();
-      const text = `${window.location.protocol}//${window.location.host}/detail/${props.item.target_hash}`;
-      window.open('https://twitter.com/intent/tweet?text='+text);
-    }
+    
 
     //comment
     const comment = (res) => {
@@ -647,10 +637,20 @@ export default {
       document.getElementsByTagName('body')[0].classList.remove("fixed");
     }
 
+    //ShareLink 
+    const getShareLink = () => {
+      const argsJson = JSON.stringify({
+        hierarchies:[{target_hash:props.item.target_hash,account_id : props.item.accountId}],
+        invitor:store.getters.accountId || ''
+      })
+      const signature = bs58.encode(Buffer.from(argsJson));
+      return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
     //share -> handleCopy
     const copy_text = ref()
     const triggerCopy = async (str,isShare) => {
-      state.copyText = isShare ? `${window.location.protocol}//${window.location.host}/detail/${str}` : str;
+      state.copyText = isShare ? getShareLink() : str;
       nextTick(() => {
         copy_text.value.click();
       });
