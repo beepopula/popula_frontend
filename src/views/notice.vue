@@ -38,8 +38,8 @@
               </div>
               <div class="reply-user">Replying to you</div> 
               <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
-              <div class="text-default" v-else>
-                <img src="@/assets/images/post-item/text-default.png"/>
+              <div v-else class="default-content">
+                This is a Tonken-gated content.
               </div>
             </div>
 
@@ -392,11 +392,19 @@ export default {
             word-wrap: break-word;
           }
         }
-        .text-default{
+        .default-content{
+          padding: 120px 0 64px;
+          background: #36363C url('@/assets/images/post-item/icon-lock-gray.png') no-repeat center 64px;
+          background-size:40px 40px;
+          border-radius: 10px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: rgba(255,255,255,0.5);
+          letter-spacing: 0;
+          text-align: center;
+          font-weight: 400;
+          line-height:16px;
           margin-top:20px;
-          img{
-            width:100%;
-          }
         }
       }
       .like-item,.follow-item{

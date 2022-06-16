@@ -9,6 +9,7 @@ export default class MainContract{
     contract
     methods = {
         viewMethods: [
+            'check_viewd'
         ],
         changeMethods: [
             'add_content',
@@ -60,7 +61,7 @@ export default class MainContract{
         const transaction = {
             methodName: "report",
             args: param,
-            deposit: "20000000000000000000000",
+            deposit: "5000000000000000000000000",
             gas: "100000000000000"
         }
         return await this._signAndSendTransaction(transaction)

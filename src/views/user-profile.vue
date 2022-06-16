@@ -6,6 +6,10 @@
         <!-- user-info -->
         <div class="user-info" v-if="user.data">
           <img class="bg" src="@/assets/images/profile/bg.png"/>
+          <div class="btns">
+            <div class="btn edit" v-if="accountId == $store.getters.accountId"></div>
+            <div class="btn share" :data-clipboard-text="shareLink" @click="handleCopyFun()"></div>
+          </div>
           <div class="info">
             <img v-if="user.avatar" class="avatar" :src="user.avatar"/>
             <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
@@ -153,12 +157,16 @@
     <!-- suspend -->
     <suspend @postSuccess="postSuccess()" />
 
+    <!-- login-mask -->
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
+
+    <!-- #copy_text  display:none;  -->
+ 
   </div>
 </template>
 
 <script>
-  import { ref, reactive, toRefs, getCurrentInstance,  } from "vue";
+  import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
   import NftContract from "@/contract/NftContract";
@@ -168,6 +176,7 @@
   import About from '@/component/about.vue';
   import loginMask from "@/component/login-mask.vue";
   import suspend from "@/component/suspend.vue";
+  import ClipboardJS from 'clipboard';
 
   export default {
     components: {
@@ -248,6 +257,7 @@
         // isEndNft:false,
         // isLoadingNft:false,
         //other
+        shareLink:`${window.location.protocol}//${window.location.host}/user-profile/${route.params.id || store.getters.accountId}`,
         showLogin:false,
       });
 
@@ -463,6 +473,25 @@
         state.nftList.created = createdList;
       }
 
+      //share
+      const handleCopyFun = () => {
+        const clipboard = new ClipboardJS('.btn.share')
+        clipboard.on('success', e => {
+          proxy.$Message({
+            message: "copy success",
+            type: "success",
+          });
+          clipboard.destroy() 
+        })
+        clipboard.on('error', e => {
+          proxy.$Message({
+            message: "error",
+            type: "error",
+          });
+          clipboard.destroy()
+        })
+      }
+
 
       //LoginMask
       const showLoginMask = () => {
@@ -485,6 +514,7 @@
         showNftList,
         closeNftList,
         changeNftTab,
+        handleCopyFun,
         showLoginMask,
         closeLoginMask,
       };
@@ -503,12 +533,35 @@
       .user-info{
         background: #28282D;
         border-radius: 24px;
+        position:relative;
         .bg{
           width:690px;
           height:240px;
           object-fit: cover;
           border-top-left-radius: 24px;
           border-top-right-radius: 24px;
+        }
+        .btns{
+          height:24px;
+          position: absolute;
+          top:20px;
+          right:20px;
+          display:flex;
+          align-items: center;
+          .btn{
+            width:24px;
+            height:24px;
+            cursor:pointer;
+            &.edit{
+              background:url("@/assets/images/common/icon-edit.png") no-repeat center center;
+              background-size:24px 24px;
+            }
+            &.share{
+              margin-left:40px;
+              background:url("@/assets/images/profile/icon-share.png") no-repeat right center;
+              background-size:24px 24px;
+            }
+          }
         }
         .info{
           position: relative;

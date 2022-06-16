@@ -6,20 +6,33 @@
 import { reactive, toRefs,} from "vue";
 import { useRoute,useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import MainContract from "@/contract/MainContract";
 import * as bs58 from 'bs58';
 export default {
   setup(){
     const store = useStore();
     const route = useRoute();
     const router = useRouter();
+    const mainContract = new MainContract(store.state.account);
 
-    const init = () => {
-      const argsJson = bs58.decode(route.params.id).toString();
-      const args = JSON.parse(argsJson);
+    const init = async () => {
+      const parmsJson = bs58.decode(route.params.id).toString();
+      const args = JSON.parse(parmsJson)['args'];
       //storage
       const postInfo = JSON.parse(localStorage.getItem("postInfo")) || [];
-      if(args.invitor && args.invitor!=store.getters.accountId && postInfo.indexOf(argsJson)==-1){
-        localStorage.setItem("postInfo",JSON.stringify(postInfo.concat(argsJson)));
+      // console.log(args,args.inviter_id ,store.getters.accountId , postInfo.indexOf(parmsJson));
+      if(args.inviter_id && args.inviter_id!=store.getters.accountId && postInfo.indexOf(parmsJson)==-1){
+        let recorded = true;
+        if(store.getters.accountId){
+          const check_params = {
+            ...args,
+            account_id:store.getters.accountId
+          }
+          recorded = await store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_viewed", check_params); 
+        }
+        if(!recorded){
+          localStorage.setItem("postInfo",JSON.stringify(postInfo.concat(parmsJson)));
+        }
       }
       //router
       const hierarchies = args.hierarchies;

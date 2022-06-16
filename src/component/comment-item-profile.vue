@@ -465,14 +465,17 @@ export default {
 
     //shareLink
     const getShareLink = () => {
-      const argsJson = JSON.stringify({
-        hierarchies:[
-          ...props.item.hierarchies,
-          {target_hash:props.item.target_hash,account_id : props.item.accountId}
-        ],
-        invitor:store.getters.accountId || ''
+      const parmsJson = JSON.stringify({
+        type:'content',
+        args:{
+          hierarchies:[
+            ...props.item.hierarchies,
+            {target_hash:props.item.target_hash,account_id : props.item.accountId}
+          ],
+          inviter_id:store.getters.accountId || ''
+        }
       })
-      const signature = bs58.encode(Buffer.from(argsJson));
+      const signature = bs58.encode(Buffer.from(parmsJson));
       return `${window.location.protocol}//${window.location.host}/share/${signature}`;
     }
 
