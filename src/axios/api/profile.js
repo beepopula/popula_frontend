@@ -24,4 +24,10 @@ export default {
   get_user_notifications(data) {
     return get("v1/user/getNotifications", data);
   },
+  get_user_followers(data) {
+    return get("v1/follow/followingList", data);
+  },
+  get_user_following(data) {
+    return get("v1/follow/list", data);
+  },
 };

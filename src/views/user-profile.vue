@@ -23,8 +23,8 @@
             <div class="name  txt-wrap">{{user.name || user.account_id}}</div>
             <div class="account  txt-wrap">{{user.account_id}}</div>
             <div class="total">
-              <div class="total-item"><span>{{user.data.follows}}</span> Followers</div>
-              <div class="total-item"><span>{{user.data.following}}</span> Following</div>
+              <div class="total-item" @click="showFollowList('followers')"><span>{{user.data.follows}}</span> Followers</div>
+              <div class="total-item" @click="showFollowList('following')"><span>{{user.data.following}}</span> Following</div>
               <div class="total-item"><span>{{user.data.postCount}}</span> Posts</div>
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
@@ -114,6 +114,47 @@
       </div>
     </div>
 
+    <!-- follow layer -->
+    <div class="elastic-layer follow-layer" v-if="showFollows" @click.self="closeFollowList()">
+      <div class="edit-button close" @click="closeFollowList()"></div>
+      <div class="follow-box">
+        <div class="tab-box">
+          <div :class="['tab',followCurrentTab == 'followers' ? 'active' : '']" @click="changeFollowTab('followers')">Followers</div>
+          <div :class="['tab',followCurrentTab == 'following' ? 'active' : '']" @click="changeFollowTab('following')">Following</div>
+        </div>
+        <div v-if="followList[followCurrentTab]['length']>0" class="follow-list" ref="followDiv" @scroll="followScroll()">
+          <div class="follow-item" v-for="user in followList[followCurrentTab]" :key="user.data.account_id" @click="redirectPage('/user-profile/'+user.data.account_id,false)">
+            <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
+              <template #reference>
+                <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
+                <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+              </template>
+              <template v-if="user.showUser">
+                <UserPopup  :account="user.data.account_id" :hasBtn="false" @login="showLogin=true" />
+              </template>
+            </el-popover>
+            <div class="info">
+              <div class="name txt-wrap">{{user.data.name || user.data.account_id}}</div>
+              <div class="account txt-wrap">{{user.data.account_id}}</div>
+            </div>
+            <!-- follow -->
+            <div class="follow-button" v-if="user.data.account_id !== $store.getters.accountId" >
+              <FollowButton 
+                :isFollow="user.data.isFollow" 
+                :accountId="user.data.account_id" 
+                @follow = "follow"
+              />
+            </div>
+          </div>
+          <div class="no-more" v-if="isEndFollow">No more</div>
+        </div>
+        <div v-else-if="isEndFollow" class="no-results">
+          <img src="@/assets/images/common/emoji-null.png"/>
+          No data
+        </div>
+      </div>
+    </div>
+
     <!-- communities layer -->
     <div class="elastic-layer" v-if="showCommunities" @click.self="closeCommunityList()">
       <div class="edit-button close" @click="closeCommunityList()"></div>
@@ -172,6 +213,7 @@
   import NftContract from "@/contract/NftContract";
   import FollowButton from "@/component/follow-button.vue";
   import PostItem from '@/component/post-item.vue';
+  import UserPopup from '@/component/user-popup.vue';
   import CommentItemProfile from '@/component/comment-item-profile.vue';
   import About from '@/component/about.vue';
   import loginMask from "@/component/login-mask.vue";
@@ -183,6 +225,7 @@
       FollowButton,
       PostItem,
       CommentItemProfile,
+      UserPopup,
       About,
       loginMask,
       suspend
@@ -236,6 +279,15 @@
         limit:10,
         isEnd:false,
         isLoading:false,
+        //folllow
+        showFollows:false,
+        followCurrentTab:'',
+        isLoadingFollow:false,
+        isEndFollow:false,
+        followList:{
+          followers:[],
+          following:[]
+        },
         //community
         joinedCommunities:[],
         joinedCommunityList:[],
@@ -419,6 +471,70 @@
         }
       };
 
+      //follow list
+      const showFollowList = async (type) => {
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+        state.followCurrentTab = type;
+        state.showFollows = true;
+        state.followPage = 0;
+        state.isEndFollow = false;
+        state.followList[state.followCurrentTab] =  await getFollowList();
+      }
+      const closeFollowList = () => {
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showFollows = false;
+      }
+      const changeFollowTab  = async (type) => {
+        if(state.followCurrentTab == type || state.isLoadingFollow){
+          return;
+        }
+        state.followCurrentTab = type;
+        state.followPage = 0;
+        state.isEndFollow = false;
+        state.followList[state.followCurrentTab] =  await getFollowList();
+      }
+      const getFollowList = async () => {
+        state.isLoadingFollow = true;
+        let result = [];
+        if(state.followCurrentTab=="followers"){
+           console.log(state.followCurrentTab,'----------');
+          const res = await proxy.$axios.profile.get_user_followers({
+            accountId:state.accountId,
+            currentAccountId:store.getters.accountId || '',
+            page:state.followPage,
+            limit:10
+          });
+          if(res.success){
+            state.followPage++;
+            result = res.data;
+          }
+        }else{
+          const res = await proxy.$axios.profile.get_user_following({
+            accountId:state.accountId,
+            currentAccountId:store.getters.accountId || '',
+            page:state.followPage,
+            limit:10
+          });
+          if(res.success){
+            state.followPage++;
+            result = res.data;
+          }
+        }
+        if(result.length<10){
+          state.isEndFollow = true;
+        }
+        state.isLoadingFollow = false;
+        return result;
+      }
+      const followDiv = ref();
+      const followScroll = async () => {
+        const followBox = followDiv.value;
+        if(((followBox.scrollTop + window.innerHeight - 192) >= followBox.scrollHeight-200) && !state.isLoadingFollow && !state.isEndFollow){
+          const res = await getFollowList();
+          state.followList[state.followCurrentTab] = state.followList[state.followCurrentTab].concat(res);
+        }
+      }
+
       //community-list
       const showCommunityList  = async () => {
         document.getElementsByTagName('body')[0].classList.add("fixed");
@@ -509,6 +625,11 @@
         changeTab,
         handleScroll,
         redirectPage,
+        showFollowList,
+        closeFollowList,
+        changeFollowTab,
+        followDiv,
+        followScroll,
         showCommunityList,
         closeCommunityList,
         showNftList,
@@ -608,6 +729,10 @@
               color: rgba(255,255,255,0.5);
               letter-spacing: 0;
               font-weight: 400;
+              cursor: pointer;
+              &:last-child{
+                cursor: default;
+              }
               span{
                 font-size: 16px;
                 color: #FFFFFF;
@@ -641,24 +766,6 @@
         border-radius: 24px;
         padding:0 20px;
         margin-top:20px;
-      }
-      .no-results{
-        padding:80px 0;
-        background: #28282D;
-        border-radius: 24px;
-        font-family: D-DINExp;
-        font-size: 14px;
-        color: rgba(255,255,255,0.5);
-        letter-spacing: 0;
-        text-align: center;
-        font-weight: 400;
-        line-height:16px;
-        img{
-          display:block;
-          width: 60px;
-          height: 60px;
-          margin:0 auto 12px;
-        }
       }
     }
     .right{
@@ -737,6 +844,102 @@
               border-radius: 8px;
               object-fit: cover;
             }
+          }
+        }
+      }
+    }
+  }
+  .follow-layer{
+    background: rgba(0,0,0,0.56);
+    .follow-box{
+      position:absolute;
+      top:60px;
+      left:50%;
+      transform:translateX(-50%);
+      width: 690px;
+      height: calc(100vh - 120px);
+      background: #28282D;
+      border-radius: 24px;
+      .tab-box{
+        display:flex;
+        align-items: center;
+        height:72px;
+        padding-top:10px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        .tab{
+          font-family: D-DINExp-Bold;
+          font-size: 20px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          text-align: center;
+          font-weight: 700;
+          width:50%;
+          line-height:62px;
+          text-align: center;
+          position: relative;
+          cursor: pointer;
+          &.active{
+            &::after{
+              display:block;
+              content:"";
+              position: absolute;
+              left:50%;
+              transform:translateX(-50%);
+              bottom:0;
+              width: 90px;
+              height: 4px;
+              background: #FED23C;
+              border-radius: 2px;
+
+            }
+          }
+        }
+      }
+      .follow-list{
+        height: calc(100vh - 192px);
+        overflow-y: scroll;
+        padding-top:20px;
+        .follow-item{
+          margin-bottom:30px;
+          height:60px;
+          display:flex;
+          align-items: center;
+          padding:0 20px;
+          cursor: pointer;
+          position:relative;
+          .avatar{
+            width: 60px;
+            height: 60px;
+            border-radius:50%;
+            object-fit: cover;
+          }
+          .info{
+            margin-left:15px;
+            width:300px;
+            .name{
+              display:inline-block;
+              max-width:300px;
+              font-family: D-DINExp-Bold;
+              font-size: 16px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              font-weight: 700;
+              line-height:17px;
+            }
+            .account{
+              margin-top:10px;
+              font-family: D-DINExp;
+              font-size: 16px;
+              color: rgba(255,255,255,0.5);
+              letter-spacing: 0;
+              font-weight: 400;
+              line-height:17px;
+            }
+          }
+          .follow-button{
+            position: absolute;
+            top:10px;
+            right:20px;
           }
         }
       }
@@ -837,4 +1040,23 @@
       }
     }
   }
+
+  .no-results{
+      padding:80px 0;
+      background: #28282D;
+      border-radius: 24px;
+      font-family: D-DINExp;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0;
+      text-align: center;
+      font-weight: 400;
+      line-height:16px;
+      img{
+        display:block;
+        width: 60px;
+        height: 60px;
+        margin:0 auto 12px;
+      }
+    }
 </style>
