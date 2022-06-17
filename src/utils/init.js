@@ -6,6 +6,7 @@ import { getMetadata } from "../contract/TokenContract";
 import { getQueryString, parseAmount } from "./util";
 import { getTxData, storeAccessKey } from "./transaction";
 import { Ceramic } from "./ceramic";
+import * as bs58 from 'bs58';
 
 
 
@@ -55,8 +56,9 @@ async function initSignIn() {
   //Ceramic.new()
   let res = await api.profile.get_user_info({accountId:store.getters.accountId})
   if (res.success) {
-    store.commit("setProfile", res.data)
+    store.commit("setProfile", res.data);
   }
+  checkPostInfo();
 }
 
 async function initSenderWallet(keyStore, walletConnection) {
@@ -94,6 +96,24 @@ async function initSenderWallet(keyStore, walletConnection) {
       store.commit("setSignedIn", false)
     })
   }
+}
+
+async function checkPostInfo() {
+  const postInfo = JSON.parse(localStorage.getItem("postInfo")) || [];
+  const postList = [];
+  for(let i = 0;i<postInfo.length;i++){
+    const args = JSON.parse(bs58.decode(postInfo[i]).toString())['args'];
+    const check_params = {
+      ...args,
+      account_id:store.getters.accountId
+    }
+    
+    const recorded = await store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_viewed", check_params);
+    if(!recorded){
+      postList.push(postInfo[i]);
+    }
+  }
+  localStorage.setItem("postInfo",JSON.stringify(postList));
 }
 
 export async function init() {

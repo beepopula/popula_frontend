@@ -12,7 +12,7 @@
         <div v-else-if="list.length>0" class="list">
           <template v-for="item in list">
             <!-- reply -->
-            <div v-if="item.type=='comment' && item.data.count==0" class="comment-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+            <div v-if="item.type=='comment' && item.data.count==0" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
@@ -38,8 +38,40 @@
               </div>
               <div class="reply-user">Replying to you</div> 
               <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
-              <div class="text-default" v-else>
-                <img src="@/assets/images/post-item/text-default.png"/>
+              <div v-else class="default-content">
+                This is a Tonken-gated content.
+              </div>
+            </div>
+
+            <!-- @ -->
+            <div v-else-if="item.type=='at' && item.data.count==0" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+              <div class="user">
+                <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
+                  <template #reference>
+                    <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                    <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                  </template>
+                  <template v-if="item.showUser">
+                    <UserPopup :account="item.accountId"/>
+                  </template>
+                </el-popover>
+
+                <div class="user-info">
+                  <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
+                    {{item.user.name || item.accountId}}
+                  </div> <br/>
+                  <el-popover placement="bottom-start"  trigger="hover">
+                    <template #reference>
+                      <div class="createtime">{{item.time.showTime}}</div>
+                    </template>
+                    <div class="pop-box pop-tip">{{item.time.hoverTime}}</div>
+                  </el-popover>
+                </div>
+              </div>
+              <div class="reply-user"><span>@you</span></div> 
+              <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
+              <div v-else class="default-content">
+                This is a Tonken-gated content.
               </div>
             </div>
 
@@ -205,7 +237,7 @@ export default {
             item.user = res.data;
           }
           //text
-          if(item.type == 'encrypt'){
+          if(item.comment.type == 'encrypt'){
             const info = await checkAccess(item);
             if(info.isAccess){
               item.text = info.text;
@@ -222,19 +254,28 @@ export default {
             item.url = `/detail/${item.post.target_hash}`
           }
           //text
-          if(item.type == 'encrypt'){
-            const info = await checkAccess(item);
-            if(info.isAccess){
-              item.text = info.text;
-              item.isAccess = info.isAccess
-            }
-          }else{
-            if(item.type == 'comment'){
+          if(item.type == 'comment'){
+            if(item.comment.type== 'encrypt'){
+              const info = await checkAccess(item);
+              if(info.isAccess){
+                item.text = info.text;
+                item.isAccess = info.isAccess
+              }
+            }else{
               item.text = item.comment.text;
-            }else if(item.type == 'post'){
+            }
+          }else if(item.type == 'post'){
+            if(item.post.type== 'encrypt'){
+              const info = await checkAccess(item);
+              if(info.isAccess){
+                item.text = info.text;
+                item.isAccess = info.isAccess
+              }
+            }else{
               item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
             }
           }
+          
         }
         list.push(item);
       }
@@ -311,7 +352,7 @@ export default {
       >div:last-child{
         border:0;
       }
-      .comment-item{
+      .content-item{
         padding:20px 0;
         border-bottom:1px solid rgba(255,255,255,0.1);
         cursor: pointer;
@@ -383,11 +424,19 @@ export default {
             word-wrap: break-word;
           }
         }
-        .text-default{
+        .default-content{
+          padding: 120px 0 64px;
+          background: #36363C url('@/assets/images/post-item/icon-lock-gray.png') no-repeat center 64px;
+          background-size:40px 40px;
+          border-radius: 10px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: rgba(255,255,255,0.5);
+          letter-spacing: 0;
+          text-align: center;
+          font-weight: 400;
+          line-height:16px;
           margin-top:20px;
-          img{
-            width:100%;
-          }
         }
       }
       .like-item,.follow-item{
@@ -471,7 +520,7 @@ export default {
         }
       }
       .follow-item{
-        background:url('@/assets/images/notice/icon-users.png') no-repeat left 30px;
+        background:url('@/assets/images/notice/icon-users.png') no-repeat left 20px;
         background-size:40px 40px;
       }
 

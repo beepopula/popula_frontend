@@ -90,6 +90,7 @@ export default {
           store.commit("setSearchWord", state.searchWord);
         }
         if(route.path.indexOf('/notice') == -1){
+          state.hasNotice  = false;
           initNotice().then(res=>{
             if(res.success && res.data.length>0){
               state.hasNotice  = true;

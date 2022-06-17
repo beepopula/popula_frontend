@@ -120,7 +120,7 @@
               <div class="share">35</div>
             </template>
             <div class="pop-box pop-edit">
-              <div class="pop-edit-item">
+              <div class="pop-edit-item" @click="shareTwitter()">
                 <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
                 Twitter
               </div>
@@ -220,6 +220,7 @@ import CommentItem from '@/component/comment-item.vue';
 import UserPopup from '@/component/user-popup.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
+import * as bs58 from 'bs58';
 export default {
   components: {
     Comment,
@@ -339,7 +340,6 @@ export default {
       //time
       state.time = getTimer(props.item.createAt)
       //text
-      let text = "";
       if(props.item.type !== 'encrypt'){
         state.text = props.item.text;
       }else{
@@ -350,8 +350,9 @@ export default {
     const checkAccess = async () => {
       let check_result = {}
       if(store.getters.accountId!=props.item.accountId){
-        // check_result = await checkCondition(props.item.access);
+        check_result = await checkCondition(props.item.access);
       }
+      console.log(props.item.target_hash,check_result);
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //decrypt
         const res = await proxy.$axios.post.get_decode_content({
@@ -462,10 +463,26 @@ export default {
       }
     }
 
+    //shareLink
+    const getShareLink = () => {
+      const parmsJson = JSON.stringify({
+        type:'content',
+        args:{
+          hierarchies:[
+            ...props.item.hierarchies,
+            {target_hash:props.item.target_hash,account_id : props.item.accountId}
+          ],
+          inviter_id:store.getters.accountId || ''
+        }
+      })
+      const signature = bs58.encode(Buffer.from(parmsJson));
+      return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
     //share -> handleCopy
     const copy_text = ref()
     const triggerCopy = (str,isShare) => {
-      state.copyText = isShare ? `${window.location.protocol}//${window.location.host}/detail/${props.item.postId}?comment=${props.item.target_hash}` : str;
+      state.copyText = isShare ? getShareLink() : str;
       nextTick(() => {
         copy_text.value.click();
       });
@@ -602,6 +619,10 @@ export default {
       }
     }
 
+    const shareTwitter = async () => {
+      window.open('https://twitter.com/intent/tweet?text='+getShareLink());
+    }
+
 
     return {
       ...toRefs(state),
@@ -624,7 +645,8 @@ export default {
       redirectPage,
       del,
       report,
-      block
+      block,
+      shareTwitter
     };
   },
   mounted(){

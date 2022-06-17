@@ -5,7 +5,7 @@
     </div>
     <template v-else-if="user.data">
       <!-- follow -->
-      <div class="follow-button" v-if="user.account_id !== $store.getters.accountId">
+      <div class="follow-button" v-if="user.account_id !== $store.getters.accountId && hasBtn">
         <FollowButton 
           :isFollow="user.data.isFollow" 
           :accountId="user.account_id" 
@@ -51,6 +51,10 @@
       account:{
         type:String,
         value:""
+      },
+      hasBtn:{
+        type:Boolean,
+        value:true
       },
     },
     setup(props,{ emit }) {

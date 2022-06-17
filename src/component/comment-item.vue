@@ -216,6 +216,7 @@ import Comment from '@/component/comment.vue';
 import UserPopup from '@/component/user-popup.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
+import * as bs58 from 'bs58';
 export default {
   components: {
     Comment,
@@ -462,10 +463,26 @@ export default {
       }
     }
 
+    //shareLink
+    const getShareLink = () => {
+      const parmsJson = JSON.stringify({
+        type:'content',
+        args:{
+          hierarchies:[
+            ...props.item.hierarchies,
+            {target_hash:props.item.target_hash,account_id : props.item.accountId}
+          ],
+          inviter_id:store.getters.accountId || ''
+        }
+      })
+      const signature = bs58.encode(Buffer.from(parmsJson));
+      return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
     //share -> handleCopy
     const copy_text = ref()
     const triggerCopy = async (str,isShare) => {
-      state.copyText = isShare ? `${window.location.protocol}//${window.location.host}/detail/${props.post.target_hash}?comment=${props.item.target_hash}` : str;
+      state.copyText = isShare ? getShareLink() : str;
       nextTick(() => {
         copy_text.value.click();
       });
@@ -601,21 +618,8 @@ export default {
       }
     }
 
-    //shareRecord
-    const shareRecord = async () => {
-      const res = await proxy.$axios.post.share_record({
-        target_hash:props.item.target_hash,
-        accountId:store.getters.accountId
-      });
-      if(res.success){
-        state.shareCount = parseInt(state.shareCount) + 1;
-      }
-    }
-
     const shareTwitter = async () => {
-      await shareRecord();
-      const text = `${window.location.protocol}//${window.location.host}/detail/${props.post.target_hash}?comment=${props.item.target_hash}`;
-      window.open('https://twitter.com/intent/tweet?text='+text);
+      window.open('https://twitter.com/intent/tweet?text='+getShareLink());
     }
 
 

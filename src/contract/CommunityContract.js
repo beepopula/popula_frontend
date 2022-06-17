@@ -79,7 +79,7 @@ export default class CommunityContract{
         const transaction = {
             methodName: "like",
             args: param,
-            deposit: "20000000000000000000000",
+            deposit: "5000000000000000000000000",
             gas: "100000000000000"
         }
         return await this._signAndSendTransaction(transaction)
