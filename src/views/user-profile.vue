@@ -29,31 +29,23 @@
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list">
-              <a class="media-item" href="" target="_blank">
-                <img class="plat-icon" src="@/assets/images/common/logo-link-hover.png"/>
-              </a>
-              <a class="media-item" href="" target="_blank">
-                <img class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
-              </a>
-              <a class="media-item" href="" target="_blank">
-                <img class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
-              </a>
-              <a class="media-item" href="" target="_blank">
-                <img class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
-              </a>
-              <a class="media-item" href="" target="_blank">
-                <img class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
-              </a>
-              <!--
-              <template v-for="(media,index) in mediaList" :key="index">
-                <a v-if="media.url" class="media-item" :href="media.url" target="_blank">
-                  <img v-if="media.verified" class="plat-icon" :src="'@/assets/images/common/logo-'+media.name+'-hover.png'"/>
-                  <img v-else class="media-icon" :src="'@/assets/images/common/logo-'+media.name+'.png'"/>
+              <template v-for="item in mediaList">
+                <a v-if="item.url" class="media-item" :href="item.url" target="_blank">
+                  <img v-if="item.name=='Link'" class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+                  <img v-else-if="item.name=='Twitter'" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+                  <img v-else-if="item.name=='Instagram'" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
+                  <img v-else-if="item.name=='TikTok'" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
+                  <img v-else-if="item.name=='YouTube'" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
                 </a>
-                <img v-else class="media-item media-icon" :src="'@/assets/images/common/logo-'+media.name+'.png'"/>
+                <div v-else class="media-item">
+                  <img v-if="item.name=='Link'" class="plat-icon" src="@/assets/images/common/logo-link-hover.png"/>
+                  <img v-else-if="item.name=='Twitter'" class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                  <img v-else-if="item.name=='Instagram'" class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                  <img v-else-if="item.name=='TikTok'" class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                  <img v-else-if="item.name=='YouTube'" class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                </div>
               </template>
-              -->
-          </div>
+            </div>
           </div>
         </div>
         <!-- filter-menu  -->
@@ -322,19 +314,20 @@
           });
           if(res.success){
             //media
-            if(res.data.media){
-              const media = [];
-              res.data.media.forEach(item=>{
-                media[item.name] = {
-                  url:item.url,
-                  verified:item.verified
-                }
-              })
-              state.mediaList.forEach(item=>{
-                item.url = media[item.name] ? media[item.name]['url'] : "";
-                item.verified = media[item.name] ? media[item.name]['verified'] : false;
-              })
-            }
+            state.mediaList = res.data.media;
+            // if(res.data.media){
+            //   const media = [];
+            //   res.data.media.forEach(item=>{
+            //     media[item.name] = {
+            //       url:item.url,
+            //       verified:item.verified
+            //     }
+            //   })
+            //   state.mediaList.forEach(item=>{
+            //     item.url = media[item.name] ? media[item.name]['url'] : "";
+            //     item.verified = media[item.name] ? media[item.name]['verified'] : false;
+            //   })
+            // }
 
             state.user = res.data;
             state.joinedCommunityList = state.user.data.joinedCommunities;

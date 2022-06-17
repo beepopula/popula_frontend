@@ -453,7 +453,7 @@ export default {
       //encrypt
       const res = await proxy.$axios.post.add_encrypt_content_sign({
         content:{
-          text:state.text
+          text:commentInput.value.innerHTML
         },
         accountId:store.getters.accountId || ''
       });
