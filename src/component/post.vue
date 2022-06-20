@@ -434,7 +434,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //@
       const onCheck = (e) => {
-        console.log(e,'----e-----');
         if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }

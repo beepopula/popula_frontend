@@ -20,7 +20,6 @@ export default {
       const args = JSON.parse(parmsJson)['args'];
       //storage
       const postInfo = JSON.parse(localStorage.getItem("postInfo")) || [];
-      console.log(args,args.inviter_id ,store.getters.accountId , postInfo.indexOf(route.params.id));
       if(args.inviter_id && args.inviter_id!=store.getters.accountId && postInfo.indexOf(route.params.id)==-1){
         if(store.getters.accountId){
           const check_params = {
@@ -28,7 +27,6 @@ export default {
             account_id:store.getters.accountId
           }
           const recorded = await store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_viewed", check_params); 
-          console.log(check_params,recorded);
           if(!recorded){
             localStorage.setItem("postInfo",JSON.stringify(postInfo.concat(route.params.id)));
           }

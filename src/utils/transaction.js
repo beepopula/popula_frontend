@@ -106,7 +106,6 @@ export async function getTxData(hash) {
 }
 
 export async function getReceiptState(receipt_id) {
-  console.log(receipt_id,'----receipt_id----');
   const result = await store.state.provider.sendJsonRpc("EXPERIMENTAL_receipt", { "receipt_id":receipt_id });
   return result
 }

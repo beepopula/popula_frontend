@@ -352,7 +352,6 @@ export default {
       if(store.getters.accountId!=props.item.accountId){
         check_result = await checkCondition(props.item.access);
       }
-      console.log(props.item.target_hash,check_result);
       if(check_result.is_access || store.getters.accountId==props.item.accountId){
         //decrypt
         const res = await proxy.$axios.post.get_decode_content({
