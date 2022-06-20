@@ -298,7 +298,6 @@ import { useStore } from 'vuex';
 import MainContract from "@/contract/MainContract";
 import NftContract from "@/contract/NftContract";
 import CommunityContract from "@/contract/CommunityContract";
-import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, parseAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
 import CommunityItem from '@/component/community-item.vue';
@@ -342,7 +341,6 @@ export default {
     const { proxy } = getCurrentInstance();
     const mainContract = new MainContract(store.state.account);
     const nftContract = new NftContract(store.state.account);
-    const encryptionContract = new EncryptionContract(store.state.account);
 
     //state
     const state = reactive({

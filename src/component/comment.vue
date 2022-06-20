@@ -99,7 +99,6 @@ import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
 import MainContract from "@/contract/MainContract";
 import CommunityContract from "@/contract/CommunityContract";
-import EncryptionContract from "@/contract/EncryptionContract";
 import UserPopup from '@/component/user-popup.vue';
 import LoginMask from "@/component/login-mask.vue";
 import DiscordPicker from 'vue3-discordpicker';
@@ -143,7 +142,6 @@ export default {
     const store = useStore();
     const { proxy } = getCurrentInstance();
     const mainContract = new MainContract(store.state.account);
-    const encryptionContract = new EncryptionContract(store.state.account)
 
     //state
     const state = reactive({

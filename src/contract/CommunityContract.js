@@ -43,8 +43,7 @@ export default class CommunityContract{
             const result = await executeMultipleTransactions(this.contract.account, txs)
             //TODO checkResult
         } else {
-            const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas, transaction.deposit)]
-            const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
+            const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, transaction)
             if (!checkReceiptsSuccess(result)) {
                 return false
             }

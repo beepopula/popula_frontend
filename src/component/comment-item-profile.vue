@@ -212,7 +212,6 @@ import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
 import MainContract from "@/contract/MainContract";
 import CommunityContract from "@/contract/CommunityContract";
-import EncryptionContract from "@/contract/EncryptionContract";
 import { formatAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
 import Comment from '@/component/comment.vue';
@@ -248,7 +247,6 @@ export default {
     const router = useRouter();
     const { proxy } = getCurrentInstance();
     const mainContract = new MainContract(store.state.account);
-    const encryptionContract = new EncryptionContract(store.state.account);
 
     const state = reactive({
 

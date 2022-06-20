@@ -283,7 +283,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
   import MainContract from "@/contract/MainContract";
   import NftContract from "@/contract/NftContract";
   import CommunityContract from "@/contract/CommunityContract";
-  import EncryptionContract from "@/contract/EncryptionContract";
   import { getMetadata } from "@/contract/TokenContract.js";
   import { executeMultipleTransactions, generateAccessKey } from '../utils/transaction';
   import { parseAmount,getParam,generatePhrase } from '@/utils/util';
@@ -321,7 +320,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       const { proxy } = getCurrentInstance();
       const mainContract = new MainContract(store.state.account);
       const nftContract = new NftContract(store.state.account);
-      const encryptionContract = new EncryptionContract(store.state.account);
 
       //state
       const state = reactive({

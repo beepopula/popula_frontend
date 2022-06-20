@@ -186,7 +186,6 @@ import { ref, reactive, toRefs, watch, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
 import { formatAmount, parseAmount, checkCondition, getTimer} from "@/utils/util.js";
-import EncryptionContract from "@/contract/EncryptionContract";
 import About from '@/component/about.vue';
 import UserPopup from '@/component/user-popup.vue';
 export default {
@@ -198,7 +197,6 @@ export default {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
-    const encryptionContract = new EncryptionContract(store.state.account);
 
     //state
     const state = reactive({
