@@ -512,6 +512,9 @@ export default {
     .mt-4{
       margin-top:0!important;
     }
+    .vue3-discord-emojipicker__gifbutton{
+      display:none!important;
+    }
     header,.bg-grey-700{
       display:none!important;
     }

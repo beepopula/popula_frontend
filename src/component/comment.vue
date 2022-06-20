@@ -60,6 +60,7 @@
           @update:value="value = $event"
           @emoji="setEmoji"
           @gif="setGif"
+          :apiKey="'LIVDSRZULELA'"
         />
       </div>
 

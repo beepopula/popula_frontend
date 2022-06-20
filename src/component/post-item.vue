@@ -705,10 +705,10 @@ export default {
         };
         try{
           if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
-            const result = await mainContract.delContent(params); 
+            await mainContract.delContent(params); 
           }else{
             const communityContract = await CommunityContract.new(props.item.receiverId);
-            const result = await communityContract.delContent(params);
+            await communityContract.delContent(params);
           }
         }catch(e){
           console.log("delete error:"+e);
@@ -735,10 +735,10 @@ export default {
         };
         try{
           if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
-            const result = await mainContract.report(params); 
+            await mainContract.report(params); 
           }else{
             const communityContract = await CommunityContract.new(props.item.receiverId);
-            const result = await communityContract.report(params);
+            await communityContract.report(params);
           }
         }catch(e){
           console.log("report error:"+e);

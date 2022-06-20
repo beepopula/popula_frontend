@@ -663,7 +663,7 @@ export default {
   .comment-item{
     background: #28282D;
     border-radius: 24px;
-    padding:30px 0;
+    padding:20px 0;
     &.layer-comment-item{
       padding:20px 0;
     }

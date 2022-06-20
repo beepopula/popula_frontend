@@ -12,7 +12,7 @@
         <div v-else-if="list.length>0" class="list">
           <template v-for="item in list">
             <!-- reply -->
-            <div v-if="item.type=='comment' && item.data.count==0" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+            <div v-if="item.type=='comment' && item.data.count==0 && !item.data.At" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
@@ -44,36 +44,38 @@
             </div>
 
             <!-- @ -->
-            <div v-else-if="item.type=='at' && item.data.count==0" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
-              <div class="user">
-                <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
-                  <template #reference>
-                    <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
-                    <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
-                  </template>
-                  <template v-if="item.showUser">
-                    <UserPopup :account="item.accountId"/>
-                  </template>
-                </el-popover>
-
-                <div class="user-info">
-                  <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
-                    {{item.user.name || item.accountId}}
-                  </div> <br/>
-                  <el-popover placement="bottom-start"  trigger="hover">
+            <template v-else-if="item.data.At">
+              <div class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+                <div class="user">
+                  <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
-                      <div class="createtime">{{item.time.showTime}}</div>
+                      <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                      <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     </template>
-                    <div class="pop-box pop-tip">{{item.time.hoverTime}}</div>
+                    <template v-if="item.showUser">
+                      <UserPopup :account="item.accountId"/>
+                    </template>
                   </el-popover>
+
+                  <div class="user-info">
+                    <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
+                      {{item.user.name || item.accountId}}
+                    </div> <br/>
+                    <el-popover placement="bottom-start"  trigger="hover">
+                      <template #reference>
+                        <div class="createtime">{{item.time.showTime}}</div>
+                      </template>
+                      <div class="pop-box pop-tip">{{item.time.hoverTime}}</div>
+                    </el-popover>
+                  </div>
+                </div>
+                <div class="reply-user"><span>@you</span></div> 
+                <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
+                <div v-else class="default-content">
+                  This is a Tonken-gated content.
                 </div>
               </div>
-              <div class="reply-user"><span>@you</span></div> 
-              <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
-              <div v-else class="default-content">
-                This is a Tonken-gated content.
-              </div>
-            </div>
+            </template>
 
             <!-- like -->
             <div v-else-if="item.type != 'follow' && item.data.count>0" class="like-item" @click="redirectPage(item.url)">
