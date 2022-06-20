@@ -78,7 +78,7 @@ export function generatePhrase(entrophy) {
 }
 
 export function checkReceiptsSuccess(result) {
-  if (!result.receipts_outcome) {
+  if (!result || !result.receipts_outcome) {
     return false
   }
   let index = result.receipts_outcome.findIndex(item => item.outcome.status.Failure)
