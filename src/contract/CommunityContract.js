@@ -41,7 +41,10 @@ export default class CommunityContract{
                 }]
             }]
             const result = await executeMultipleTransactions(this.contract.account, txs)
-            //TODO checkResult
+            if (!checkReceiptsSuccess(result.response[0])) {
+                return false
+            }
+            return true
         } else {
             const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, transaction)
             if (!checkReceiptsSuccess(result)) {
