@@ -414,7 +414,7 @@
   import { useRoute,useRouter } from "vue-router";
   import { useStore } from 'vuex';
   import CommunityContract from "@/contract/CommunityContract";
-  import { getGas} from '../utils/util';
+  import { checkReceiptsSuccess, getGas} from '../utils/util';
   import { executeMultipleTransactions, generateAccessKey } from '@/utils/transaction';
   import Post from '@/component/post.vue';
   import PostItem from '@/component/post-item.vue';
@@ -489,6 +489,7 @@
           communityId:route.params.id,
         });
         if(res.success) {
+          console.log(res.data)
           state.detail = res.data;
         }
         //posts
@@ -582,9 +583,10 @@
               }]
             }
             const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-            if(result){
-              state.detail.data.isJoin = !state.detail.data.isJoin;
+            if (!checkReceiptsSuccess(result.response[0])) {
+                return false
             }
+            state.detail.data.isJoin = !state.detail.data.isJoin;
           }catch(e){
             const message = state.detail.data.isJoin ? 'Quit Failed' : 'Join Failed';
             proxy.$Message({

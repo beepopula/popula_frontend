@@ -22,22 +22,23 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
           deposit: fc.deposit
         }
       } else if (fc.kind == "addKey") {
-        return {
-          kind: fc.kind,
-          args: {
-            publicKey: fc.publicKey.toString(),
-            accessKey: {
-              nonce: fc.accessKey.nonce,
-              permission: {
-                FunctionCall: {
-                  allowance: fc.accessKey.permission.functionCall.allowance,
-                  receiverId: fc.accessKey.permission.functionCall.receiverId,
-                  methodNames: fc.accessKey.permission.functionCall.methodNames
-                }
-              }
-            }
-          },
-        }
+
+        // return {
+        //   kind: fc.kind,
+        //   args: {
+        //     publicKey: fc.publicKey.toString(),
+        //     accessKey: {
+        //       nonce: fc.accessKey.nonce,
+        //       permission: {
+        //         FunctionCall: {
+        //           allowance: fc.accessKey.permission.functionCall.allowance,
+        //           receiverId: fc.accessKey.permission.functionCall.receiverId,
+        //           methodNames: fc.accessKey.permission.functionCall.methodNames
+        //         }
+        //       }
+        //     }
+        //   },
+        // }
       }
     })
     return {
@@ -97,12 +98,20 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
 }
 
 export async function signAndSendTransaction(contractId, account, tx) {
-  const shareInfo = getShareInfo()
-  if (shareInfo) {
-    return await executeMultipleTransactions(account, [tx])
-  }
   const actions = [transaction.functionCall(tx.methodName, tx.args, tx.gas, tx.deposit)]
-  return await account.signAndSendTransaction({receiverId: contractId, actions: actions})
+  const res = await account.signAndSendTransaction({receiverId: contractId, actions: actions})
+  
+  const shareInfo = getShareInfo()
+  if (shareInfo && contractId == shareInfo.args.contract_id) {
+      const actions = [transaction.functionCall(
+      "share_view",
+      {hierarchies: shareInfo.args.hierarchies, inviter_id: shareInfo.args.inviter_id},
+      "100000000000000",
+      "0")]
+      await account.signAndSendTransaction({receiverId: contractId, actions: actions})  
+  }
+  
+  return res
 }
 
 export async function getTxData(hash) {
@@ -133,6 +142,16 @@ export async function executeMultipleTransactions(
     transactions,
     callbackUrl
   ) {
+    if (store.getters.loginWallet == "sender") {
+      transactions = transactions.filter((tx) => {
+        for (let action of tx.actions) {
+          if (action.kind != "functionCall") {
+            return false
+          }
+        }
+        return true
+      })
+    }
     const shareInfo = getShareInfo()
     if (shareInfo) {
       transactions.push({
@@ -157,7 +176,8 @@ export async function executeMultipleTransactions(
       })
     );
     if (store.getters.loginWallet == "sender") {
-      return await window.near.requestSignTransactions({ transactions: nearTransactions });
+      const res = await window.near.requestSignTransactions({ transactions: nearTransactions });
+      return res
     } 
     return store.state.walletConnection.requestSignTransactions(nearTransactions, callbackUrl);
   };

@@ -78,6 +78,9 @@ export function generatePhrase(entrophy) {
 }
 
 export function checkReceiptsSuccess(result) {
+  if (!result.receipts_outcome) {
+    return false
+  }
   let index = result.receipts_outcome.findIndex(item => item.outcome.status.Failure)
   return index == -1
 }
@@ -306,7 +309,6 @@ export async function setShareInfo(shareInfoCode) {
         account_id:store.getters.accountId
       }
       const recorded = await store.state.viewAccount.viewFunction(args.contract_id, "check_viewed", check_params); 
-      console.log(check_params,recorded);
       if(!recorded){
         localStorage.setItem("shareInfo", shareInfoCode);
       } else {
