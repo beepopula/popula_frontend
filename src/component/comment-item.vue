@@ -470,9 +470,10 @@ export default {
         args:{
           hierarchies:[
             ...props.item.hierarchies,
-            {target_hash:props.item.target_hash,account_id : props.item.accountId}
+            {target_hash:props.item.target_hash,account_id : props.item.accountId},
           ],
-          inviter_id:store.getters.accountId || ''
+          inviter_id:store.getters.accountId || '',
+          contract_id: props.item.receiverId
         }
       })
       const signature = bs58.encode(Buffer.from(parmsJson));

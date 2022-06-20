@@ -289,3 +289,29 @@ export function getTimer(timestamp){
     hoverTime:utcArr.slice(1,2) + ' ' + utcArr.slice(2,3) + ' ' + utcArr.slice(3,4)//d + " at " + t
   };
 }
+
+export async function setShareInfo(shareInfoCode) {
+  if (!shareInfoCode) {
+    return
+  }
+  const shareInfo = JSON.parse(bs58.decode(shareInfoCode).toString())
+  const args = shareInfo['args'];
+  if(args && args.inviter_id && args.inviter_id != store.getters.accountId){
+    if (store.getters.accountId){
+      const check_params = {
+        ...args,
+        account_id:store.getters.accountId
+      }
+      const recorded = await store.state.viewAccount.viewFunction(args.contract_id, "check_viewed", check_params); 
+      console.log(check_params,recorded);
+      if(!recorded){
+        localStorage.setItem("shareInfo", shareInfoCode);
+      } else {
+        localStorage.removeItem("shareInfo")
+      }
+    }else{
+      localStorage.setItem("shareInfo", shareInfoCode);
+    }
+  }
+  return shareInfo
+}
