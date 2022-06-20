@@ -377,14 +377,6 @@ export default {
               target_hash: props.targetHash,
               account_id: props.parentAccount
             },
-            // {
-            //   target_hash: 'bNw4SwipyY7s6fa3FBBTk155xTaTnXgY1TFfAg9qCiX',//props.targetHash,
-            //   account_id:'billkin.testnet'//props.parentAccount
-            // },
-            // {
-            //   target_hash: "8ExQhQKEb8c4XbxKUx6pC2wS3yKTGie9m2ZKcy9V8DM9",//props.targetHash,
-            //   account_id:'billkin.testnet'//props.parentAccount
-            // },
           ]
         }else if(parent_hierarchies.length==1){//level 2
           hierarchies = [
@@ -409,6 +401,7 @@ export default {
             options.push({At:r[1].trim().substring(1)});
           }
         }
+        
         //submit
         if(props.postType == "encrypt"){
           await encryptReply(hierarchies,options);

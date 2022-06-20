@@ -45,7 +45,7 @@
 
             <!-- @ -->
             <template v-else-if="item.data.At">
-              <div class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+              <div v-if="item.post" class="content-item" @click="redirectPage('/detail/'+item.post.target_hash,false)">
                 <div class="user">
                   <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
@@ -70,7 +70,37 @@
                   </div>
                 </div>
                 <div class="reply-user"><span>@you</span></div> 
-                <pre v-if="item.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
+                <pre v-if="item.post.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
+                <div v-else class="default-content">
+                  This is a Tonken-gated content.
+                </div>
+              </div>
+              <div v-else class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+                <div class="user">
+                  <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
+                    <template #reference>
+                      <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                      <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                    </template>
+                    <template v-if="item.showUser">
+                      <UserPopup :account="item.accountId"/>
+                    </template>
+                  </el-popover>
+
+                  <div class="user-info">
+                    <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
+                      {{item.user.name || item.accountId}}
+                    </div> <br/>
+                    <el-popover placement="bottom-start"  trigger="hover">
+                      <template #reference>
+                        <div class="createtime">{{item.time.showTime}}</div>
+                      </template>
+                      <div class="pop-box pop-tip">{{item.time.hoverTime}}</div>
+                    </el-popover>
+                  </div>
+                </div>
+                <div class="reply-user"><span>@you</span></div> 
+                <pre v-if="item.comment.type != 'encrypt' || item.isAccess" class="text"><div v-html="item.text"></div></pre>
                 <div v-else class="default-content">
                   This is a Tonken-gated content.
                 </div>
@@ -224,27 +254,27 @@ export default {
       const length = Math.min(data.length,100);
       for(let i = 0;i<length;i++){//data.length
         const item = data[i];
-        if(item.type=='comment' && item.data.count==0){ //reply
+        if(item.type!='follow' && item.data.count==0){ //reply & @
           //time
           item.time = getTimer(item.createAt)
           
           item.user = {}
           const res = await proxy.$axios.profile.get_user_info({
-            accountId:item.comment.accountId,
+            accountId:item.type == 'comment' ? item.comment.accountId : item.post.accountId,
             currentAccountId: store.getters.accountId || ''
           });
           if(res.success){
             item.user = res.data;
           }
           //text
-          if(item.comment.type == 'encrypt'){
+          if((item.type == 'comment' && item.comment.type == 'encrypt') || (item.type == 'post' && item.post.type == 'encrypt')){
             const info = await checkAccess(item);
             if(info.isAccess){
               item.text = info.text;
               item.isAccess = info.isAccess
             }
           }else{
-            item.text = item.comment.text;
+            item.text = item.type == 'comment' ? item.comment.text : item.post.text;
           }
         }else if(item.type!='follow' && item.data.count>0){ //like
           //url

@@ -11,6 +11,7 @@
           @keyup.capture="onChange"
           @focus="checkLogin"
           @click="onClick"
+          @paste="onPaste"
         />
         <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
         
@@ -433,6 +434,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //@
       const onCheck = (e) => {
+        console.log(e,'-----');
+        if(e.key == 'v' && e.metaKey){
+          console.log(e.clipboardData,'============');
+        }
         if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }
