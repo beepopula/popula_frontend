@@ -6,6 +6,7 @@ import { PublicKey } from 'near-api-js/lib/utils';
 import { baseDecode, serialize } from 'borsh';
 import store from "@/store/index.js";
 import BN from 'bn.js';
+import { getShareInfo, setShareInfo } from "./util";
 
 
 async function createTransaction({receiverId,actions,nonceOffset = 1}) {
@@ -60,7 +61,6 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
       )
     }
   })
-
   
 
   const localKey = await store.state.account.connection.signer.getPublicKey(
@@ -96,7 +96,12 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
   }
 }
 
-export async function signAndSendTransaction(contractId, account, actions) {
+export async function signAndSendTransaction(contractId, account, tx) {
+  const shareInfo = getShareInfo()
+  if (shareInfo) {
+    return await executeMultipleTransactions(account, [tx])
+  }
+  const actions = [transaction.functionCall(tx.methodName, tx.args, tx.gas, tx.deposit)]
   return await account.signAndSendTransaction({receiverId: contractId, actions: actions})
 }
 
@@ -128,6 +133,19 @@ export async function executeMultipleTransactions(
     transactions,
     callbackUrl
   ) {
+    const shareInfo = getShareInfo()
+    if (shareInfo) {
+      transactions.push({
+        receiverId: shareInfo.args.contract_id,
+        actions: [{
+            kind: "functionCall",
+            methodName: "share_view",
+            args: {hierarchies: shareInfo.args.hierarchies, inviter_id: shareInfo.args.inviter_id},
+            deposit: "0",
+            gas: "100000000000000"
+        }]
+      })
+    }
     const nearTransactions = await Promise.all(
       transactions.map((t, i) => {
         return createTransaction({

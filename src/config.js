@@ -11,7 +11,6 @@ export default function getConfig() {
         helperUrl: "https://helper.mainnet.near.org",
         explorerUrl: "https://explorer.mainnet.near.org",
         MAIN_CONTRACT: "v5-app.bhc8521.testnet",
-        ENCRYPTION_CONTRACT: "encryption.bhc8521.testnet",
         COMMUNITY_GENESIS_CONTRACT: "community.bhc8521.testnet",
         NFT_CONTRACT: "nft.bhc8521.testnet",
         TOKEN_FACTORY: "token3.popula.near",
@@ -19,6 +18,8 @@ export default function getConfig() {
         LINKDROP: "linkdrop6.popula.near",
         REFERRAL: "referral2.popula.near",
         IPFS: "https://ipfs.popula.io",
+        CERAMIC_NETWORK: 'mainnet', 
+        CERAMIC_API: 'https://ceramic-private.3boxlabs.com',
         storageCostPerByte: "10000000000000000000" 
       };
     case "testnet":
@@ -29,11 +30,12 @@ export default function getConfig() {
         helperUrl: "https://helper.testnet.near.org",
         explorerUrl: "https://explorer.testnet.near.org",
         MAIN_CONTRACT: "app.beepopula.testnet",
-        ENCRYPTION_CONTRACT: "encryption.beepopula.testnet",
         COMMUNITY_GENESIS_CONTRACT: "community.beepopula.testnet",
         NFT_CONTRACT: "nft.beepopula.testnet",
         TOKEN_FACTORY: "token.beepopula.testnet",
         IPFS: "https://ipfs.popula.io",
+        CERAMIC_NETWORK: 'testnet-clay', 
+        CERAMIC_API: 'http://54.255.155.106:7007',
         storageCostPerByte: "10000000000000000000" 
       };
       case "dev-testnet":
@@ -44,11 +46,12 @@ export default function getConfig() {
           helperUrl: "https://helper.testnet.near.org",
           explorerUrl: "https://explorer.testnet.near.org",
           MAIN_CONTRACT: "v5-app.bhc8521.testnet",
-          ENCRYPTION_CONTRACT: "encryption.bhc8521.testnet",
           COMMUNITY_GENESIS_CONTRACT: "community-genesis2.bhc8521.testnet",
           NFT_CONTRACT: "nft.bhc8521.testnet",
           TOKEN_FACTORY: "token3.bhc8521.testnet",
           IPFS: "https://ipfs.popula.io",
+          CERAMIC_NETWORK: 'testnet-clay', 
+          CERAMIC_API: 'http://54.255.155.106:7007',
           storageCostPerByte: "10000000000000000000" 
         };
     case "betanet":

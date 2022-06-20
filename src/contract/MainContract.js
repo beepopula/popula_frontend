@@ -24,8 +24,7 @@ export default class MainContract{
     }
 
     async _signAndSendTransaction(transaction) {
-        const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas, transaction.deposit)]
-        const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
+        const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, transaction)
         if (!checkReceiptsSuccess(result)) {
             return false
         }

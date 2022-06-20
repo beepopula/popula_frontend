@@ -23,7 +23,7 @@
         trigger="hover"
         >
         <template #reference>
-          <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
+          <a class="media-item" target="_blank" href="https://twitter.com/beepopula">
             <img src="@/assets/images/common/logo-twitter.png"/>
             <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
           </a>
@@ -37,7 +37,7 @@
         trigger="hover"
         >
         <template #reference>
-          <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
+          <a class="media-item" target="_blank" href="https://medium.com/beepopula">
             <img src="@/assets/images/common/logo-medium.png"/>
             <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
           </a>
@@ -51,7 +51,7 @@
         trigger="hover"
         >
         <template #reference>
-          <a class="media-item" target="_blank" href="https://github.com/popula-io">
+          <a class="media-item" target="_blank" href="https://github.com/beepopula">
             <img src="@/assets/images/common/logo-github.png"/>
             <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
           </a>

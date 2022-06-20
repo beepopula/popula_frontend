@@ -12,7 +12,7 @@
           <div class="button-border" @click="$router.push('/explore')">
             <div class="button">Explore</div>
           </div>
-          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Creator Register</a>
+          <a class="button-register" href="https://0smaupbwvz0.typeform.com/to/BYx9MMTZ?typeform-source=popula.io" target="_blank">Launch Your Community</a>
         </div>
       </div>
     </div>
@@ -133,7 +133,7 @@
             trigger="hover"
             >
             <template #reference>
-              <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
+              <a class="media-item" target="_blank" href="https://twitter.com/beepopula">
                 <img src="@/assets/images/common/logo-twitter.png"/>
                 <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
               </a>
@@ -147,7 +147,7 @@
             trigger="hover"
             >
             <template #reference>
-              <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
+              <a class="media-item" target="_blank" href="https://medium.com/beepopula">
                 <img src="@/assets/images/common/logo-medium.png"/>
                 <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
               </a>
@@ -161,7 +161,7 @@
             trigger="hover"
             >
             <template #reference>
-              <a class="media-item" target="_blank" href="https://github.com/popula-io">
+              <a class="media-item" target="_blank" href="https://github.com/beepopula">
                 <img src="@/assets/images/common/logo-github.png"/>
                 <img class="hover" src="@/assets/images/common/logo-github-hover.png"/>
               </a>
@@ -198,6 +198,7 @@ export default {
     }
   },
   mounted(){
+    this.$router.push({query: {}});
     let left = 0;
     let intervalId = null;
     let ul = document.getElementById("ul_img");

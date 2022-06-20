@@ -284,7 +284,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
   import MainContract from "@/contract/MainContract";
   import NftContract from "@/contract/NftContract";
   import CommunityContract from "@/contract/CommunityContract";
-  import EncryptionContract from "@/contract/EncryptionContract";
   import { getMetadata } from "@/contract/TokenContract.js";
   import { executeMultipleTransactions, generateAccessKey } from '../utils/transaction';
   import { parseAmount,getParam,generatePhrase } from '@/utils/util';
@@ -322,7 +321,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       const { proxy } = getCurrentInstance();
       const mainContract = new MainContract(store.state.account);
       const nftContract = new NftContract(store.state.account);
-      const encryptionContract = new EncryptionContract(store.state.account);
 
       //state
       const state = reactive({
@@ -1129,20 +1127,22 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }
         };
         postInput.value.innerHTML = "";
-        proxy.$Loading.hideLoading();
-        if (res) {
+        
+        if (res == true) {
           proxy.$Message({
             message: "Post Success",
             type: "success",
           });
+          proxy.$Loading.hideLoading();
           setTimeout(()=>{
             emit("postSuccess");
           },500)
-        } else {
+        } else  if (res == false) {
           proxy.$Message({
             message: "Oops,something went wrong. Please try again or submit a report.",
             type: "error",
           });
+          proxy.$Loading.hideLoading();
         }
       }
       
