@@ -490,7 +490,6 @@
         state.isLoadingFollow = true;
         let result = [];
         if(state.followCurrentTab=="followers"){
-           console.log(state.followCurrentTab,'----------');
           const res = await proxy.$axios.profile.get_user_followers({
             accountId:state.accountId,
             currentAccountId:store.getters.accountId || '',

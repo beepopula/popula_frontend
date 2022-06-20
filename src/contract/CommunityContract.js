@@ -77,7 +77,7 @@ export default class CommunityContract{
 
     async report(param){
         const transaction = {
-            methodName: "like",
+            methodName: "report",
             args: param,
             deposit: "5000000000000000000000000",
             gas: "100000000000000"
