@@ -42,7 +42,6 @@ export default class CommunityContract{
             }]
             const result = await executeMultipleTransactions(this.contract.account, txs)
             //TODO checkResult
-            return true
         } else {
             const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas, transaction.deposit)]
             const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
@@ -120,7 +119,7 @@ export default class CommunityContract{
     constructor(contractId, near){
         const wallet = new nearAPI.WalletConnection(near, contractId)
         const account = wallet.account()
-        this.isSignedIn = wallet.isSignedIn()
+        this.isSignedIn = wallet.isSignedIn() && store.getters.accountId == account.accountId
         this.contract = new nearAPI.Contract(account, contractId, {...this.methods, sender: account});
     }
 

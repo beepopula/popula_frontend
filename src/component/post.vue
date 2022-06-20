@@ -1128,20 +1128,22 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }
         };
         postInput.value.innerHTML = "";
-        proxy.$Loading.hideLoading();
-        if (res) {
+        
+        if (res == true) {
           proxy.$Message({
             message: "Post Success",
             type: "success",
           });
+          proxy.$Loading.hideLoading();
           setTimeout(()=>{
             emit("postSuccess");
           },500)
-        } else {
+        } else  if (res == false) {
           proxy.$Message({
             message: "Oops,something went wrong. Please try again or submit a report.",
             type: "error",
           });
+          proxy.$Loading.hideLoading();
         }
       }
       

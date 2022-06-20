@@ -426,7 +426,7 @@ export default {
         return;
       }
 
-      proxy.$Loading.hideLoading();
+      //proxy.$Loading.hideLoading();
       emit("comment");
     }
 
@@ -487,13 +487,15 @@ export default {
     //handleSuccess
     const handleSuccess = (res) => {
       state.text = ""
-      if (res) {
+      if (res == true) {
+        proxy.$Loading.hideLoading()
         proxy.$Message({
           message: "Comment Success",
           type: "success",
         });
         resetInfo()
-      } else {
+      } else if(res == false) {
+        proxy.$Loading.hideLoading()
         proxy.$Message({
           message: "Oops,something went wrong. Please try again or submit a report.",
           type: "error",

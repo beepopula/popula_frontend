@@ -58,8 +58,7 @@ async function initSignIn() {
   if (res.success) {
     store.commit("setProfile", res.data);
   }
-  const shareInfo = localStorage.getItem("shareInfo")
-  await setShareInfo(shareInfo);
+  await setShareInfo();
 }
 
 async function initSenderWallet(keyStore, walletConnection) {

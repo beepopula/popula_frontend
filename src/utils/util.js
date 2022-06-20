@@ -292,7 +292,10 @@ export function getTimer(timestamp){
 
 export async function setShareInfo(shareInfoCode) {
   if (!shareInfoCode) {
-    return
+    shareInfoCode = localStorage.getItem("shareInfo")
+    if (!shareInfoCode) {
+      return
+    }
   }
   const shareInfo = JSON.parse(bs58.decode(shareInfoCode).toString())
   const args = shareInfo['args'];
@@ -314,4 +317,11 @@ export async function setShareInfo(shareInfoCode) {
     }
   }
   return shareInfo
+}
+
+export function getShareInfo() {
+  const shareInfoCode = localStorage.getItem("shareInfo")
+  if (shareInfoCode) {
+    return JSON.parse(bs58.decode(shareInfoCode).toString())
+  }
 }

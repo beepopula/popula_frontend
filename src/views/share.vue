@@ -19,7 +19,8 @@ export default {
     const init = async () => {
       const shareInfoCode = route.params.id
       const shareInfo = await setShareInfo(shareInfoCode)
-      const hierarchies = shareInfo.hierarchies
+      console.log(shareInfo)
+      const hierarchies = shareInfo.args.hierarchies
       //router
       const len = hierarchies.length;
       if(len==1){ //post

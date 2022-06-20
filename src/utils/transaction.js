@@ -6,6 +6,7 @@ import { PublicKey } from 'near-api-js/lib/utils';
 import { baseDecode, serialize } from 'borsh';
 import store from "@/store/index.js";
 import BN from 'bn.js';
+import { getShareInfo, setShareInfo } from "./util";
 
 
 async function createTransaction({receiverId,actions,nonceOffset = 1}) {
@@ -61,6 +62,10 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
     }
   })
 
+  const shareInfo = getShareInfo()
+  if (shareInfo && shareInfo.args.contract_id == receiverId) {
+    actions.push(transaction.functionCall("share_view", {hierarchies: shareInfo.args.hierarchies, inviter_id: shareInfo.args.inviter_id}, "100000000000000", "0" ))
+  }
   
 
   const localKey = await store.state.account.connection.signer.getPublicKey(
