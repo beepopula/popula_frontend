@@ -193,8 +193,81 @@
     <!-- login-mask -->
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 
-    <!-- #copy_text  display:none;  -->
- 
+    <!-- edit layer-->
+    <div class="elastic-layer edit-layer" v-if="showEdit" @click.self="closeEdit()">
+      <div class="edit-button close" @click="closeEdit()"></div>
+      <div class="edit-box">
+        <div class="edit-head">
+          Edit profile
+          <div class="mini-button-border">
+            <div class="mini-button" @click="save()">Save</div>
+          </div>
+        </div>
+        <div class="edit-form">
+          <!-- avatar -->
+          <el-upload
+            class="upload-avatar"
+            :show-file-list="false"
+            list-type="picture-card"
+            accept="image/png, image/jpeg, image/jpg"
+            :http-request="uploadAvatar"
+            :before-upload="beforeAvatarUpload"
+          >
+            <div class="avatar-box">
+              <img v-if="editProfile.avatar" class="avatar" :src="editProfile.avatar" />
+              <div class="upload-button"></div>
+            </div>
+          </el-upload>
+          <!-- background -->
+          <el-upload
+            class="upload-background"
+            :show-file-list="false"
+            list-type="picture-card"
+            accept="image/png, image/jpeg, image/jpg"
+            :http-request="uploadBackground"
+            :before-upload="beforeBackgroundUpload"
+          >
+            <div class="background-box">
+              <img v-if="editProfile.background" class="background" :src="editProfile.background" />
+              <div class="upload-button"></div>
+            </div>
+          </el-upload>
+          <div class="mian-form">
+            <!-- Name -->
+            <div class="form-item form-item-account">
+              <div class="form-item-content">
+                <el-input placeholder="Your name"  v-model="user.account_id"  disabled/>
+              </div>
+            </div>
+            <!-- Name -->
+            <div class="form-item">
+              <div class="form-item-label"> Name</div>
+              <div class="form-item-content">
+                <el-input placeholder="Your name"  v-model="editProfile.name"  />
+              </div>
+            </div>
+            <!-- Bio -->
+            <div class="form-item">
+              <div class="form-item-label"> Bio</div>
+              <div class="form-item-content">
+                <el-input  placeholder="Tell others more about you!  " v-model="editProfile.bio" />
+              </div>
+            </div>
+            <!-- Binding -->
+            <div class="form-item form-item-media">
+              <div class="form-item-label"> Binding</div>
+              <div class="form-item-content">
+                <el-input  placeholder="Paste link here  " v-model="editProfile.media.twitter" />
+                <el-input  placeholder="Paste link here  " v-model="editProfile.media.instagram" />
+                <el-input  placeholder="Paste link here  " v-model="editProfile.media.youtube" />
+                <el-input  placeholder="Paste link here  " v-model="editProfile.media.tiktok" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -300,6 +373,15 @@
         // limitNft:10,
         // isEndNft:false,
         // isLoadingNft:false,
+        //edit
+        showEdit:true,
+        editProfile:{
+          background:'',
+          avatar:'',
+          name:'',
+          bio:'',
+          media:{}
+        },
         //other
         shareLink:`${window.location.protocol}//${window.location.host}/user-profile/${route.params.id || store.getters.accountId}`,
         showLogin:false,
@@ -1033,23 +1115,227 @@
       }
     }
   }
-
   .no-results{
-      padding:80px 0;
+    padding:80px 0;
+    background: #28282D;
+    border-radius: 24px;
+    font-family: D-DINExp;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0;
+    text-align: center;
+    font-weight: 400;
+    line-height:16px;
+    img{
+      display:block;
+      width: 60px;
+      height: 60px;
+      margin:0 auto 12px;
+    }
+  }
+  .edit-layer{
+    background: rgba(0,0,0,0.56);
+    .edit-box{
+      position:absolute;
+      top:60px;
+      left:50%;
+      transform:translateX(-50%);
+      width: 690px;
+      height: calc(100vh - 120px);
       background: #28282D;
       border-radius: 24px;
-      font-family: D-DINExp;
-      font-size: 14px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0;
-      text-align: center;
-      font-weight: 400;
-      line-height:16px;
-      img{
-        display:block;
-        width: 60px;
-        height: 60px;
-        margin:0 auto 12px;
+      .edit-head{
+        display:flex;
+        align-items: center;
+        justify-content:space-between;
+        height:76px;
+        padding:0 20px;
+        font-family: D-DINExp-Bold;
+        font-size: 20px;
+        color: #FFFFFF;
+        letter-spacing: 0;
+        font-weight: 700;
+      }
+      .edit-form{
+        position:relative;
+        .upload-avatar{
+          position:absolute;
+          left:16px;
+          top:140px;
+          :deep(.el-upload){
+            width: 98px;
+            height: 98px;
+            padding:4px;
+            border:0;
+            border-radius:50%;
+            background: rgba(40,40,45,1);
+            .avatar-box{
+              width: 90px;
+              height: 90px;
+              border-radius:50%;
+              position:relative;
+              .upload-button{
+                width: 90px;
+                height: 90px;
+                border-radius:50%;
+                background: rgba(0,0,0,0.50) url("@/assets/images/common/icon-upload.png") no-repeat center center;
+                background-size:30px;
+                position:absolute;
+                top:0;
+                left:0;
+              }
+            }
+          }
+        }
+        .upload-background{
+          margin-bottom: 68px;
+          :deep(.el-upload){
+            width: 690px;
+            height: 170px;
+            background: #111113;
+            border:none;
+            .background-box{
+              width: 690px;
+              height: 170px;
+              position:relative;
+              .upload-button{
+                width: 70px;
+                height: 70px;
+                border-radius:50%;
+                background: rgba(255,255,255,0.10) url("@/assets/images/common/icon-upload.png") no-repeat center center;
+                background-size:30px;
+                position:absolute;
+                top:50%;
+                left:50%;
+                transform:translate(-50%,-50%);
+              }
+            }
+          }
+        }
+        .mian-form{
+          padding:0 20px;
+          height: calc(100vh - 464px);
+          overflow-y: scroll;
+          .form-item{
+            padding-top:40px;
+            &.form-item-account{
+              padding-top:30px;
+              .form-item-content{
+                margin-top:0;
+                :deep(.el-input){
+                  width:100%;
+                  input{
+                    background: #36363C;
+                    color: rgba(255,255,255,0.3);
+                  }
+                }
+              }
+            }
+            &.form-item-media{
+              :deep(.el-input){
+                padding-bottom:15px;
+              }
+            }
+            .form-item-label{
+              font-family: D-DINExp-Bold;
+              font-size: 14px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              font-weight: 700;
+              line-height:20px;
+            }
+            .form-item-tip{
+              font-family: D-DINExp-Bold;
+              font-size: 14px;
+              color: #FF6868;
+              letter-spacing: 0;
+              font-weight: 700;
+              line-height: 20px;
+            }
+            .form-item-content{
+              margin: 15px 0 0;
+              :deep(.el-input){
+                width:100%;
+                input{
+                  width:100%;
+                  height: 52px;
+                  line-height:50px;
+                  background: #36363C;
+                  border-radius: 10px;
+                  padding:0 16px;
+                  border:1px solid transparent;
+                  font-family: D-DINExp;
+                  font-size: 16px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  font-weight: 400;
+                }
+                &.twitter-input{
+                  input{
+                    padding:0 30px 0 64px;
+                    background:#111113 url('static/image/Twitter_disable.png') no-repeat 30px center;
+                    background-size:24px;
+                  }
+                }
+                &.instagram-input{
+                  input{
+                    padding:0 30px 0 64px;
+                    background:#111113 url('static/image/Instagram_disable.png') no-repeat 30px center;
+                    background-size:24px;
+                  }
+                }
+                &.youtube-input{
+                  input{
+                    padding:0 30px 0 64px;
+                    background:#111113 url('static/image/YouTube_disable.png') no-repeat 30px center;
+                    background-size:24px;
+                  }
+                }
+                &.tiktok-input{
+                  input{
+                    padding:0 30px 0 64px;
+                    background:#111113 url('static/image/TikTok_disable.png') no-repeat 30px center;
+                    background-size:24px;
+                  }
+                }
+              }
+              :deep(.el-textarea){
+                width:100%;
+                height:240px;
+                border-radius: 30px;
+                overflow:hidden;
+                textarea{
+                  width:100%;
+                  height:240px;
+                  background: #36363C;
+                  border-radius: 10px;
+                  padding:30px;
+                  font-family: D-DINExp;
+                  font-size: 20px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  line-height: 36px;
+                  font-weight: 400;
+                  border:0;
+                  resize:none;
+                }
+                .el-input__count{
+                  background:transparent;
+                  opacity: 0.5;
+                  font-family: D-DINExp-Bold;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  font-weight: 700;
+                  bottom:20px;
+                  right:30px;
+                }
+              }
+            }
+          }
+
+        }
       }
     }
+  }
 </style>
