@@ -583,8 +583,10 @@
               }]
             }
             const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-            if (!checkReceiptsSuccess(result.response[0])) {
+            if (result && result.response) {
+              if (!checkReceiptsSuccess(result.response[0])) {
                 return false
+              }
             }
             state.detail.data.isJoin = !state.detail.data.isJoin;
           }catch(e){
