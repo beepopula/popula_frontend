@@ -30,4 +30,10 @@ export default {
   get_user_following(data) {
     return get("v1/follow/list", data);
   },
+  set_user_info(data) {
+    return post("v1/user/updateInfo", data);
+  },
+  verify_twitter(data) {
+    return post("v1/user/verifyTwitter", data);
+  },
 };

@@ -5,9 +5,10 @@
       <div class="left">
         <!-- user-info -->
         <div class="user-info" v-if="user.data">
-          <img class="bg" src="@/assets/images/profile/bg.png"/>
+          <img v-if="user.background" class="bg" :src="user.background"/>
+          <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
           <div class="btns">
-            <div class="btn edit" v-if="accountId == $store.getters.accountId"></div>
+            <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditLayer()"></div>
             <div class="btn share" :data-clipboard-text="shareLink" @click="handleCopyFun()"></div>
           </div>
           <div class="info">
@@ -29,22 +30,42 @@
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list">
-              <template v-for="item in mediaList">
-                <a v-if="item.url" class="media-item" :href="item.url" target="_blank">
-                  <img v-if="item.name=='Link'" class="plat-icon" src="@/assets/images/common/logo-link.png"/>
-                  <img v-else-if="item.name=='Twitter'" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
-                  <img v-else-if="item.name=='Instagram'" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
-                  <img v-else-if="item.name=='TikTok'" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
-                  <img v-else-if="item.name=='YouTube'" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
-                </a>
-                <div v-else class="media-item">
-                  <img v-if="item.name=='Link'" class="plat-icon" src="@/assets/images/common/logo-link-hover.png"/>
-                  <img v-else-if="item.name=='Twitter'" class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
-                  <img v-else-if="item.name=='Instagram'" class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
-                  <img v-else-if="item.name=='TikTok'" class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
-                  <img v-else-if="item.name=='YouTube'" class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
-                </div>
-              </template>
+              <!-- Twitter -->
+              <a v-if="user.twitter && user.twitter.url" class="media-item" :href="user.twitter.url" target="_blank">
+                <img v-if="user.twitter.verified" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+                <img v-else class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+              </a>
+              <div v-else class="media-item">
+                <img class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+              </div>
+
+              <!-- Instagram -->
+              <a v-if="user.instagram && user.instagram.url" class="media-item" :href="user.instagram.url" target="_blank">
+                <img v-if="user.instagram.verified" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
+                <img v-else class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+              </a>
+              <div v-else class="media-item">
+                <img class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+              </div>
+
+              <!-- TikTok -->
+              <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="user.tiktok.url" target="_blank">
+                <img v-if="user.tiktok.verified" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
+                <img v-else class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+              </a>
+              <div v-else class="media-item">
+                <img class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+              </div>
+
+              <!-- YouTube -->
+              <a v-if="user.youtube && user.youtube.url" class="media-item" :href="user.youtube.url" target="_blank">
+                <img v-if="user.youtube.verified" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
+                <img v-else class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+              </a>
+              <div v-else class="media-item">
+                <img class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+              </div>
+
             </div>
           </div>
         </div>
@@ -194,8 +215,8 @@
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 
     <!-- edit layer-->
-    <div class="elastic-layer edit-layer" v-if="showEdit" @click.self="closeEdit()">
-      <div class="edit-button close" @click="closeEdit()"></div>
+    <div class="elastic-layer edit-layer" v-if="showEdit" @click.self="closeEditLayer()">
+      <div class="edit-button close" @click="closeEditLayer()"></div>
       <div class="edit-box">
         <div class="edit-head">
           Edit profile
@@ -208,10 +229,10 @@
           <el-upload
             class="upload-avatar"
             :show-file-list="false"
-            list-type="picture-card"
             accept="image/png, image/jpeg, image/jpg"
-            :http-request="uploadAvatar"
-            :before-upload="beforeAvatarUpload"
+            list-type="picture-card"
+            :on-change="uploadAvatar"
+            :auto-upload="false"
           >
             <div class="avatar-box">
               <img v-if="editProfile.avatar" class="avatar" :src="editProfile.avatar" />
@@ -222,10 +243,10 @@
           <el-upload
             class="upload-background"
             :show-file-list="false"
-            list-type="picture-card"
             accept="image/png, image/jpeg, image/jpg"
-            :http-request="uploadBackground"
-            :before-upload="beforeBackgroundUpload"
+            list-type="picture-card"
+            :on-change="uploadBackground"
+            :auto-upload="false"
           >
             <div class="background-box">
               <img v-if="editProfile.background" class="background" :src="editProfile.background" />
@@ -233,7 +254,7 @@
             </div>
           </el-upload>
           <div class="mian-form">
-            <!-- Name -->
+            <!-- Account -->
             <div class="form-item form-item-account">
               <div class="form-item-content">
                 <el-input placeholder="Your name"  v-model="user.account_id"  disabled/>
@@ -241,7 +262,8 @@
             </div>
             <!-- Name -->
             <div class="form-item">
-              <div class="form-item-label"> Name</div>
+              <div class="form-item-tip" v-if="nameError"> Name can’t be blank</div>
+              <div class="form-item-label" v-else> Name</div>
               <div class="form-item-content">
                 <el-input placeholder="Your name"  v-model="editProfile.name"  />
               </div>
@@ -257,16 +279,18 @@
             <div class="form-item form-item-media">
               <div class="form-item-label"> Binding</div>
               <div class="form-item-content">
-                <el-input  placeholder="Paste link here  " v-model="editProfile.media.twitter" />
-                <el-input  placeholder="Paste link here  " v-model="editProfile.media.instagram" />
-                <el-input  placeholder="Paste link here  " v-model="editProfile.media.youtube" />
-                <el-input  placeholder="Paste link here  " v-model="editProfile.media.tiktok" />
+                <el-input class="twitter-input" placeholder="Paste link here  " v-model="editProfile.twitter.url" />
+                <el-input class="instagram-input" placeholder="Paste link here  " v-model="editProfile.instagram.url" />
+                <el-input class="youtube-input" placeholder="Paste link here  " v-model="editProfile.youtube.url" />
+                <el-input class="tiktok-input" placeholder="Paste link here  " v-model="editProfile.tiktok.url" />
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <Cropper ref='avatarCropper' :aspectRatio="1" @changeicon="changeicon"></Cropper>
+    <Cropper ref='backgroundCropper' :aspectRatio="23/8" @changeicon="changeicon"></Cropper>
 
   </div>
 </template>
@@ -283,6 +307,7 @@
   import About from '@/component/about.vue';
   import loginMask from "@/component/login-mask.vue";
   import suspend from "@/component/suspend.vue";
+  import Cropper from '@/component/cropper.vue';
   import ClipboardJS from 'clipboard';
 
   export default {
@@ -293,7 +318,8 @@
       UserPopup,
       About,
       loginMask,
-      suspend
+      suspend,
+      Cropper
     },
     setup() {
       const store = useStore();
@@ -305,29 +331,6 @@
       const state = reactive({
         accountId : "",
         user: {}, 
-        mediaList:[
-          {        
-            name: 'Link',        
-            url: "",        
-            verified: false    
-          },{        
-            name: 'Twitter',        
-            url: "",        
-            verified: false    
-          },{        
-            name: 'Instagram',        
-            url: "",        
-            verified: false    
-          },{        
-            name: 'YouTube',        
-            url: "",        
-            verified: false    
-          },{        
-            name: 'TikTok',        
-            url: "",        
-            verified: false    
-          }
-        ],
         //list
         currentTab:"",
         list:{
@@ -374,13 +377,20 @@
         // isEndNft:false,
         // isLoadingNft:false,
         //edit
-        showEdit:true,
+        showEdit:false,
+        paramName:'',
+        aspectRatio:1,
+        nameError:false,
+        isLoadingEdit:false,
         editProfile:{
-          background:'',
           avatar:'',
+          background:'',
           name:'',
           bio:'',
-          media:{}
+          twitter:{url:'',verified:false},
+          instagram:{url:'',verified:false},
+          youtube:{url:'',verified:false},
+          tiktok:{url:'',verified:false}
         },
         //other
         shareLink:`${window.location.protocol}//${window.location.host}/user-profile/${route.params.id || store.getters.accountId}`,
@@ -609,6 +619,81 @@
         }
       }
 
+      //edit
+      const showEditLayer = () => {
+        state.editProfile = {
+          name:state.user.name,
+          avatar:state.user.avatar,
+          background:state.user.background,
+          bio:state.user.bio,
+          twitter:state.user.twitter || {url:'',verified:false},
+          instagram:state.user.instagram || {url:'',verified:false},
+          youtube:state.user.youtube || {url:'',verified:false},
+          tiktok:state.user.tiktok || {url:'',verified:false}
+        };
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+        state.showEdit = true;
+      }
+      const closeEditLayer = () => {
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+        state.showEdit = false;
+      }
+      const save = async () => {
+        if(!state.editProfile.name.trim()){
+          state.nameError = true;
+          return;
+        }
+        proxy.$Loading.showLoading({title: "Loading"});
+        state.nameError = false;
+        state.isLoadingEdit = true;
+        const param = {
+          accountId:store.getters.accountId,
+          name:state.editProfile.name,
+          avatar : state.editProfile.avatar,
+          background : state.editProfile.background,
+          bio : state.editProfile.bio,
+          twitter : state.editProfile.twitter.url,
+          instagram : state.editProfile.instagram.url,
+          youtube : state.editProfile.youtube.url,
+          tiktok : state.editProfile.tiktok.url
+        }
+        const res = await proxy.$axios.profile.set_user_info(param);
+        if(res.success){
+          //update info
+          state.user.name = state.editProfile.name;
+          state.user.avatar = state.editProfile.avatar;
+          state.user.background = state.editProfile.background;
+          state.user.bio = state.editProfile.bio;
+          state.user.twitter = state.editProfile.twitter;
+          state.user.instagram = state.editProfile.instagram;
+          state.user.youtube = state.editProfile.youtube;
+          state.user.tiktok = state.editProfile.tiktok;
+
+          state.showEdit = false;
+        }
+        proxy.$Loading.hideLoading();
+        state.isLoadingEdit = false;
+
+      }
+
+      //edit avatar & background
+      const avatarCropper= ref()
+      const backgroundCropper= ref()
+      const uploadAvatar = (file) => {
+        state.paramName = 'avatar';
+        avatarCropper.value.uploads(file);
+      }
+      const uploadBackground = (file) => {
+        state.paramName = 'background'
+        backgroundCropper.value.uploads(file);
+      }
+      const changeicon = (e) => {
+        state.editProfile[state.paramName] = e;
+      }
+
+
+
+
       //community-list
       const showCommunityList  = async () => {
         document.getElementsByTagName('body')[0].classList.add("fixed");
@@ -705,6 +790,14 @@
         changeFollowTab,
         followDiv,
         followScroll,
+        showEditLayer,
+        closeEditLayer,
+        save,
+        avatarCropper,
+        backgroundCropper,
+        uploadAvatar,
+        uploadBackground,
+        changeicon,
         showCommunityList,
         closeCommunityList,
         showNftList,
@@ -832,6 +925,9 @@
             .media-item{
               width:24px;
               margin-right:30px;
+              img{
+                height:24px;
+              }
             }
           }
         }
@@ -1155,6 +1251,54 @@
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
+        .mini-button-border{
+          padding: 2px;
+          width: 90px;
+          height: 40px;
+          border-radius: 24px;
+          background:  rgba(255,255,255,0.2);
+          cursor:pointer;
+          position:relative;
+          &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left:0;
+            width: 100%;
+            height: 100%;
+            transform-origin:center;
+            transform:scale(1.1);
+            filter: blur(10px) brightness(80%) opacity(.8);
+            border-radius: 24px;
+            background:  #FED23C;
+            z-index: 1;
+            transition:opacity 0.7s;
+            opacity:0;
+          }
+          &:hover{
+            background:  #FED23C;
+            &::after {
+              opacity:0.8;
+            }
+          }
+          .mini-button{
+            width: 86px;
+            height: 36px;
+            border-radius: 20px;
+            background: #28282D;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            font-family: D-DINExp-Bold;
+            font-size: 14px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            text-align: center;
+            font-weight: 700;
+            position:relative;
+            z-index:2;
+          }
+        }
       }
       .edit-form{
         position:relative;
@@ -1162,6 +1306,7 @@
           position:absolute;
           left:16px;
           top:140px;
+          z-index: 2;
           :deep(.el-upload){
             width: 98px;
             height: 98px;
@@ -1174,6 +1319,12 @@
               height: 90px;
               border-radius:50%;
               position:relative;
+              .avatar{
+                width: 90px;
+                height: 90px;
+                object-fit: cover;
+                border-radius:50%;
+              }
               .upload-button{
                 width: 90px;
                 height: 90px;
@@ -1198,6 +1349,11 @@
               width: 690px;
               height: 170px;
               position:relative;
+              .background{
+                width: 690px;
+                height: 170px;
+                object-fit: cover;
+              }
               .upload-button{
                 width: 70px;
                 height: 70px;
@@ -1218,24 +1374,6 @@
           overflow-y: scroll;
           .form-item{
             padding-top:40px;
-            &.form-item-account{
-              padding-top:30px;
-              .form-item-content{
-                margin-top:0;
-                :deep(.el-input){
-                  width:100%;
-                  input{
-                    background: #36363C;
-                    color: rgba(255,255,255,0.3);
-                  }
-                }
-              }
-            }
-            &.form-item-media{
-              :deep(.el-input){
-                padding-bottom:15px;
-              }
-            }
             .form-item-label{
               font-family: D-DINExp-Bold;
               font-size: 14px;
@@ -1270,34 +1408,6 @@
                   letter-spacing: 0;
                   font-weight: 400;
                 }
-                &.twitter-input{
-                  input{
-                    padding:0 30px 0 64px;
-                    background:#111113 url('static/image/Twitter_disable.png') no-repeat 30px center;
-                    background-size:24px;
-                  }
-                }
-                &.instagram-input{
-                  input{
-                    padding:0 30px 0 64px;
-                    background:#111113 url('static/image/Instagram_disable.png') no-repeat 30px center;
-                    background-size:24px;
-                  }
-                }
-                &.youtube-input{
-                  input{
-                    padding:0 30px 0 64px;
-                    background:#111113 url('static/image/YouTube_disable.png') no-repeat 30px center;
-                    background-size:24px;
-                  }
-                }
-                &.tiktok-input{
-                  input{
-                    padding:0 30px 0 64px;
-                    background:#111113 url('static/image/TikTok_disable.png') no-repeat 30px center;
-                    background-size:24px;
-                  }
-                }
               }
               :deep(.el-textarea){
                 width:100%;
@@ -1329,6 +1439,52 @@
                   font-weight: 700;
                   bottom:20px;
                   right:30px;
+                }
+              }
+            }
+            &.form-item-account{
+              padding-top:30px;
+              .form-item-content{
+                margin-top:0;
+                :deep(.el-input){
+                  width:100%;
+                  input{
+                    background: #36363C;
+                    color: rgba(255,255,255,0.3);
+                  }
+                }
+              }
+            }
+            &.form-item-media{
+              :deep(.el-input){
+                padding-bottom:15px;
+                input{
+                  padding-left:44px;
+                }
+              
+                &.twitter-input{
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-twitter.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
+                }
+                &.instagram-input{
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-instagram.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
+                }
+                &.youtube-input{
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-youtube.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
+                }
+                &.tiktok-input{
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-tiktok.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
                 }
               }
             }
