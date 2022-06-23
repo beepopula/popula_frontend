@@ -176,14 +176,14 @@ export default defineComponent({
     overflow: auto;
     .el-dialog{
         width:500px;
-        height:400px;
+        height:430px;
         position:absolute;
         top:50%;
         left:50%;
         transform:translate(-50%,-50%);
-        background: #fff;
-        border-radius: 5px;
-        padding:20px;
+        background: #28282D;;
+        border-radius: 10px;
+        padding:30px;
         box-sizing: border-box;
 
     }
@@ -199,7 +199,6 @@ export default defineComponent({
         width: 300px;
         height: 300px;
         background-color: #F0F2F5;
-        margin-right: 10px;
         border-radius: 4px;
         .avatar-left-crop {
             width: 300px;
@@ -217,8 +216,12 @@ export default defineComponent({
             width: 100%;
             position: absolute;
             bottom: 5px;
-            color: #ffffff;
+            font-family: D-DINExp-Bold;
             font-size: 14px;
+            color: rgba(255,255,255,1);
+            letter-spacing: 0;
+            text-align: center;
+            font-weight: 400;
         }
     }
     .avatar-right {
@@ -229,35 +232,27 @@ export default defineComponent({
     }
 }
 .footer{
-    margin-top:20px;
+    margin-top:30px;
     justify-content: flex-end;
-}
-
-
-@media screen and (max-width: 816px) {
-    .el-dialog-mask{
-        .el-dialog{
-            width:90%;
-            height:auto;
-            position:absolute;
-            top:50%;
-            left:5%;
-            transform:translateY(-50%);
-        }
-    }
-    .avatar {
-        flex-direction:column;
-        align-items:center;
-        .avatar-left {
-            width: calc(90vw - 40px);
-            height: calc(90vw - 40px);
-            .avatar-left-crop {
-                width: calc(90vw - 40px);
-                height: calc(90vw - 40px);
-            }
-        }
-        .avatar-right {
-            margin-top:10px;
+    .el-button{
+        width: 90px;
+        height: 40px;
+        border-radius: 24px;
+        background: transparent;
+        border: 2px solid rgba(255,255,255,0.2);
+        font-family: D-DINExp-Bold;
+        font-size: 14px;
+        color: rgba(255,255,255,0.3);
+        letter-spacing: 0;
+        text-align: center;
+        font-weight: 700;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        margin-left:20px;
+        &.el-button--primary{
+            border: 2px solid #FED23C;
+            color: rgba(255,255,255,1);
         }
     }
 }

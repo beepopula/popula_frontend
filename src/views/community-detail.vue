@@ -13,7 +13,7 @@
           <img v-if="detail.avatar"  class="avatar" :src="detail.avatar">
           <img v-else  class="avatar" src="@/assets/images/test/community.png">
           <div class="info">
-            <div class="name">{{detail.name}}</div>
+            <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
             <div class="creator">Created by 
               <el-popover placement="bottom-start"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
                 <template #reference>
@@ -139,7 +139,10 @@
       <!-- left -->
       <div class="left">
         <!-- Community Information-->
-        <div class="title">Community Information</div>
+        <div class="title" style="justify-content:flex-start;">
+          Community Information
+          <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditContributorLayer"></div>
+        </div>
         <div class="community-information">
           <div class="intro">{{detail.information}}</div>       
           <div class="media">
@@ -199,8 +202,10 @@
           
         </div>
         <!-- Benefits -->
-        <!--
-        <div class="title">Benefits</div>
+        <div class="title" style="justify-content:flex-start;">
+          Benefits
+          <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBenefitsLayer"></div>
+        </div>
         <div class="benefits">
           <template v-for="i in 4">
             <div :class="['benefit-item',i%2==0 ? 'mr0' : '']">
@@ -215,10 +220,11 @@
             </div>
           </template>
         </div>
-        -->
         <!-- News -->
-        <!--
-        <div class="title">News</div>
+        <div class="title" style="justify-content:flex-start;">
+          News
+          <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditNewsLayer"></div>
+        </div>
         <div class="news">
           <div class="news-item">
             <div class="news-right">
@@ -246,7 +252,6 @@
             </div>
           </div>
         </div>
-        -->
 
       </div>
       <!-- right -->
@@ -406,7 +411,23 @@
   <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 
   <!-- suspend -->
-  <suspend @postSuccess="postSuccess()" />
+  <!-- <suspend @postSuccess="postSuccess()" /> -->
+
+  <!-- CommunityEditBasicinfo -->
+  <template v-if="showEditBasicinfo">
+    <CommunityEditBasicinfo :communityId="$route.params.id" :editInfo="editBasicinfo" @updateInfo="updateBasicinfo" @closeEditLayer="showEditBasicinfo=false"/>
+  </template>
+  <template v-if="showEditContributor">
+    <CommunityEditContributor :communityId="$route.params.id" :editInfo="editContributor" @updateInfo="updateContributor" @closeEditLayer="showEditContributor=false"/>
+  </template>
+  <template v-if="showEditBenefits">
+    <CommunityEditBenefits :communityId="$route.params.id" :editInfo="benefits" @updateInfo="updateBenefits" @closeEditLayer="showEditBenefits=false"/>
+  </template>
+  <template v-if="showEditNews">
+    <CommunityEditNews :communityId="$route.params.id" :editInfo="news" @updateInfo="updateNews" @closeEditLayer="showEditNews=false"/>
+  </template>
+
+
 </template>
 
 <script>
@@ -424,6 +445,10 @@
   import FollowButton from "@/component/follow-button.vue";
   import UserPopup from '@/component/user-popup.vue';
   import suspend from "@/component/suspend.vue";
+  import CommunityEditBasicinfo from "@/component/community-edit-basicinfo.vue";
+  import CommunityEditContributor from "@/component/community-edit-contributor.vue";
+  import CommunityEditBenefits from "@/component/community-edit-benefits.vue";
+  import CommunityEditNews from "@/component/community-edit-news.vue";
   import draggable from 'vuedraggable'
   export default {
     components: {
@@ -435,6 +460,10 @@
       FollowButton,
       UserPopup,
       suspend,
+      CommunityEditBasicinfo,
+      CommunityEditContributor,
+      CommunityEditBenefits,
+      CommunityEditNews,
       draggable,
     },
     setup(){
@@ -477,10 +506,19 @@
         showLogin:false,
         showLayer:false,
         drag: false,
-        //other
         showCreateUser:false,
         showCreateUser2:false,
-        contributors:[]
+        //
+        contributors:[],
+        benefits:[],
+        news:[],
+        //edit
+        showEditBasicinfo:false,
+        editBasicinfo:{},
+        showEditContributor:false,
+        editContributor:{},
+        showEditBenefits:false,
+        showEditNews:false,
       })
 
       const init = async () => {
@@ -718,6 +756,69 @@
         }
       }
 
+      //edit Basicinfo
+      const showEditBasicinfoLayer = () => {
+        state.editBasicinfo = {
+          name:state.detail.name,
+          info:state.detail.info,
+          avatar:state.detail.avatar,
+          cover:state.detail.cover
+        }
+        state.showEditBasicinfo = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateBasicinfo = (info) => {
+        state.detail.name = info.name;
+        state.detail.info = info.info;
+        state.detail.avatar = info.avatar;
+        state.detail.cover = info.cover;
+        
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditBasicinfo = false;
+      }
+
+
+      //edit Contributor
+      const showEditContributorLayer = () => {
+        state.editContributor = {
+          information:state.detail.information,
+          contributor:state.detail.contributor || []
+        }
+        state.showEditContributor = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateContributor = (info) => {
+        state.detail.information = info.information;
+        state.detail.contributor = info.contributor;
+
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditContributor = false;
+      }
+
+      //edit Benefits
+      const showEditBenefitsLayer = () => {
+        state.showEditBenefits = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateBenefits = (info) => {
+        state.benefits = info.benefits;
+        
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditbenefits = false;
+      }
+
+      //edit News
+      const showEditNewsLayer = () => {
+        state.showEditNews = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateNews = (info) => {
+        state.news = info.news;
+        
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditNews = false;
+      }
+
       //drag
       const dragEnd = async (event) => {
         state.drag = false;
@@ -778,6 +879,14 @@
         closeMemberList,
         memberLayer,
         membersScroll,
+        showEditBasicinfoLayer,
+        updateBasicinfo,
+        showEditContributorLayer,
+        updateContributor,
+        showEditBenefitsLayer,
+        updateBenefits,
+        showEditNewsLayer,
+        updateNews,
         dragEnd,
         redirectPage,
         backTop,
@@ -843,6 +952,11 @@
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
+              display:flex;
+              align-items: center;
+              span{
+                max-width: 300px;
+              }
             }
             .creator{
               margin-top:8px;
@@ -1700,6 +1814,16 @@
       margin-top:20px;
     }
   }
+
+  .edit-btn{
+    width:16px;
+    height:16px;
+    cursor:pointer;
+    background:url("@/assets/images/common/icon-edit.png") no-repeat center center;
+    background-size:16px 16px;
+    margin-left:12px;
+  }
+
 </style>
 
 <style lang="scss">

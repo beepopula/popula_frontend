@@ -22,7 +22,7 @@
             </div>
             <template v-else-if="userList.length>0">
               <template v-for="user in userList">
-                <template v-if="user.data">
+                <template>
                   <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
                     <template #reference>
                       <div class="user-item" @click="onSelectSubmit(user)">
@@ -39,7 +39,7 @@
                     </template>
                   </el-popover>
                 </template>
-                <template v-else>
+                <!-- <template v-else>
                   <div class="user-item" @click="onSelectSubmit(user)">
                     <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
                     <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
@@ -48,7 +48,7 @@
                       <div class="user-account  txt-wrap">{{user.account_id}}</div>
                     </div>
                   </div>
-                </template>
+                </template> -->
               </template>
             </template>
             <div v-else class="nobody">Nobody yet.</div>
@@ -503,21 +503,21 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           accountId:str,
         });
         if(res.success){
-          const list = [];
-          const len = Math.min(res.data.length,5)
-          for(let i =0;i<len;i++){
-            const user = await proxy.$axios.profile.get_user_info({
-              accountId:res.data[i]['account_id'],
-              currentAccountId: store.getters.accountId || ''
-            });
-            if(user.success){
-              list.push(user.data);
-              // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
-            }else{
-              list.push({account_id:res.data[i]['account_id']});
-            }
-          }
-          state.userList = list;
+          // const list = [];
+          // const len = Math.min(res.data.length,5)
+          // for(let i =0;i<len;i++){
+          //   const user = await proxy.$axios.profile.get_user_info({
+          //     accountId:res.data[i]['account_id'],
+          //     currentAccountId: store.getters.accountId || ''
+          //   });
+          //   if(user.success){
+          //     list.push(user.data);
+          //     // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
+          //   }else{
+          //     list.push({account_id:res.data[i]['account_id']});
+          //   }
+          // }
+          state.userList = res.data;
           state.isLoaingUserList = false;
         }
       }

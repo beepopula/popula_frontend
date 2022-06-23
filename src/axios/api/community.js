@@ -21,4 +21,7 @@ export default {
   replacement_sequence(data) {
     return post("v1/communities/replacementSequence", data);
   },
+  set_community_basicinfo(data) {
+    return post("v1/communities/update", data);
+  },
 };
