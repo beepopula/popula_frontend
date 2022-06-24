@@ -9,9 +9,38 @@
         </div>
       </div>
       <div class="edit-form">
-        <div class="mian-form">
-          
-
+        <div class="main-form">
+          <!-- Benefits -->
+          <div class="form-title"> 
+            Add Benefit 
+            <div class="add-btn" @click="addBenefit()"></div>
+          </div>
+          <div class="form-content">
+            <div class="news-item" v-for="(item,index) in benefits">
+              <div class="delete-btn" v-if="benefits.length>1" @click="deleteBenefit(index)"></div>
+              <div class="form-item">
+                <div class="form-item-label">Title</div>
+                <div class="form-item-content">
+                  <el-input  placeholder=""   v-model="item.title" maxlength="50" show-word-limit/>
+                </div>
+              </div>
+              <div class="form-item">
+                <div class="form-item-label">Introduction</div>
+                <div class="form-item-content">
+                  <el-input  placeholder="" type="textarea" autosize   v-model="item.introduction" maxlength="300" show-word-limit/>
+                </div>
+              </div>
+              <div class="form-item">
+                <div class="form-item-label">Type</div>
+                <div class="form-item-content">
+                  <el-select v-model="item.type" size="large">
+                    <el-option  key="earn"  label="earn"  value="earn"></el-option>
+                    <el-option  key="access"  label="access"  value="access"></el-option>
+                  </el-select>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -41,7 +70,7 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        benefits:props.editInfo,
+        benefits:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{title:'',introduction:'',type:''}],
         //other
         
       })
@@ -51,23 +80,32 @@
         emit('closeEditLayer');
       }
 
+      const addBenefit = () => {
+        state.benefits.push({title:'',introduction:'',type:''});
+      }
+
+      const deleteBenefit = (index) => {
+        state.benefits.splice(index, 1);
+      }
+
       //edit
       const save = async () => {
         proxy.$Loading.showLoading({title: "Loading"});
         const param = {
           accountId:'bhc8521.testnet', //store.getters.accountId,
           communityId:props.communityId,
-          ...state.edit,
+          benefits:state.benefits
         }
         try{
-          const res = await proxy.$axios.community.set_community_contributor(param);
-          if(res.success){
-            emit('updateInfo',state.edit);
-          }else{
-            throw new Error("request failed")
-          }
+          console.log(param,'----param----');
+          // const res = await proxy.$axios.community.set_community_contributor(param);
+          // if(res.success){
+          //   emit('updateInfo',state.edit);
+          // }else{
+          //   throw new Error("request failed")
+          // }
         }catch(e){
-          console.log("set_community_contributor:"+e);
+          console.log("set_community_benefits:"+e);
           proxy.$Message({
             message: "Edit Failed",
             type: "error",
@@ -79,6 +117,8 @@
 
       return {
         ...toRefs(state),
+        addBenefit,
+        deleteBenefit,
         save,
         closeEditLayer,
       }
@@ -161,13 +201,183 @@
       }
       .edit-form{
         position:relative;
-        .mian-form{
-          padding:0 20px 20px;
-          max-height: calc(100vh - 196px);
+        padding:0 0 20px;
+        .main-form{
+          padding:20px 20px 0;
+          max-height: calc(100vh - 216px);
           overflow-y: scroll;
+        
+          .form-title{
+            display: flex;
+            align-items: center;
+            justify-content:space-between;
+            height:24px;
+            font-family: D-DINExp-Bold;
+            font-size: 14px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            margin-bottom:12px;
+            .add-btn{
+              width:24px;
+              height:24px;
+              background: url('@/assets/images/common/icon-add.png') no-repeat center;
+              background-size:24px 24px;
+              cursor: pointer;
+            }
+          }
+          .benefit-item{
+            background: #36363C;
+            border-radius: 10px;
+            margin-bottom:20px;
+            padding:20px;
+            position:relative;
+            &:last-child{
+              margin-bottom: 0;
+            }
+            .delete-btn{
+              position:absolute;
+              top:-4px;
+              right:-4px;
+              width: 24px;
+              height: 24px;
+              cursor: pointer;
+              border-radius:50%;
+              background: #28282D url("@/assets/images/common/icon-delete.png") no-repeat center center;
+            }
+          }
+          .form-item{
+            padding-top:40px;
+            &:first-child{
+              padding-top:0;
+            }
+            .form-item-label{
+              font-family: D-DINExp-Bold;
+              font-size: 14px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              font-weight: 700;
+              line-height:20px;
+            }
+            .form-item-content{
+              margin: 15px 0 0;
+              :deep(.el-input){
+                width:100%;
+                input{
+                  width:100%;
+                  height: 50px;
+                  line-height:48px;
+                  background: transparent;
+                  border-radius: 10px;
+                  padding:0 16px;
+                  border: 1px solid rgba(255,255,255,0.2);
+                  font-family: D-DINExp;
+                  font-size: 16px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  font-weight: 400;
+                }
+                .el-input__count{
+                  background:transparent;
+                  .el-input__count-inner{
+                    padding:0 10px;
+                    background:transparent;
+                    opacity: 0.5;
+                    font-family: D-DINExp;
+                    font-size: 14px;
+                    color: #FFFFFF;
+                    letter-spacing: 0;
+                    text-align: right;
+                    font-weight: 400;
+                  }
+                }
+              }
+              :deep(.el-select){
+                width:295px;
+                .is-focus{
+                  input{
+                    border: 1px solid rgba(255,255,255,1);
+                  }
+                }
+                .el-select__caret{
+                  height:50px;
+                }
+              }
+              :deep(.el-textarea){
+                width:100%;
+                border-radius: 10px;
+                overflow:hidden;
+                padding:15px;
+                background: transparent;
+                border: 1px solid rgba(255,255,255,0.2);
+                textarea{
+                  width:100%;
+                  min-height:52px!important;
+                  background: transparent;
+                  border-radius: 0px;
+                  padding:0;
+                  font-family: D-DINExp;
+                  font-size: 16px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  line-height: 26px;
+                  font-weight: 400;
+                  border:0;
+                  resize:none;
+                }
+                .el-input__count{
+                  background:transparent;
+                  bottom:16px;
+                  right:16px;
+                  opacity: 0.5;
+                  font-family: D-DINExp;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  text-align: right;
+                  font-weight: 400;
+                }
+              }
+            }
+          }
+        }
+        
+      }
+    }
+  }
+  
+</style>
+<style lang="scss">
+  .el-select__popper{
+    border:0!important;
 
+    background:transparent!important;
+    .el-scrollbar{
+      transform:translateY(-10px);
+      background: #111113!important;
+      border-radius: 10px!important;
+      overflow: hidden;
+      .el-select-dropdown__wrap{
+        .el-scrollbar__view{
+          padding:0;
+          .el-select-dropdown__item{
+            height:50px;
+            line-height:50px;
+            padding:0 16px;
+            font-family: D-DINExp;
+            font-size: 16px;
+            color: #FFFFFF;
+            font-weight: 400;
+            &:hover,&.selected{
+              background: rgba(40,40,45,0.5)!important;
+              color: #FFFFFF;
+            }
+          }
         }
       }
+    }
+    .el-popper__arrow{
+      display:none;
     }
   }
 </style>

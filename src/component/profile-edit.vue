@@ -354,8 +354,8 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
                 width:100%;
                 input{
                   width:100%;
-                  height: 52px;
-                  line-height:50px;
+                  height: 50px;
+                  line-height:48px;
                   background: #36363C;
                   border-radius: 10px;
                   padding:0 16px;

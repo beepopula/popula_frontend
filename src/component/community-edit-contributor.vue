@@ -23,7 +23,7 @@
             <div class="form-item-label"> Contributor</div>
             <div class="form-item-content">
               <div class="contributor-search">
-                <el-input placeholder="search near address" class="search-input" v-model="searchWord" @change="search()"/>
+                <el-input placeholder="search near address" :class="['search-input',hasSearchBorder?'border':'']" v-model="searchWord" @focus="hasSearchBorder=true" @blur="hasSearchBorder=false" @input="search()"/>
                 <div class="contributor-search-list" v-if="searchWord.trim().length>0">
                   <div class="loading-box" v-if="isSearching">
                     <img class="white-loading" src="@/assets/images/common/loading.png"/>
@@ -35,7 +35,7 @@
                       <div class="name txt-wrap">{{item.name || item.account_id}}</div>
                     </div>
                   </template>
-                  <div v-else-if="state.nobody" class="nobody">Nobody yet.</div>
+                  <div v-else-if="nobody" class="nobody">Nobody yet.</div>
                 </div>
               </div>
               <div class="contributor-list">
@@ -47,7 +47,6 @@
                     <div class="delete-btn" @click="deleteContributor(index)"></div>
                   </div>
                 </template>
-
               </div>
             </div>
           </div>
@@ -88,7 +87,8 @@
         searchWord:'',
         searchList:[],
         isSearching:false,
-        nobody:false
+        nobody:false,
+        hasSearchBorder:false
       })
 
       const init = () => {
@@ -307,8 +307,8 @@
                 width:100%;
                 input{
                   width:100%;
-                  height: 52px;
-                  line-height:50px;
+                  height: 50px;
+                  line-height:48px;
                   background: #36363C;
                   border-radius: 10px;
                   padding:0 16px;
@@ -326,6 +326,11 @@
                     background:#36363C url("@/assets/images/header/icon-search.png") no-repeat 20px center !important;
                     background-size:16px 16px!important;
                   }
+                  &.border{
+                    input{
+                      border: 1px solid rgba(255,255,255,1);
+                    }
+                  }
                 }
               }
               
@@ -337,9 +342,9 @@
                 background: #36363C;
                 textarea{
                   width:100%;
-                  min-height:82px!important;
+                  min-height:52px!important;
                   background: transparent;
-                  border-radius: 10px;
+                  border-radius: 0px;
                   padding:0;
                   font-family: D-DINExp;
                   font-size: 16px;
