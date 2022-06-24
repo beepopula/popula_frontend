@@ -14,6 +14,11 @@
             Add News
             <div class="add-btn" @click="addNews()"></div>
           </div>
+          <div class="read-box">
+            <el-input  placeholder=""   v-model="link"/>
+            <div class="read-btn" @click="readUrl()">ok</div>
+          </div>
+
           <div class="form-title"> News</div>
           <div class="form-content">
             <div class="news-item" v-for="(item,index) in news">
@@ -21,6 +26,12 @@
                 <div class="form-item-label">News Url</div>
                 <div class="form-item-content">
                   <el-input  placeholder=""   v-model="item.url" disabled/>
+                </div>
+              </div>
+              <div class="form-item">
+                <div class="form-item-label">Cover</div>
+                <div class="form-item-content">
+                  
                 </div>
               </div>
               <div class="form-item">
@@ -32,13 +43,7 @@
               <div class="form-item">
                 <div class="form-item-label">Introduction</div>
                 <div class="form-item-content">
-                  <el-input  placeholder="" type="textarea" autosize   v-model="item.introduction" maxlength="300" show-word-limit/>
-                </div>
-              </div>
-              <div class="form-item">
-                <div class="form-item-label">Creator</div>
-                <div class="form-item-content">
-                  <el-input  placeholder=""  v-model="item.creator" maxlength="30" show-word-limit/>
+                  <el-input  placeholder="" type="textarea" autosize v-model="item.introduction" maxlength="300" show-word-limit/>
                 </div>
               </div>
               <div class="delete-btn" @click="deleteNews(index)"></div>
@@ -76,7 +81,7 @@
       const state = reactive({
         news:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{url:'',title:''}],
         //other
-        
+        link:''
       })
 
       const closeEditLayer = () => {
@@ -237,6 +242,50 @@
               background: url('@/assets/images/common/icon-add.png') no-repeat center;
               background-size:24px 24px;
               cursor: pointer;
+            }
+          }
+          .read-box{
+            margin:8px 0 40px;
+            height:50px;
+            display: flex;
+            align-items: center;
+            justify-content:space-between;
+            :deep(.el-input){
+              width:489px;
+              input{
+                width:100%;
+                height: 50px;
+                line-height:48px;
+                background: #36363C;
+                border-radius: 10px;
+                padding:0 16px;
+                border: transparent;
+                font-family: D-DINExp;
+                font-size: 16px;
+                color: #FFFFFF;
+                letter-spacing: 0;
+                font-weight: 400;
+              }
+            }
+            .read-btn{
+              width: 141px;
+              height: 50px;
+              border: 2px solid rgba(255,255,255,0.2);
+              border-radius: 40px;
+              display: flex;
+              align-items: center;
+              justify-content:center;
+              font-family: D-DINExp-Bold;
+              font-size: 16px;
+              color: rgba(255,255,255,0.3);
+              letter-spacing: 0;
+              text-align: center;
+              font-weight: 700;
+              cursor: pointer;
+              &:hover{
+                color: rgba(255,255,255,1);
+                border: 2px solid #FED23C;
+              }
             }
           }
           .news-item{
