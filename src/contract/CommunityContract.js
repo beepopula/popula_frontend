@@ -115,6 +115,16 @@ export default class CommunityContract{
         }
         return await this._signAndSendTransaction(transaction)
     }
+
+    async share(param){
+        const transaction = {
+            methodName: "share",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
+    }
     
 
 

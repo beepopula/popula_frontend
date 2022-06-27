@@ -594,7 +594,8 @@ export default {
       }
     };
 
-    const shareTwitter = async () => {
+    const shareTwitter = () => {
+      shareRecord();
       window.open('https://twitter.com/intent/tweet?text='+getShareLink());
     }
     
@@ -645,9 +646,40 @@ export default {
           contract_id: props.item.receiverId
         }
       })
-      console.log(parmsJson)
       const signature = bs58.encode(Buffer.from(parmsJson));
       return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
+    const shareRecord = () => {
+      if(checkLogin()){
+        const params = {hierarchies:[{target_hash:props.item.target_hash,account_id : props.item.accountId}]};
+        const check_params = {
+          ...params,
+          // inviter_id: store.getters.accountId,
+          account_id: store.getters.accountId,
+        }
+        if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+          store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_shared", check_params).then(check_res => {
+            console.log(check_res,'----check_res----');
+            if(!check_res){
+              mainContract.share(params).then(()=>{
+                state.shareCount++;
+              })
+            }
+          })
+        }else{
+          store.state.viewAccount.viewFunction(props.item.receiverId, "check_shared", check_params).then(check_res => {
+            console.log(check_res,'----check_res----');
+            if(!check_res){
+              CommunityContract.new(props.item.receiverId).then(communityContract=>{
+                communityContract.share(params).then(()=>{
+                  state.shareCount++;
+                })
+              })
+            }
+          })
+        }
+      }
     }
 
     //share -> handleCopy
@@ -660,6 +692,7 @@ export default {
     }
     const handleCopyFun = () => {
       const clipboard = new Clipboard('#copy_text')
+      shareRecord();
       clipboard.on('success', e => {
         proxy.$Message({
           message: "copy success",

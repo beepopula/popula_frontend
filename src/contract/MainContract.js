@@ -9,7 +9,8 @@ export default class MainContract{
     contract
     methods = {
         viewMethods: [
-            'check_viewd'
+            'check_viewed',
+            'check_shared'
         ],
         changeMethods: [
             'add_content',
@@ -18,6 +19,7 @@ export default class MainContract{
             'unfollow',
             'like',
             'unlike',
+            'share',
             'report',
             'del_content'
         ]  // mint
@@ -84,6 +86,10 @@ export default class MainContract{
 
     async unlike(param){
         return await this.contract.unlike(param)
+    }
+
+    async share(param){
+        return await this.contract.share(param)
     }
 
     constructor(account){
