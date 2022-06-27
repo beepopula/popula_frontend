@@ -19,8 +19,7 @@
             <div class="add-btn" @click="addBenefit()"></div>
           </div>
           <div class="form-content">
-            <div class="news-item" v-for="(item,index) in benefits">
-              <div class="delete-btn" v-if="benefits.length>1" @click="deleteBenefit(index)"></div>
+            <div class="benefit-item" v-for="(item,index) in benefits">
               <div class="form-item">
                 <div class="form-item-label">Title</div>
                 <div class="form-item-content">
@@ -42,6 +41,8 @@
                   </el-select>
                 </div>
               </div>
+
+              <div class="delete-btn" v-if="benefits.length>1" @click="deleteBenefit(index)"></div>
             </div>
           </div>
         </div>

@@ -31,10 +31,16 @@
                   <el-input  placeholder=""   v-model="item.url" disabled/>
                 </div>
               </div>
-              <div class="form-item">
+              <div class="form-item form-item-cover">
                 <div class="form-item-label">Cover</div>
                 <div class="form-item-content">
-                  
+                  <div class="cover-box">
+                    <template v-if="item.cover">
+                      <img class="cover" :src="item.cover" />
+                      <div class="cover-delete-btn" @click="item.cover=''"></div>
+                    </template>
+                    <div class="upload-button" @click="uploadCover(item)"></div>
+                  </div>
                 </div>
               </div>
               <div class="form-item">
@@ -53,6 +59,18 @@
             </div>
           </div>
 
+          <el-upload
+            ref="uploadInput"
+            id="upload-input"
+            action=""
+            accept="image/png, image/jpeg, image/jpg, image/gif"
+            :show-file-list="false"
+            list-type="picture-card"
+            :http-request="uploadImg"
+            :before-upload="beforeUpload"
+            >
+          </el-upload>
+
         </div>
       </div>
     </div>
@@ -63,6 +81,7 @@
   import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
+  import { upload } from "@/utils/upload.js";
   export default {
     components: {
     },
@@ -85,7 +104,9 @@
         news:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{url:'',title:''}],
         //other
         link:'',
-        isLoading : false
+        currentItem:null,
+        isUploading: false,
+        isLoading : false,
       })
 
       const closeEditLayer = () => {
@@ -109,6 +130,32 @@
 
       const deleteNews = (index) => {
         state.news.splice(index,1)
+      }
+
+      // const uploadInput = ref();
+      const uploadCover = (item)  => {
+        if(state.isUploading){return;}
+        state.currentItem = item;
+        state.isUploading =true;
+        const elUploadInput = document.getElementById('upload-input').getElementsByTagName("input")[0];
+        elUploadInput.click();
+      }
+      const beforeUpload = (file,fileList) => {
+        if (file.size > 1024 * 1024 * 2) {// maxSize = 2M
+            proxy.$Message({
+              message: "The maximum size is 2M",
+              type: "error",
+            });
+            return false
+        }
+        return file
+      }
+      const uploadImg = ({ file }) => {
+        upload(file).then(data=>{
+          state.currentItem.cover = data;
+          state.currentItem = null;
+          state.isUploading = false;
+        })
       }
 
       //edit
@@ -148,6 +195,9 @@
         deleteNews,
         save,
         closeEditLayer,
+        uploadCover,
+        beforeUpload,
+        uploadImg
       }
     }
   }
@@ -316,6 +366,9 @@
               background: #28282D url("@/assets/images/common/icon-delete.png") no-repeat center center;
             }
           }
+          #upload-input{
+            display: none;
+          }
           .form-item{
             padding-top:40px;
             &:first-child{
@@ -396,6 +449,42 @@
                   text-align: right;
                   font-weight: 400;
                 }
+              }
+            }
+          }
+          .form-item-cover{
+
+            .cover-box{
+              width: 160px;
+              height: 160px;
+              position:relative;
+              cursor: pointer;
+              .cover{
+                width: 160px;
+                height: 160px;
+                border-radius:10px;
+                object-fit: cover;
+              }
+              .upload-button{
+                width: 160px;
+                height: 160px;
+                border-radius:10px;
+                background: rgba(0,0,0,0.70) url("@/assets/images/common/icon-upload.png") no-repeat center center;
+                background-size:30px;
+                position:absolute;
+                top:0;
+                left:0;
+              }
+              .cover-delete-btn{
+                position:absolute;
+                top:-4px;
+                right:-4px;
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                border-radius:50%;
+                background: #28282D url("@/assets/images/common/icon-delete.png") no-repeat center center;
+                z-index:2;
               }
             }
           }
