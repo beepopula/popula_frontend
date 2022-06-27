@@ -16,7 +16,23 @@
         <div class="mian-form">
           <!-- Verify -->
           <div class="verify">
-            
+            <div class="step step1">
+              <div class="step-title">Step 1</div>
+              <div class="step-intro">
+                Please click this button below and tweet a verification message on Twitter
+              </div>
+              <a class="twitter-button" target="_blank" :href="'https://twitter.com/intent/tweet?text='+text">
+                <img src="@/assets/images/common/logo-twitter.png"/>
+              Tweet
+              </a>
+            </div>
+            <div class="step step2">
+              <div class="step-title">Step 2</div>
+              <div class="step-intro">
+                On your tweet, find the share button. Copy link and paste it here. Click the button to verify your account
+              </div>
+              <el-input  placeholder="Paste link here"  v-model="twitter"  />
+            </div>
           </div>
         </div>
       </div>
@@ -54,9 +70,10 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
+  import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
+  import { getAccountSign } from '../utils/util';
   export default {
     props:{
       editInfo:{
@@ -76,12 +93,31 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
       const state = reactive({
         editProfile:props.editInfo,
         isLoading:false,
-        showVerify:true,
+        showVerify:false,
+        twitter:"",
+        signtrue:"",
+        text:"",
       })
+
+      const init = async () => {
+        state.signtrue = await getAccountSign(store.getters.accountId);
+        state.text = 'popula. '+ state.signtrue;
+      }
+      init();
 
       const closeEditLayer = () => {
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         emit('closeEditLayer');
+      }
+
+      const verify = async () => {
+        const res = await proxy.$axios.profile.verify_twitter({twitter: state.twitter, sign: state.signtrue,accountId:store.getters.accountId});
+        if(res.success){
+          proxy.$Message({message: "Twitter account verified successfully",type: "success"});
+          setTimeout(()=>{
+            router.push("/mine");
+          },1000);
+        }
       }
 
       //save
@@ -109,6 +145,7 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
       return {
         ...toRefs(state),
         save,
+        verify,
         closeEditLayer,
       }
     }
@@ -230,14 +267,6 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
               letter-spacing: 0;
               font-weight: 700;
               line-height:20px;
-            }
-            .form-item-tip{
-              font-family: D-DINExp-Bold;
-              font-size: 14px;
-              color: #FF6868;
-              letter-spacing: 0;
-              font-weight: 700;
-              line-height: 20px;
             }
             .form-item-content{
               margin: 15px 0 0;
@@ -362,6 +391,79 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
                   input{
                     padding-right:85px;
                   }
+                }
+              }
+            }
+          }
+          .step{
+            padding:20px 0;
+            .step-title{
+              font-family: D-DINExp-Bold;
+              font-size: 18px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              font-weight: 700;
+              line-height:20px;
+            }
+            .step-intro{
+              margin-top:9px;
+              font-family: D-DINExp;
+              font-size: 14px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              line-height: 22px;
+              font-weight: 400;
+            }
+            .twitter-button{
+              margin:20px 0;
+              width:240px;
+              height:50px;
+              border: 2px solid #FED23C;
+              border-radius: 40px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
+              font-family: D-DINExp-Bold;
+              font-size: 16px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              text-align: center;
+              font-weight: 700;
+              img{
+                width:16px;
+                margin-right: 8px;
+              }
+
+            }
+            :deep(.el-input){
+              margin-top:20px;
+              width:100%;
+              input{
+                width:100%;
+                height: 50px;
+                line-height:48px;
+                background: #36363C;
+                border-radius: 10px;
+                padding:0 16px;
+                border:1px solid transparent;
+                font-family: D-DINExp;
+                font-size: 16px;
+                color: #FFFFFF;
+                letter-spacing: 0;
+                font-weight: 400;
+              }
+              .el-input__count{
+                background:transparent;
+                .el-input__count-inner{
+                  padding:0 10px;
+                  background:transparent;
+                  opacity: 0.5;
+                  font-family: D-DINExp;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  text-align: right;
+                  font-weight: 400;
                 }
               }
             }
