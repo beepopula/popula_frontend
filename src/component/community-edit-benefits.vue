@@ -5,7 +5,10 @@
       <div class="edit-head">
         Edit Benefits
         <div class="mini-button-border">
-          <div class="mini-button" @click="save()">Save</div>
+          <div class="mini-button" @click="save()">
+            <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
+            <template v-else>Save</template>
+          </div>
         </div>
       </div>
       <div class="edit-form">
@@ -72,7 +75,7 @@
       const state = reactive({
         benefits:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{title:'',introduction:'',type:''}],
         //other
-        
+        isLoading : false
       })
 
       const closeEditLayer = () => {
@@ -90,7 +93,9 @@
 
       //edit
       const save = async () => {
-        proxy.$Loading.showLoading({title: "Loading"});
+        if(state.isLoading){  return; }
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isLoading = true;
         const param = {
           accountId:'bhc8521.testnet', //store.getters.accountId,
           communityId:props.communityId,
@@ -111,7 +116,8 @@
             type: "error",
           });
         }
-        proxy.$Loading.hideLoading();
+        // proxy.$Loading.hideLoading();
+        state.isLoading = false;
         
       }
 

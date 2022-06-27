@@ -240,7 +240,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
               </div>
             </div>
             <div class="button-border button-post-nft">
-              <div class="button" @click="postNft()">Mint</div>
+              <div class="button" @click="postNft()">
+                <img v-if="isPosting" class="white-loading" src="@/assets/images/common/loading.png"/>
+                <template v-else>Mint</template>
+              </div>
             </div>
 
           </div>
@@ -251,7 +254,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       <!-- post button -->
       <div :id="'pop-notice'+location" :class="['mini-button-border','button-post',!postForm.text.trim() && postForm.imgs.length<=0 ?'disabled' : '']">
-        <div :id="'pop-button'+location" class="mini-button" @click="post()">Post</div>
+        <div :id="'pop-button'+location" class="mini-button" @click="post()">
+          <img v-if="isPosting" class="white-loading" src="@/assets/images/common/loading.png"/>
+          <template v-else>Post</template>
+        </div>
         <!-- post notice -->
         <div class="pop-box pop-intro pop-notice" v-if="showNotice">
           <div class="title">Notice</div>
@@ -373,6 +379,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //other
         showLogin:false,
         showNotice:false,
+        isPosting:false
       })
 
       const init = async () => {
@@ -896,7 +903,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //post
       const post = async () => {
-        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin()){
+        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin() || state.isPosting){
           return;
         }
         if(state.postForm.isNft){
@@ -916,7 +923,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.showNotice = true;
           return;
         }
-        proxy.$Loading.showLoading({title: "Loading"});
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isPosting = true;
         //options
         const options = [];
         if(postInput.value.innerHTML){
@@ -941,7 +949,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             message: "Post Failed",
             type: "error",
           });
-          proxy.$Loading.hideLoading();
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
           return;
         }
         handleSuccess(result);
@@ -1045,7 +1054,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //postNft
       const postNft = async () => {
         //check 
-        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin()){
+        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin() || state.isPosting){
           return;
         }
         //check Nft Info
@@ -1064,7 +1073,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           return;
         }
 
-        proxy.$Loading.showLoading({title: "Loading"});
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isPosting = true;
 
         try{
           //cover
@@ -1099,7 +1109,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
           const result = await nftContract.nftCreateSeries(params,deposit);
         }catch(e){
-          proxy.$Loading.hideLoading();
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
           proxy.$Message({
             message: "Post NFT Failed",
             type: "error",
@@ -1132,13 +1143,15 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }
         };
         postInput.value.innerHTML = "";
+        state.isPosting = false;
         
         if (res == true) {
           proxy.$Message({
             message: "Post Success",
             type: "success",
           });
-          proxy.$Loading.hideLoading();
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
           setTimeout(()=>{
             emit("postSuccess");
           },500)
@@ -1147,7 +1160,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             message: "Oops,something went wrong. Please try again or submit a report.",
             type: "error",
           });
-          proxy.$Loading.hideLoading();
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
         }
       }
       

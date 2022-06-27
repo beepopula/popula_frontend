@@ -72,7 +72,10 @@
     <div class="edit">
       <!-- reply button -->
       <div :id="'pop-reply-notice'+targetHash" :class="['mini-button-border','button-replay',!text.trim() ? 'disabled' : '']">
-        <div class="mini-button" @click="reply()">Reply</div>
+        <div class="mini-button" @click="reply()">
+          <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
+          <template v-else>Reply</template>
+        </div>
         <!-- comment notice -->
         <div class="pop-box pop-intro pop-notice" v-if="showNotice">
           <div class="title">Notice</div>
@@ -158,6 +161,8 @@ export default {
       isLoaingUserList:false,
       showUserList:false,
       userList:[],
+
+      isLoading:false,
     })
 
     const commentInput = ref()
@@ -357,7 +362,7 @@ export default {
 
     //reply
     const reply = async () => {
-      if(!state.text || !checkLogin()){
+      if(!state.text || !checkLogin() || state.isLoading){
         return;
       }
       //notice
@@ -365,7 +370,8 @@ export default {
         state.showNotice = true;
         return;
       }
-      proxy.$Loading.showLoading({title: "Loading"});
+      // proxy.$Loading.showLoading({title: "Loading"});
+      state.isLoading = true;
 
       try{
         const parent_hierarchies = props.hierarchies || [];
@@ -409,7 +415,8 @@ export default {
           await publicReply(hierarchies,options);
         }
       }catch(e){
-        proxy.$Loading.hideLoading();
+        // proxy.$Loading.hideLoading();
+        state.isLoading = false;
         proxy.$Message({
           message: "Reply Failed",
           type: "error",
@@ -417,8 +424,6 @@ export default {
         console.log("reply error:"+e);
         return;
       }
-
-      //proxy.$Loading.hideLoading();
       emit("comment");
     }
 
@@ -480,19 +485,19 @@ export default {
     const handleSuccess = (res) => {
       state.text = ""
       if (res == true) {
-        proxy.$Loading.hideLoading()
         proxy.$Message({
           message: "Comment Success",
           type: "success",
         });
         resetInfo()
       } else if(res == false) {
-        proxy.$Loading.hideLoading()
         proxy.$Message({
           message: "Oops,something went wrong. Please try again or submit a report.",
           type: "error",
         });
       }
+      //proxy.$Loading.hideLoading();
+      state.isLoading = false;
     }
 
     const resetInfo = () => {

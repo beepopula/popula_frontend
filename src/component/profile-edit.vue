@@ -6,7 +6,10 @@
       <div class="edit-head">
         Edit profile
         <div class="mini-button-border">
-          <div class="mini-button" @click="save()">Save</div>
+          <div class="mini-button" @click="save()">
+            <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
+            <template v-else>Save</template>
+          </div>
         </div>
       </div>
       <div class="edit-form">
@@ -116,7 +119,7 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
         // },
         paramName:'',
         nameError:false,
-        isLoadingEdit:false,
+        isLoading:false,
       })
 
 
@@ -142,13 +145,14 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
 
       //save
       const save = async () => {
+        if(state.isLoading){ return; }
         if(!state.editProfile.name.trim()){
           state.nameError = true;
           return;
         }
-        proxy.$Loading.showLoading({title: "Loading"});
         state.nameError = false;
-        state.isLoadingEdit = true;
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isLoading = true;
         const param = {
           accountId:store.getters.accountId,
           name:state.editProfile.name,
@@ -165,8 +169,8 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
           //update info
           emit("updateInfo",state.editProfile);
         }
-        proxy.$Loading.hideLoading();
-        state.isLoadingEdit = false;
+        // proxy.$Loading.hideLoading();
+        state.isLoading = false;
 
       }
 

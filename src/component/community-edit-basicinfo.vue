@@ -5,7 +5,10 @@
       <div class="edit-head">
         Edit community
         <div class="mini-button-border">
-          <div class="mini-button" @click="save()">Save</div>
+          <div class="mini-button" @click="save()">
+            <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
+            <template v-else>Save</template>
+          </div>
         </div>
       </div>
       <div class="edit-form">
@@ -95,7 +98,8 @@
         // },
         //other 
         nameError:false,
-        paramName:''
+        paramName:'',
+        isLoading:false,
       })
 
       //edit avatar & cover
@@ -120,11 +124,13 @@
 
       //edit
       const save = async () => {
+        if(state.isLoading){  return; }
         if(!state.edit.name.trim()){
           state.nameError = true;
           return;
         }
-        proxy.$Loading.showLoading({title: "Loading"});
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isLoading = true;
         state.nameError = false;
         const param = {
           accountId:'bhc8521.testnet', //store.getters.accountId,
@@ -145,7 +151,8 @@
             type: "error",
           });
         }
-        proxy.$Loading.hideLoading();
+        // proxy.$Loading.hideLoading();
+        state.isLoading = false;
       }
 
       return {
