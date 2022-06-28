@@ -8,7 +8,7 @@
           <img v-if="user.background" class="bg" :src="user.background"/>
           <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
           <div class="btns">
-            <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditLayer()"></div>
+            <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditBasicinfoLayer()"></div>
             <div class="btn share" :data-clipboard-text="shareLink" @click="handleCopyFun()"></div>
           </div>
           <div class="info">
@@ -29,43 +29,46 @@
               <div class="total-item"><span>{{user.data.postCount}}</span> Posts</div>
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
-            <div class="media-list">
-              <!-- Twitter -->
-              <a v-if="user.twitter && user.twitter.url" class="media-item" :href="user.twitter.url" target="_blank">
-                <img v-if="user.twitter.verified" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
-                <img v-else class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
-              </a>
-              <div v-else class="media-item">
-                <img class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
-              </div>
+            <div class="media-list-box">
+              <div class="media-list">
+                <!-- Twitter -->
+                <a v-if="user.twitter && user.twitter.url" class="media-item" :href="user.twitter.url" target="_blank">
+                  <img v-if="user.twitter.verified" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+                  <img v-else class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                </div>
 
-              <!-- Instagram -->
-              <a v-if="user.instagram && user.instagram.url" class="media-item" :href="user.instagram.url" target="_blank">
-                <img v-if="user.instagram.verified" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
-                <img v-else class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
-              </a>
-              <div v-else class="media-item">
-                <img class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
-              </div>
+                <!-- Instagram -->
+                <a v-if="user.instagram && user.instagram.url" class="media-item" :href="user.instagram.url" target="_blank">
+                  <img v-if="user.instagram.verified" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
+                  <img v-else class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                </div>
 
-              <!-- TikTok -->
-              <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="user.tiktok.url" target="_blank">
-                <img v-if="user.tiktok.verified" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
-                <img v-else class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
-              </a>
-              <div v-else class="media-item">
-                <img class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
-              </div>
+                <!-- TikTok -->
+                <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="user.tiktok.url" target="_blank">
+                  <img v-if="user.tiktok.verified" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
+                  <img v-else class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                </div>
 
-              <!-- YouTube -->
-              <a v-if="user.youtube && user.youtube.url" class="media-item" :href="user.youtube.url" target="_blank">
-                <img v-if="user.youtube.verified" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
-                <img v-else class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
-              </a>
-              <div v-else class="media-item">
-                <img class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
-              </div>
+                <!-- YouTube -->
+                <a v-if="user.youtube && user.youtube.url" class="media-item" :href="user.youtube.url" target="_blank">
+                  <img v-if="user.youtube.verified" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
+                  <img v-else class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                </div>
 
+              </div>
+              <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditMediaLayer()"></div>
             </div>
           </div>
         </div>
@@ -208,9 +211,13 @@
       </div>
     </div>
 
-    <!-- ProfileEdit -->
-    <template v-if="showEdit">
-      <ProfileEdit :accountId="user.account_id" :editInfo="editInfo" @updateInfo="updateInfo" @closeEditLayer="showEdit=false"/>
+    <!-- ProfileEditBasicinfo -->
+    <template v-if="showEditBasicinfo">
+      <ProfileEditBasicinfo :accountId="user.account_id" :editInfo="editBasicinfo" @updateInfo="updateBasicinfo" @closeEditLayer="showEditBasicinfo=false"/>
+    </template>
+    <!-- ProfileEditMedia -->
+    <template v-if="showEditMedia">
+      <ProfileEditMedia :accountId="user.account_id" :editInfo="editMedia" @updateInfo="updateMedia" @closeEditLayer="showEditMedia=false"/>
     </template>
 
     <!-- suspend -->
@@ -235,7 +242,8 @@
   import About from '@/component/about.vue';
   import loginMask from "@/component/login-mask.vue";
   import suspend from "@/component/suspend.vue";
-  import ProfileEdit from "@/component/profile-edit.vue";
+  import ProfileEditBasicinfo from "@/component/profile-edit-basicinfo.vue";
+  import ProfileEditMedia from "@/component/profile-edit-media.vue";
   import ClipboardJS from 'clipboard';
 
   export default {
@@ -247,7 +255,8 @@
       About,
       loginMask,
       suspend,
-      ProfileEdit
+      ProfileEditBasicinfo,
+      ProfileEditMedia
     },
     setup() {
       const store = useStore();
@@ -305,8 +314,10 @@
         // isEndNft:false,
         // isLoadingNft:false,
         //edit
-        showEdit:false,
-        editInfo:{},
+        showEditBasicinfo:false,
+        editBasicinfo:{},
+        showEditMedia:false,
+        editMedia:{},
         //other
         shareLink:`${window.location.protocol}//${window.location.host}/user-profile/${route.params.id || store.getters.accountId}`,
         showLogin:false,
@@ -535,32 +546,50 @@
       }
 
       //edit
-      const showEditLayer = () => {
-        state.editInfo = {
+      const showEditBasicinfoLayer = () => {
+        state.editBasicinfo = {
           name:state.user.name,
           avatar:state.user.avatar,
           background:state.user.background,
           bio:state.user.bio,
+
           twitter:state.user.twitter || {url:'',verified:false},
           instagram:state.user.instagram || {url:'',verified:false},
           youtube:state.user.youtube || {url:'',verified:false},
           tiktok:state.user.tiktok || {url:'',verified:false}
         };
         document.getElementsByTagName('body')[0].classList.add("fixed");
-        state.showEdit = true;
+        state.showEditBasicinfo = true;
       }
-      const updateInfo = (editProfile) => {
-        state.user.name = editProfile.name;
-        state.user.avatar = editProfile.avatar;
-        state.user.background = editProfile.background;
-        state.user.bio = editProfile.bio;
-        state.user.twitter = editProfile.twitter;
-        state.user.instagram = editProfile.instagram;
-        state.user.youtube = editProfile.youtube;
-        state.user.tiktok = editProfile.tiktok;
+      const updateBasicinfo = (info) => {
+        state.user.name = info.name;
+        state.user.avatar = info.avatar;
+        state.user.background = info.background;
+        state.user.bio = info.bio;
 
         document.getElementsByTagName('body')[0].classList.remove("fixed");
-        state.showEdit = false;
+        state.showEditBasicinfo = false;
+      }
+      const showEditMediaLayer = () => {
+        state.editMedia = {
+          twitter:state.user.twitter || {url:'',verified:false},
+          instagram:state.user.instagram || {url:'',verified:false},
+          youtube:state.user.youtube || {url:'',verified:false},
+          tiktok:state.user.tiktok || {url:'',verified:false},
+
+          bio:state.user.bio,
+        };
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+        state.showEditMedia = true;
+      }
+      const updateMedia = (info) => {
+        state.user.twitter = info.twitter;
+        state.user.instagram = info.instagram;
+        state.user.youtube = info.youtube;
+        state.user.tiktok = info.tiktok;
+
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditMedia = false;
       }
 
 
@@ -662,8 +691,10 @@
         changeFollowTab,
         followDiv,
         followScroll,
-        showEditLayer,
-        updateInfo,
+        showEditBasicinfoLayer,
+        updateBasicinfo,
+        showEditMediaLayer,
+        updateMedia,
         showCommunityList,
         closeCommunityList,
         showNftList,
@@ -785,15 +816,29 @@
             line-height: 24px;
             font-weight: 400;
           }
-          .media-list{
+          .media-list-box{
+            height:24px;
             margin-top:20px;
-            display:flex;
-            .media-item{
-              width:24px;
-              margin-right:30px;
-              img{
-                height:24px;
+            display: flex;
+            align-items: center;
+            justify-content:space-between;
+            .media-list{
+              display:flex;
+              .media-item{
+                width:24px;
+                margin-right:30px;
+                img{
+                  height:24px;
+                }
               }
+            }
+            .edit{
+              width:24px;
+              height:24px;
+              cursor:pointer;
+              background:url("@/assets/images/common/icon-edit.png") no-repeat center center;
+              background-size:24px 24px;
+              
             }
           }
         }

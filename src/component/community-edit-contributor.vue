@@ -46,7 +46,7 @@
                   <div class="contributor-item">
                     <img v-if="item.avatar" class="avatar" :src="item.avatar"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
-                    <div class="name txt-wrap">{{item.name || item.account_id }}</div>
+                    <div class="name txt-wrap">{{item.name || item.accountId }}</div>
                     <div class="delete-btn" @click="deleteContributor(index)"></div>
                   </div>
                 </template>
@@ -147,19 +147,19 @@
       const selectContributor = (item) => {
         let hasSelected = false;
         state.edit.contributor.forEach((user)=>{
-          if(user.account_id == item.account_id){
+          if(user.accountId == item.account_id){
             hasSelected = true;
           }
         })
         if(!hasSelected){
           state.searchWord = "";
           state.searchList = [];
+          item.accountId= item.account_id;
           state.edit.contributor.push(item);
         }else{
           proxy.$Message({
             message: "Cannot be added repeatedly",
           });
-          
         }
       }
 
@@ -172,12 +172,19 @@
         if(state.isLoading){  return; }
         // proxy.$Loading.showLoading({title: "Loading"});
         state.isLoading = true;
+
+        const contributorList = [];
+        state.edit.contributor.forEach(item=>{
+          contributorList.push(item.accountId);
+        })
         const param = {
-          accountId:'bhc8521.testnet', //store.getters.accountId,
+          accountId:store.getters.accountId,
           communityId:props.communityId,
-          ...state.edit,
+          information:state.edit.information,
+          contributor:contributorList,
         }
         try{
+          // console.log(param);
           const res = await proxy.$axios.community.set_community_contributor(param);
           if(res.success){
             emit('updateInfo',state.edit);

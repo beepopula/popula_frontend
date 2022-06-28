@@ -25,16 +25,22 @@
           <div class="form-title"> News</div>
           <div class="form-content">
             <div class="news-item" v-for="(item,index) in news">
-              <div class="form-item" v-if="item.url">
+              <div class="form-item form-item-url" v-if="item.url">
                 <div class="form-item-label">News Url</div>
                 <div class="form-item-content">
                   <el-input  placeholder=""   v-model="item.url" disabled/>
                 </div>
               </div>
-              <div class="form-item">
+              <div class="form-item form-item-cover">
                 <div class="form-item-label">Cover</div>
                 <div class="form-item-content">
-                  
+                  <div class="cover-box">
+                    <template v-if="item.picture">
+                      <img class="cover" :src="item.picture" />
+                      <div class="cover-delete-btn" @click="item.picture=''"></div>
+                    </template>
+                    <div class="upload-button" @click="uploadCover(item)"></div>
+                  </div>
                 </div>
               </div>
               <div class="form-item">
@@ -53,8 +59,23 @@
             </div>
           </div>
 
+          <el-upload
+            ref="uploadInput"
+            id="upload-input"
+            action=""
+            accept="image/png, image/jpeg, image/jpg, image/gif"
+            :show-file-list="false"
+            list-type="picture-card"
+            :http-request="uploadImg"
+            :before-upload="beforeUpload"
+            >
+          </el-upload>
+
         </div>
       </div>
+    </div>
+    <div id="output">
+      <iframe name="sendMessage" id="iframe" src=""></iframe>
     </div>
   </div>
 </template>
@@ -63,6 +84,7 @@
   import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
+  import { upload } from "@/utils/upload.js";
   export default {
     components: {
     },
@@ -85,7 +107,10 @@
         news:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{url:'',title:''}],
         //other
         link:'',
-        isLoading : false
+        currentItem:null,
+        isUploading: false,
+        isLoading : false,
+        showDom:false
       })
 
       const closeEditLayer = () => {
@@ -94,11 +119,25 @@
       }
 
       const readUrl = () => {
-        
+        if(!state.link.trim()){
+          proxy.$Message({
+            message: "Link cannot be empty",
+            type: "",
+          });
+          return false
+        }
+
+        // const iframe = document.getElementById('iframe');
+        // iframe.src = state.link;
+        // iframe.onload = function(e){
+        //   iframe.contentWindow.postmessage('give u a message', state.link);
+        //   //tuhao.com的脚本
+        //   window.addEventListener('message', receiver, false);
+        // }
       }
 
       const addNews = () => {
-        state.news.push({
+        state.news.unshift({
           picture:'',
           title:'',
           introduction:'',
@@ -111,24 +150,69 @@
         state.news.splice(index,1)
       }
 
+      // const uploadInput = ref();
+      const uploadCover = (item)  => {
+        if(state.isUploading){return;}
+        state.currentItem = item;
+        state.isUploading =true;
+        const elUploadInput = document.getElementById('upload-input').getElementsByTagName("input")[0];
+        elUploadInput.click();
+      }
+      const beforeUpload = (file,fileList) => {
+        if (file.size > 1024 * 1024 * 2) {// maxSize = 2M
+            proxy.$Message({
+              message: "The maximum size is 2M",
+              type: "error",
+            });
+            return false
+        }
+        return file
+      }
+      const uploadImg = ({ file }) => {
+        upload(file).then(data=>{
+          state.currentItem.picture = data;
+          state.currentItem = null;
+          state.isUploading = false;
+        })
+      }
+
       //edit
       const save = async () => {
         if(state.isLoading){  return; }
+
+        //check list
+        let checkRes = true;
+        const news = [];
+        state.news.forEach(item=>{
+          if(!(!item.title.trim() && !item.introduction.trim() && !item.picture)){
+            if(!item.title.trim() || !item.introduction.trim()){
+              checkRes = false;
+            }
+            news.push(item);
+          }
+        })
+        if(!checkRes){
+          proxy.$Message({
+            message: "Please fill in the complete information",
+            type: "",
+          });
+          return;
+        }
+
         // proxy.$Loading.showLoading({title: "Loading"});
         state.isLoading = true;
-
         const param = {
-          accountId:'bhc8521.testnet', //store.getters.accountId,
+          accountId:store.getters.accountId,
           communityId:props.communityId,
-          news:state.news
+          news:news
         }
         try{
-          // const res = await proxy.$axios.community.set_community_contributor(param);
-          // if(res.success){
-          //   emit('updateInfo',state.edit);
-          // }else{
-          //   throw new Error("request failed")
-          // }
+          const res = await proxy.$axios.community.set_community_news(param);
+          if(res.success){
+            emit('updateInfo',news);
+          }else{
+            throw new Error("request failed")
+          }
         }catch(e){
           console.log("set_community_news:"+e);
           proxy.$Message({
@@ -148,6 +232,9 @@
         deleteNews,
         save,
         closeEditLayer,
+        uploadCover,
+        beforeUpload,
+        uploadImg
       }
     }
   }
@@ -316,6 +403,9 @@
               background: #28282D url("@/assets/images/common/icon-delete.png") no-repeat center center;
             }
           }
+          #upload-input{
+            display: none;
+          }
           .form-item{
             padding-top:40px;
             &:first-child{
@@ -396,6 +486,53 @@
                   text-align: right;
                   font-weight: 400;
                 }
+              }
+            }
+            &.form-item-url{
+              .form-item-content{
+                :deep(.el-input){
+                  width:100%;
+                  input{
+                    background: #36363C;
+                    color: rgba(255,255,255,0.3);
+                  }
+                }
+              }
+            }
+          }
+          .form-item-cover{
+
+            .cover-box{
+              width: 160px;
+              height: 160px;
+              position:relative;
+              cursor: pointer;
+              .cover{
+                width: 160px;
+                height: 160px;
+                border-radius:10px;
+                object-fit: cover;
+              }
+              .upload-button{
+                width: 160px;
+                height: 160px;
+                border-radius:10px;
+                background: rgba(0,0,0,0.70) url("@/assets/images/common/icon-upload.png") no-repeat center center;
+                background-size:30px;
+                position:absolute;
+                top:0;
+                left:0;
+              }
+              .cover-delete-btn{
+                position:absolute;
+                top:-4px;
+                right:-4px;
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                border-radius:50%;
+                background: #28282D url("@/assets/images/common/icon-delete.png") no-repeat center center;
+                z-index:2;
               }
             }
           }

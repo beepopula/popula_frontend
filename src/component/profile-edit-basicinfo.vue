@@ -1,9 +1,10 @@
 <template>
+  <!-- edit layer-->
   <div class="elastic-layer edit-layer" @click.self="closeEditLayer()">
     <div class="edit-button close" @click="closeEditLayer()"></div>
     <div class="edit-box">
       <div class="edit-head">
-        Edit community
+        Edit profile
         <div class="mini-button-border">
           <div class="mini-button" @click="save()">
             <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
@@ -22,38 +23,44 @@
           :auto-upload="false"
         >
           <div class="avatar-box">
-            <img v-if="edit.avatar" class="avatar" :src="edit.avatar" />
+            <img v-if="editProfile.avatar" class="avatar" :src="editProfile.avatar" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
-        <!-- cover -->
+        <!-- background -->
         <el-upload
-          class="upload-cover"
+          class="upload-background"
           :show-file-list="false"
           accept="image/png, image/jpeg, image/jpg"
           list-type="picture-card"
-          :on-change="uploadCover"
+          :on-change="uploadBackground"
           :auto-upload="false"
         >
-          <div class="cover-box">
-            <img v-if="edit.cover" class="cover" :src="edit.cover" />
+          <div class="background-box">
+            <img v-if="editProfile.background" class="background" :src="editProfile.background" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
         <div class="mian-form">
+          <!-- Account -->
+          <div class="form-item form-item-account">
+            <div class="form-item-content">
+              <el-input placeholder="Your name"  v-model="$props.accountId"  disabled/>
+            </div>
+          </div>
           <!-- Name -->
           <div class="form-item">
             <div class="form-item-tip" v-if="nameError"> Name can’t be blank</div>
             <div class="form-item-label" v-else> Name</div>
             <div class="form-item-content">
-              <el-input placeholder="Your name"  v-model="edit.name"  maxlength="50" show-word-limit/>
+              <el-input placeholder="Your name"  v-model="editProfile.name"  maxlength="50" show-word-limit/>
             </div>
           </div>
           <!-- Bio -->
           <div class="form-item">
             <div class="form-item-label"> Bio</div>
             <div class="form-item-content">
-              <el-input  placeholder="Tell others more about you!  " autosize type="textarea"  v-model="edit.info" maxlength="160" show-word-limit/>
+              <el-input  placeholder="Tell others more about you!  " v-model="editProfile.bio" type="textarea" maxlength="160" show-word-limit />
             </div>
           </div>
         </div>
@@ -61,11 +68,11 @@
     </div>
   </div>
   <Cropper ref='avatarCropper' :aspectRatio="1" @changeicon="changeicon"></Cropper>
-  <Cropper ref='coverCropper' :aspectRatio="23/8" @changeicon="changeicon"></Cropper>
+  <Cropper ref='backgroundCropper' :aspectRatio="23/8" @changeicon="changeicon"></Cropper>
 </template>
 
 <script>
-  import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
+import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
   import Cropper from '@/component/cropper.vue';
@@ -78,7 +85,7 @@
         type:Object,
         value:{}
       },
-      communityId:{
+      accountId:{
         type:String,
         value:""
       }
@@ -89,33 +96,26 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        edit:props.editInfo,
-        // {
-        //   avatar:'',  
-        //   cover:'',
-        //   name:'',
-        //   info:'',
-        // },
-        //other 
-        nameError:false,
+        editProfile:props.editInfo,
         paramName:'',
+        nameError:false,
         isLoading:false,
       })
 
-      //edit avatar & cover
+
+      //edit avatar & background
       const avatarCropper= ref()
-      const coverCropper= ref()
+      const backgroundCropper= ref()
       const uploadAvatar = (file) => {
         state.paramName = 'avatar';
         avatarCropper.value.uploads(file);
       }
-      const uploadCover = (file) => {
-        state.paramName = 'cover'
-        coverCropper.value.uploads(file);
+      const uploadBackground = (file) => {
+        state.paramName = 'background'
+        backgroundCropper.value.uploads(file);
       }
       const changeicon = (e) => {
-        console.log(e,'----e-----');
-        state.edit[state.paramName] = e;
+        state.editProfile[state.paramName] = e;
       }
 
       const closeEditLayer = () => {
@@ -123,46 +123,45 @@
         emit('closeEditLayer');
       }
 
-      //edit
+      //save
       const save = async () => {
-        if(state.isLoading){  return; }
-        if(!state.edit.name.trim()){
+        if(state.isLoading){ return; }
+        if(!state.editProfile.name.trim()){
           state.nameError = true;
           return;
         }
+        state.nameError = false;
         // proxy.$Loading.showLoading({title: "Loading"});
         state.isLoading = true;
-        state.nameError = false;
         const param = {
           accountId:store.getters.accountId,
-          communityId:props.communityId,
-          ...state.edit,
+          name:state.editProfile.name,
+          avatar : state.editProfile.avatar,
+          background : state.editProfile.background,
+          bio : state.editProfile.bio,
+
+          twitter : state.editProfile.twitter.url,
+          instagram : state.editProfile.instagram.url,
+          youtube : state.editProfile.youtube.url,
+          tiktok : state.editProfile.tiktok.url
         }
-        try{
-          const res = await proxy.$axios.community.set_community_basicinfo(param);
-          if(res.success){
-            emit('updateInfo',state.edit);
-          }else{
-            throw new Error("request failed")
-          }
-        }catch(e){
-          console.log("set_community_basicinfo:"+e);
-          proxy.$Message({
-            message: "Edit Failed",
-            type: "error",
-          });
+        const res = await proxy.$axios.profile.set_user_info(param);
+        if(res.success){
+          //update info
+          emit("updateInfo",state.editProfile);
         }
         // proxy.$Loading.hideLoading();
         state.isLoading = false;
+
       }
 
       return {
         ...toRefs(state),
         save,
         avatarCropper,
-        coverCropper,
+        backgroundCropper,
         uploadAvatar,
-        uploadCover,
+        uploadBackground,
         changeicon,
         closeEditLayer,
       }
@@ -179,9 +178,11 @@
       left:50%;
       transform:translate(-50%,-50%);
       width: 690px;
+      max-height: calc(100vh - 120px);
       background: #28282D;
       border-radius: 24px;
       overflow: hidden;
+      padding-bottom:20px;
       .edit-head{
         display:flex;
         align-items: center;
@@ -281,18 +282,18 @@
             }
           }
         }
-        .upload-cover{
+        .upload-background{
           margin-bottom: 68px;
           :deep(.el-upload){
             width: 690px;
             height: 170px;
             background: #111113;
             border:none;
-            .cover-box{
+            .background-box{
               width: 690px;
               height: 170px;
               position:relative;
-              .cover{
+              .background{
                 width: 690px;
                 height: 170px;
                 object-fit: cover;
@@ -312,7 +313,7 @@
           }
         }
         .mian-form{
-          padding:0 20px 20px;
+          padding:0 20px;
           max-height: calc(100vh - 464px);
           overflow-y: scroll;
           .form-item{
@@ -376,7 +377,6 @@
                   width:100%;
                   min-height:82px!important;
                   background: transparent;
-                  border-radius: 10px;
                   padding:0;
                   font-family: D-DINExp;
                   font-size: 16px;
@@ -386,6 +386,7 @@
                   font-weight: 400;
                   border:0;
                   resize:none;
+                  border-radius:0;
                 }
                 .el-input__count{
                   background:transparent;
@@ -398,6 +399,19 @@
                   letter-spacing: 0;
                   text-align: right;
                   font-weight: 400;
+                }
+              }
+            }
+            &.form-item-account{
+              padding-top:30px;
+              .form-item-content{
+                margin-top:0;
+                :deep(.el-input){
+                  width:100%;
+                  input{
+                    background: #36363C;
+                    color: rgba(255,255,255,0.3);
+                  }
                 }
               }
             }
