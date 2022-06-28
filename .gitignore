@@ -2,3 +2,4 @@ node_modules
 dist
 src/env.js
 .DS_Store
+src/utils/secret.js
