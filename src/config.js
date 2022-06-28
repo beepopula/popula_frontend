@@ -20,7 +20,7 @@ export default function getConfig() {
         IPFS: "https://ipfs.popula.io",
         CERAMIC_NETWORK: 'mainnet', 
         CERAMIC_API: 'https://ceramic-private.3boxlabs.com',
-        storageCostPerByte: "10000000000000000000" 
+        AWS_STORAGE: 'https://popula-frontend.s3.amazonaws.com/user'
       };
     case "testnet":
       return {
@@ -36,7 +36,7 @@ export default function getConfig() {
         IPFS: "https://ipfs.popula.io",
         CERAMIC_NETWORK: 'testnet-clay', 
         CERAMIC_API: 'http://54.255.155.106:7007',
-        storageCostPerByte: "10000000000000000000" 
+        AWS_STORAGE: 'https://popula-frontend.s3.amazonaws.com/user'
       };
       case "dev-testnet":
         return {
@@ -52,7 +52,7 @@ export default function getConfig() {
           IPFS: "https://ipfs.popula.io",
           CERAMIC_NETWORK: 'testnet-clay', 
           CERAMIC_API: 'http://54.255.155.106:7007',
-          storageCostPerByte: "10000000000000000000" 
+          AWS_STORAGE: 'https://popula-frontend.s3.amazonaws.com/user'
         };
     case "betanet":
       return {

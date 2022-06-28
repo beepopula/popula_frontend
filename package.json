@@ -19,6 +19,7 @@
     "clipboard": "^2.0.11",
     "cropperjs": "^1.5.12",
     "element-plus": "^1.0.2-beta.70",
+    "ipfs-only-hash": "^4.0.0",
     "js-base64": "^3.7.2",
     "js-sha256": "^0.9.0",
     "key-did-provider-ed25519": "^2.0.0",
