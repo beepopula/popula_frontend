@@ -114,7 +114,8 @@
         coverCropper.value.uploads(file);
       }
       const changeicon = (e) => {
-        state[state.paramName] = e;
+        console.log(e,'----e-----');
+        state.edit[state.paramName] = e;
       }
 
       const closeEditLayer = () => {
@@ -133,7 +134,7 @@
         state.isLoading = true;
         state.nameError = false;
         const param = {
-          accountId:'bhc8521.testnet', //store.getters.accountId,
+          accountId:store.getters.accountId,
           communityId:props.communityId,
           ...state.edit,
         }

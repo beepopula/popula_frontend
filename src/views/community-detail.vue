@@ -175,7 +175,6 @@
           -->
 
           <!-- creator -->
-          <!--
           <div class="contributor-box" v-if="contributors.length>0">
             <div class="mini-title">Contributor</div>
             <div class="contributor">
@@ -186,8 +185,8 @@
                       <img v-if="item.avatar" class="avatar" :src="item.avatar">
                       <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                       <div class="user-info">
-                        <div class="name txt-wrap">{{item.name || item.account_id}}</div>
-                        <div class="account txt-wrap">{{item.account_id}}</div>
+                        <div class="name txt-wrap">{{item.name || item.accountId}}</div>
+                        <div class="account txt-wrap">{{item.accountId}}</div>
                       </div>
                     </div>
                   </template>
@@ -198,60 +197,65 @@
               </template>
             </div>
           </div>
-          -->
           
         </div>
         <!-- Benefits -->
-        <div class="title" style="justify-content:flex-start;">
-          Benefits
-          <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBenefitsLayer"></div>
-        </div>
-        <div class="benefits">
-          <template v-for="i in 4">
-            <div :class="['benefit-item',i%2==0 ? 'mr0' : '']">
-              <div class="mini-title">This is a tittle</div>
-              <div class="benefit-intro">
-                Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more…
+        <template v-if="benefits.length>0 || detail.data.createUser.account_id == $store.getters.accountId">
+          <div class="title" style="justify-content:flex-start;">
+            Benefits
+            <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBenefitsLayer"></div>
+          </div>
+          <div class="benefits">
+            <template v-for="(benefit,index) in benefits">
+              <div :class="['benefit-item',index%2==1 ? 'mr0' : '']">
+                <div class="mini-title">{{benefit.title}}</div>
+                <div class="benefit-intro">
+                  {{benefit.introduction}}
+                </div>
+                <div class="benefit-bottom">
+                  <div class="benefit-access">{{benefit.type}}</div>
+                  <!--<div class="benefit-points">100 points</div>-->
+                </div>
               </div>
-              <div class="benefit-bottom">
-                <div class="benefit-access">Access</div>
-                <div class="benefit-points">100 points</div>
-              </div>
-            </div>
-          </template>
-        </div>
+            </template>
+          </div>
+        </template>
         <!-- News -->
-        <div class="title" style="justify-content:flex-start;">
-          News
-          <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditNewsLayer"></div>
-        </div>
-        <div class="news">
-          <div class="news-item">
-            <div class="news-right">
-              <div class="mini-title">This is a tittle</div>
-              <div class="news-intro">
-                Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more
-              </div>
-              <div class="news-bottom">
-                <div class="news-from">Mirror</div>
-                <div class="news-time">Jan 4 , 2022</div>
-              </div>
-            </div>
+        <template v-if="news.length>0 || detail.data.createUser.account_id == $store.getters.accountId">
+          <div class="title" style="justify-content:flex-start;">
+            News
+            <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditNewsLayer"></div>
           </div>
-          <div class="news-item">
-            <img class="news-left-cover" src="https://popula-frontend.s3.amazonaws.com/user/i41wnDgEdlbS1cIzmGAB0QT1t0fGbaUP.png"/>
-            <div class="news-right">
-              <div class="mini-title">This is a tittle</div>
-              <div class="news-intro news-right-intro">
-                Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more
+          <div class="news">
+            <template  v-for="(item,index) in news">
+              <div v-if="item.picture" class="news-item">
+                <img class="news-left-cover" :src="item.picture"/>
+                <div class="news-right">
+                  <div class="mini-title">{{item.title}}</div>
+                  <div class="news-intro news-right-intro">{{item.introduction}}</div>
+                  <!--
+                  <div class="news-bottom">
+                    <div class="news-from">Mirror</div>
+                    <div class="news-time">Jan 4 , 2022</div>
+                  </div>
+                  -->
+                </div>
               </div>
-              <div class="news-bottom">
-                <div class="news-from">Mirror</div>
-                <div class="news-time">Jan 4 , 2022</div>
+              <div v-else class="news-item">
+                <div class="news-right">
+                  <div class="mini-title">{{item.title}}</div>
+                  <div class="news-intro">{{item.introduction}}</div>
+                  <!--
+                  <div class="news-bottom">
+                    <div class="news-from">Mirror</div>
+                    <div class="news-time">Jan 4 , 2022</div>
+                  </div>
+                  -->
+                </div>
               </div>
-            </div>
+            </template>
           </div>
-        </div>
+        </template>
 
       </div>
       <!-- right -->
@@ -527,8 +531,8 @@
           communityId:route.params.id,
         });
         if(res.success) {
-          console.log(res.data)
           state.detail = res.data;
+          state.contributors = state.detail.contributor ||  [];
         }
         //posts
         changeTab('hot');
@@ -547,23 +551,28 @@
         state.members = (await getMembers()).slice(0,3);
         //postCommunity
         initUnreadCount();
-        //contributors
-        initContributor();
+        //initBenefitAndNews
+        initBenefits();
+        initNews();
       };
 
-      //initContributor
-      const initContributor = async () => {
-        const list = state.detail.contributor ||  [];
-        const contributors = [];
-        for(let i = 0;i<list.length;i++){
-          const res = await proxy.$axios.profile.get_user_info({
-            accountId:list[i],
-          });
-          if(res.success){
-            contributors.push(res.data);
-          }
+      const initBenefits = async () => {
+        const res = await proxy.$axios.community.get_benefit_list({
+          communityId:route.params.id,
+          accountId:store.getters.accountId || '',
+        });
+        if(res.success) {
+          state.benefits = res.data;
         }
-        state.contributors = contributors;
+      }
+      const initNews = async () => {
+        const res = await proxy.$axios.community.get_news_list({
+          communityId:route.params.id,
+          accountId:store.getters.accountId || '',
+        });
+        if(res.success) {
+          state.news = res.data;
+        }
       }
 
       //unread post count
@@ -782,14 +791,14 @@
       const showEditContributorLayer = () => {
         state.editContributor = {
           information:state.detail.information,
-          contributor:state.detail.contributor || []
+          contributor:state.contributors || []
         }
         state.showEditContributor = true;
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateContributor = (info) => {
         state.detail.information = info.information;
-        state.detail.contributor = info.contributor;
+        state.contributor = info.contributor;
 
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showEditContributor = false;
@@ -801,10 +810,9 @@
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateBenefits = (info) => {
-        state.benefits = info.benefits;
-        
+        state.benefits = info;
+        state.showEditBenefits = false;
         document.getElementsByTagName('body')[0].classList.remove("fixed");
-        state.showEditbenefits = false;
       }
 
       //edit News
@@ -813,7 +821,7 @@
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateNews = (info) => {
-        state.news = info.news;
+        state.news = info;
         
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showEditNews = false;
@@ -1408,6 +1416,7 @@
             .contributor-item{
               margin-right:40px;
               margin-top:20px;
+              margin-bottom:0;
               &.mr0{
                 margin-right:0;
               }
@@ -1434,6 +1443,7 @@
             margin-right:0;
           }
           .benefit-intro{
+            height:120px;
             margin-top:10px;
             opacity: 0.7;
             font-family: D-DINExp;

@@ -552,6 +552,11 @@
           avatar:state.user.avatar,
           background:state.user.background,
           bio:state.user.bio,
+
+          twitter:state.user.twitter || {url:'',verified:false},
+          instagram:state.user.instagram || {url:'',verified:false},
+          youtube:state.user.youtube || {url:'',verified:false},
+          tiktok:state.user.tiktok || {url:'',verified:false}
         };
         document.getElementsByTagName('body')[0].classList.add("fixed");
         state.showEditBasicinfo = true;
@@ -570,7 +575,9 @@
           twitter:state.user.twitter || {url:'',verified:false},
           instagram:state.user.instagram || {url:'',verified:false},
           youtube:state.user.youtube || {url:'',verified:false},
-          tiktok:state.user.tiktok || {url:'',verified:false}
+          tiktok:state.user.tiktok || {url:'',verified:false},
+
+          bio:state.user.bio,
         };
         document.getElementsByTagName('body')[0].classList.add("fixed");
         state.showEditMedia = true;

@@ -25,7 +25,7 @@
           <div class="form-title"> News</div>
           <div class="form-content">
             <div class="news-item" v-for="(item,index) in news">
-              <div class="form-item" v-if="item.url">
+              <div class="form-item form-item-url" v-if="item.url">
                 <div class="form-item-label">News Url</div>
                 <div class="form-item-content">
                   <el-input  placeholder=""   v-model="item.url" disabled/>
@@ -35,9 +35,9 @@
                 <div class="form-item-label">Cover</div>
                 <div class="form-item-content">
                   <div class="cover-box">
-                    <template v-if="item.cover">
-                      <img class="cover" :src="item.cover" />
-                      <div class="cover-delete-btn" @click="item.cover=''"></div>
+                    <template v-if="item.picture">
+                      <img class="cover" :src="item.picture" />
+                      <div class="cover-delete-btn" @click="item.picture=''"></div>
                     </template>
                     <div class="upload-button" @click="uploadCover(item)"></div>
                   </div>
@@ -74,6 +74,9 @@
         </div>
       </div>
     </div>
+    <div id="output">
+      <iframe name="sendMessage" id="iframe" src=""></iframe>
+    </div>
   </div>
 </template>
 
@@ -107,6 +110,7 @@
         currentItem:null,
         isUploading: false,
         isLoading : false,
+        showDom:false
       })
 
       const closeEditLayer = () => {
@@ -115,11 +119,25 @@
       }
 
       const readUrl = () => {
-        
+        if(!state.link.trim()){
+          proxy.$Message({
+            message: "Link cannot be empty",
+            type: "",
+          });
+          return false
+        }
+
+        // const iframe = document.getElementById('iframe');
+        // iframe.src = state.link;
+        // iframe.onload = function(e){
+        //   iframe.contentWindow.postmessage('give u a message', state.link);
+        //   //tuhao.com的脚本
+        //   window.addEventListener('message', receiver, false);
+        // }
       }
 
       const addNews = () => {
-        state.news.push({
+        state.news.unshift({
           picture:'',
           title:'',
           introduction:'',
@@ -152,7 +170,7 @@
       }
       const uploadImg = ({ file }) => {
         upload(file).then(data=>{
-          state.currentItem.cover = data;
+          state.currentItem.picture = data;
           state.currentItem = null;
           state.isUploading = false;
         })
@@ -161,21 +179,40 @@
       //edit
       const save = async () => {
         if(state.isLoading){  return; }
+
+        //check list
+        let checkRes = true;
+        const news = [];
+        state.news.forEach(item=>{
+          if(!(!item.title.trim() && !item.introduction.trim() && !item.picture)){
+            if(!item.title.trim() || !item.introduction.trim()){
+              checkRes = false;
+            }
+            news.push(item);
+          }
+        })
+        if(!checkRes){
+          proxy.$Message({
+            message: "Please fill in the complete information",
+            type: "",
+          });
+          return;
+        }
+
         // proxy.$Loading.showLoading({title: "Loading"});
         state.isLoading = true;
-
         const param = {
-          accountId:'bhc8521.testnet', //store.getters.accountId,
+          accountId:store.getters.accountId,
           communityId:props.communityId,
-          news:state.news
+          news:news
         }
         try{
-          // const res = await proxy.$axios.community.set_community_contributor(param);
-          // if(res.success){
-          //   emit('updateInfo',state.edit);
-          // }else{
-          //   throw new Error("request failed")
-          // }
+          const res = await proxy.$axios.community.set_community_news(param);
+          if(res.success){
+            emit('updateInfo',news);
+          }else{
+            throw new Error("request failed")
+          }
         }catch(e){
           console.log("set_community_news:"+e);
           proxy.$Message({
@@ -448,6 +485,17 @@
                   letter-spacing: 0;
                   text-align: right;
                   font-weight: 400;
+                }
+              }
+            }
+            &.form-item-url{
+              .form-item-content{
+                :deep(.el-input){
+                  width:100%;
+                  input{
+                    background: #36363C;
+                    color: rgba(255,255,255,0.3);
+                  }
                 }
               }
             }

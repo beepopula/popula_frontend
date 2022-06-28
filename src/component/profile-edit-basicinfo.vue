@@ -139,6 +139,11 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
           avatar : state.editProfile.avatar,
           background : state.editProfile.background,
           bio : state.editProfile.bio,
+
+          twitter : state.editProfile.twitter.url,
+          instagram : state.editProfile.instagram.url,
+          youtube : state.editProfile.youtube.url,
+          tiktok : state.editProfile.tiktok.url
         }
         const res = await proxy.$axios.profile.set_user_info(param);
         if(res.success){

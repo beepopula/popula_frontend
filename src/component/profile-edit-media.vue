@@ -111,12 +111,16 @@
       }
 
       const verify = async () => {
+        if(!state.twitter.trim()){
+          proxy.$Message({message: "Please copy the tweet link first and paste it into the input box in the second step",type: ""});
+        }
         const res = await proxy.$axios.profile.verify_twitter({twitter: state.twitter, sign: state.signtrue,accountId:store.getters.accountId});
         if(res.success){
           proxy.$Message({message: "Twitter account verified successfully",type: "success"});
-          setTimeout(()=>{
-            router.push("/mine");
-          },1000);
+          state.editProfile.twitter.url = res.data.author_url;
+          state.showVerify = false;
+        }else{
+          proxy.$Message({message: "Twitter Account verification failed",type: "error"});
         }
       }
 
@@ -130,7 +134,9 @@
           twitter : state.editProfile.twitter.url,
           instagram : state.editProfile.instagram.url,
           youtube : state.editProfile.youtube.url,
-          tiktok : state.editProfile.tiktok.url
+          tiktok : state.editProfile.tiktok.url,
+
+          bio : state.editProfile.bio,
         }
         const res = await proxy.$axios.profile.set_user_info(param);
         if(res.success){
@@ -196,6 +202,7 @@
             margin-right:12px;
             background:url("@/assets/images/common/icon-arrow-right.png") no-repeat right center;
             background-size:16px 16px;
+            transform:rotate(180deg);
 
           }
           

@@ -36,8 +36,8 @@
                 <div class="form-item-label">Type</div>
                 <div class="form-item-content">
                   <el-select v-model="item.type" size="large">
-                    <el-option  key="earn"  label="earn"  value="earn"></el-option>
-                    <el-option  key="access"  label="access"  value="access"></el-option>
+                    <el-option  key="Earn"  label="Earn"  value="Earn"></el-option>
+                    <el-option  key="Access"  label="Access"  value="Access"></el-option>
                   </el-select>
                 </div>
               </div>
@@ -85,7 +85,7 @@
       }
 
       const addBenefit = () => {
-        state.benefits.push({title:'',introduction:'',type:''});
+        state.benefits.unshift({title:'',introduction:'',type:''});
       }
 
       const deleteBenefit = (index) => {
@@ -95,21 +95,42 @@
       //edit
       const save = async () => {
         if(state.isLoading){  return; }
+
+        //check list
+        let checkRes = true;
+        const benefits = [];
+        state.benefits.forEach(item=>{
+          if(!(!item.title.trim() && !item.introduction.trim() && !item.type)){
+            console.log("111");
+            if(!item.title.trim() || !item.introduction.trim() || !item.type){
+              checkRes = false;
+            }
+            benefits.push(item);
+          }
+        })
+        if(!checkRes){
+          proxy.$Message({
+            message: "Please fill in the complete information",
+            type: "",
+          });
+          return;
+        }
+
+        //save
         // proxy.$Loading.showLoading({title: "Loading"});
         state.isLoading = true;
         const param = {
-          accountId:'bhc8521.testnet', //store.getters.accountId,
+          accountId:store.getters.accountId,
           communityId:props.communityId,
-          benefits:state.benefits
+          benefits:benefits
         }
         try{
-          console.log(param,'----param----');
-          // const res = await proxy.$axios.community.set_community_contributor(param);
-          // if(res.success){
-          //   emit('updateInfo',state.edit);
-          // }else{
-          //   throw new Error("request failed")
-          // }
+          const res = await proxy.$axios.community.set_community_benefits(param);
+          if(res.success){
+            emit('updateInfo',benefits);
+          }else{
+            throw new Error("request failed")
+          }
         }catch(e){
           console.log("set_community_benefits:"+e);
           proxy.$Message({
