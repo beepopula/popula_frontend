@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import getConfig from "../config";
 
 function loginWallet() {
   if (typeof window.near !== 'undefined' && window.near.isSender && window.near.isSignedIn() && window.localStorage.getItem("popula_wallet_auth_key")) {
@@ -103,6 +104,17 @@ const getters = {
       return
     }
     return loginWallet()
+  },
+
+  getAwsImg() {
+    const nearConfig = getConfig();
+    return (img)=>{
+      if(img.indexOf(nearConfig.IPFS+'/ipfs')>-1){
+        return img.replace(nearConfig.IPFS+'/ipfs',nearConfig.AWS_STORAGE)+'.png'
+      }else{
+        return img
+      }
+    }
   }
 }
 

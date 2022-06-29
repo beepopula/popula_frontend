@@ -15,7 +15,7 @@
           @login = "login"
         />
       </div>
-      <img v-if="user.avatar" class="avatar" :src="user.avatar"/>
+      <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
       <div class="name  txt-wrap">{{user.name || user.account_id}}</div>
       <div class="account  txt-wrap">{{user.account_id}}</div>
@@ -27,7 +27,7 @@
       <div class="bio txt-wrap2">{{user.bio}}</div>
       <div class="comunity-joined" v-if="joinedCommunities && joinedCommunities.length>0">
         <div class="community-item" v-for="item in joinedCommunities" @click.stop="redirectPage('/community-detail/'+item.communityId,false)">
-          <img v-if="item.avatar"  class="avatar" :src="item.avatar">
+          <img v-if="item.avatar"  class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
           <img v-else  class="avatar" src="@/assets/images/test/community.png">
           <div class="name txt-wrap">{{item.name}}</div>
         </div>

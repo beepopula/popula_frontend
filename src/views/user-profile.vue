@@ -5,14 +5,14 @@
       <div class="left">
         <!-- user-info -->
         <div class="user-info" v-if="user.data">
-          <img v-if="user.background" class="bg" :src="user.background"/>
+          <img v-if="user.background" class="bg" :src="$store.getters.getAwsImg(user.background)" @error.once="$event.target.src=user.background" />
           <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
           <div class="btns">
             <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditBasicinfoLayer()"></div>
             <div class="btn share" :data-clipboard-text="shareLink" @click="handleCopyFun()"></div>
           </div>
           <div class="info">
-            <img v-if="user.avatar" class="avatar" :src="user.avatar"/>
+            <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
             <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
             <div class="follow-button" v-if="user.account_id !== $store.getters.accountId">
               <FollowButton 
@@ -107,7 +107,7 @@
           </div>  
           <div class="communities">
             <div :class="['community',index%3==2 ? 'mr0' : '']" v-for="(item,index) in joinedCommunities" @click="redirectPage('/community-detail/'+item.communityId,false)">
-              <img v-if="item.avatar" class="avatar" :src="item.avatar">
+              <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
               <img v-else class="avatar" src="@/assets/images/test/community.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
@@ -121,7 +121,7 @@
           </div>  
           <div class="nfts">
             <div :class="['nft',index%3==2 ? 'mr0' : '']" v-for="(item,index) in nfts" @click="redirectPage('/detail/'+item.target_hash,false)">
-              <img class="avatar" :src="item.metadata.media"/>
+              <img class="avatar" :src="$store.getters.getAwsImg(item.metadata.media)" @error.once="$event.target.src=item.metadata.media" />
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@
           <div class="follow-item" v-for="user in followList[followCurrentTab]" :key="user.data.account_id" @click="redirectPage('/user-profile/'+user.data.account_id,false)">
             <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
               <template #reference>
-                <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
+                <img v-if="user.data.avatar" class="avatar" :src="$store.getters.getAwsImg(user.data.avatar)" @error.once="$event.target.src=user.data.avatar" />
                 <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
               </template>
               <template v-if="user.showUser">
@@ -179,7 +179,7 @@
           <div class="title">Joined Communities</div>
           <div id="community-list" class="community-list" >
             <div v-for="(item,index) in joinedCommunityList" :class="['community-item',index%3==2 ? 'mr0' : '']" @click="redirectPage('/community-detail/'+item.communityId)">
-              <img v-if="item.avatar" class="avatar" :src="item.avatar">
+              <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
               <img v-else class="avatar" src="@/assets/images/test/community.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
@@ -202,7 +202,7 @@
           </div>
           <div id="nft-list" class="nft-list" >
             <div v-for="(item,index) in nftList[nftCurrentTab]" :class="['nft-item',index%4==3 ? 'mr0' : '']" @click="redirectPage('/detail/'+item.target_hash)">
-              <img class="media" :src="item.metadata.media"/>
+              <img class="media" :src="$store.getters.getAwsImg(item.metadata.media)" @error.once="$event.target.src=item.metadata.media"/>
               <div class="name txt-wrap">{{item.metadata.title}}</div>
               <div class="collection txt-wrap">{{item.contract_id}}</div>
             </div>

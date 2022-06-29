@@ -23,7 +23,7 @@
                   <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
                     <template #reference>
                       <div class="user-item" @click="onSelectSubmit(user)">
-                        <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                        <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
                         <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
                         <div class="user-info">
                           <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
@@ -38,7 +38,7 @@
                 </template>
                 <template v-else>
                   <div class="user-item" @click="onSelectSubmit(user)">
-                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
+                    <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
                     <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
                     <div class="user-info">
                       <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
@@ -67,7 +67,7 @@
       <el-input v-model="text" @focus="checkLogin()" rows="1"  :autosize="true"  placeholder="Add a comment." maxlength="300"  type="textarea" :show-word-limit="text.trim().length>0" />
     </div>
     <!-- avatar -->
-    <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
+    <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.getters.getAwsImg($store.state.profile.avatar)" @error.once="$event.target.src=$store.state.profile.avatar"/>
     <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
     <div class="edit">
       <!-- reply button -->

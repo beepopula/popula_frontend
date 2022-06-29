@@ -1,10 +1,10 @@
 <template>
   <div v-if="detail" :class="['community-item','community-item-'+from]" @click="redirectPage('/community-detail/'+detail.communityId,false,true)">
-    <img v-if="detail.cover" class="cover" :src="detail.cover">
+    <img v-if="detail.cover" class="cover" :src="$store.getters.getAwsImg(detail.cover)" @error.once="$event.target.src=detail.cover">
     <img v-else class="cover" src="@/assets/images/test/bg.png">
     <div class="info">
       <div class="avatar-border">
-        <img v-if="detail.avatar"  class="avatar" :src="detail.avatar">
+        <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
         <img v-else  class="avatar" src="@/assets/images/test/community.png">
       </div>
       <div class="item-token item-token-multiple3">

@@ -10,7 +10,7 @@
     <div class="community-info" v-if="detail.data">
       <div class="info-box">
         <div class="info-left">
-          <img v-if="detail.avatar"  class="avatar" :src="detail.avatar">
+          <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
           <img v-else  class="avatar" src="@/assets/images/test/community.png">
           <div class="info">
             <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
@@ -107,7 +107,7 @@
           <div class="members-list">
             <template v-for="item in members">
               <div class="members-item" v-if="item" @click="redirectPage('/user-profile/'+item.account_id,false)">
-                <img v-if="item.avatar" class="avatar" :src="item.avatar">
+                <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                 <div class="info">
                   <div :class="['name','name-'+item.data.type]">
@@ -159,7 +159,7 @@
             <el-popover placement="bottom-start"  trigger="hover" @show="showCreateUser2=true" @hide="showCreateUser2=false">
               <template #reference>
                 <div class="user" @click="redirectPage('/user-profile/'+detail.data.createUser.account_id,false)">
-                  <img v-if="detail.data.createUser.avatar" class="avatar" :src="detail.data.createUser.avatar">
+                  <img v-if="detail.data.createUser.avatar" class="avatar" :src="$store.getters.getAwsImg(detail.data.createUser.avatar)" @error.once="$event.target.src=detail.data.createUser.avatar">
                   <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                   <div class="user-info">
                     <div class="name">{{detail.data.createUser.name || detail.data.createUser.account_id}}</div>
@@ -182,7 +182,7 @@
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
                     <div :class="['user','contributor-item',index%4 == 3 ? 'mr0' : '']">
-                      <img v-if="item.avatar" class="avatar" :src="item.avatar">
+                      <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
                       <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                       <div class="user-info">
                         <div class="name txt-wrap">{{item.name || item.accountId}}</div>
@@ -229,7 +229,7 @@
           <div class="news">
             <template  v-for="(item,index) in news">
               <div v-if="item.picture" class="news-item">
-                <img class="news-left-cover" :src="item.picture"/>
+                <img class="news-left-cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/>
                 <div class="news-right">
                   <div class="mini-title">{{item.title}}</div>
                   <div class="news-intro news-right-intro">{{item.introduction}}</div>
@@ -318,7 +318,7 @@
           <template v-for="item in 7">
             <div class="members-rank-item">
               <div class="members-rank-item-left">
-                <img v-if="item.avatar" class="avatar" :src="item.avatar">
+                <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                 <div class="name txt-wrap">VValkerVValkerVValkerVValker</div>
               </div>
@@ -365,7 +365,7 @@
               trigger="hover"
               >
               <template #reference>
-                <img v-if="element.avatar" :src="element.avatar" @click="redirectPage('/community-detail/'+element.communityId)">
+                <img v-if="element.avatar" :src="$store.getters.getAwsImg(element.avatar)" @error.once="$event.target.src=element.avatar" @click="redirectPage('/community-detail/'+element.communityId)">
                 <img v-else src="@/assets/images/test/community.png" @click="redirectPage('/community-detail/'+element.communityId)">
               </template>
               <div class="pop-box pop-tip" v-if="!drag">{{element.name}}</div>

@@ -22,7 +22,7 @@
           :auto-upload="false"
         >
           <div class="avatar-box">
-            <img v-if="edit.avatar" class="avatar" :src="edit.avatar" />
+            <img v-if="edit.avatar" class="avatar" :src="$store.getters.getAwsImg(edit.avatar)" @error.once="$event.target.src=edit.avatar" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
@@ -36,7 +36,7 @@
           :auto-upload="false"
         >
           <div class="cover-box">
-            <img v-if="edit.cover" class="cover" :src="edit.cover" />
+            <img v-if="edit.cover" class="cover" :src="$store.getters.getAwsImg(edit.cover)" @error.once="$event.target.src=edit.cover" />
             <div class="upload-button"></div>
           </div>
         </el-upload>

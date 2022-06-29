@@ -33,7 +33,7 @@
                   </div>
                   <template v-else-if="searchList.length>0">
                     <div class="contributor-search-item" v-for="item in searchList" @click="selectContributor(item)">
-                      <img v-if="item.avatar" class="avatar" :src="item.avatar"/>
+                      <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar"/>
                       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                       <div class="name txt-wrap">{{item.name || item.account_id}}</div>
                     </div>
@@ -44,7 +44,7 @@
               <div class="contributor-list">
                 <template v-for="(item,index) in edit.contributor">
                   <div class="contributor-item">
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar"/>
+                    <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                     <div class="name txt-wrap">{{item.name || item.accountId }}</div>
                     <div class="delete-btn" @click="deleteContributor(index)"></div>

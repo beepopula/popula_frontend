@@ -23,7 +23,7 @@
           :auto-upload="false"
         >
           <div class="avatar-box">
-            <img v-if="editProfile.avatar" class="avatar" :src="editProfile.avatar" />
+            <img v-if="editProfile.avatar" class="avatar" :src="$store.getters.getAwsImg(editProfile.avatar)" @error.once="$event.target.src=editProfile.avatar" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
@@ -37,7 +37,7 @@
           :auto-upload="false"
         >
           <div class="background-box">
-            <img v-if="editProfile.background" class="background" :src="editProfile.background" />
+            <img v-if="editProfile.background" class="background" :src="$store.getters.getAwsImg(editProfile.background)" @error.once="$event.target.src=editProfile.background" />
             <div class="upload-button"></div>
           </div>
         </el-upload>

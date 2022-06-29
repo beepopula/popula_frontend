@@ -36,7 +36,7 @@
                 <div class="form-item-content">
                   <div class="cover-box">
                     <template v-if="item.picture">
-                      <img class="cover" :src="item.picture" />
+                      <img class="cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/>
                       <div class="cover-delete-btn" @click="item.picture=''"></div>
                     </template>
                     <div class="upload-button" @click="uploadCover(item)"></div>

@@ -49,6 +49,6 @@ export async function upload(file) {
   params.sign = await getAccountSign(params.args)
 
   axios.post(`${store.state.nearConfig.IPFS}/upload`, params)
-  return cid
+  return `${store.state.nearConfig.IPFS}/ipfs/${cid}`
   
 }

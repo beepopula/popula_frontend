@@ -26,7 +26,7 @@
             trigger="hover"
             >
             <template #reference>
-              <img v-if="store.state.profile.avatar" class="user-photo-img" :src="store.state.profile.avatar"/>
+              <img v-if="store.state.profile.avatar" class="user-photo-img" :src="$store.getters.getAwsImg($store.state.profile.avatar)" @error.once="$event.target.src=$store.state.profile.avatar"/>
               <img v-else class="user-photo-img" src="@/assets/images/common/user-default.png"/>
             </template>
             <div class="user-menu-list">

@@ -16,7 +16,7 @@
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
-                    <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                    <img v-if="item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                   </template>
                   <template v-if="item.showUser">
@@ -49,7 +49,7 @@
                 <div class="user">
                   <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
-                      <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                      <img v-if="item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                       <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     </template>
                     <template v-if="item.showUser">
@@ -79,7 +79,7 @@
                 <div class="user">
                   <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
-                      <img v-if="item.user.avatar" class="avatar" :src="item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                      <img v-if="item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                       <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     </template>
                     <template v-if="item.showUser">
@@ -112,7 +112,7 @@
               <div class="avatar-list">
                 <template v-for="(user,index) in item.data.likes">
                   <template v-if="index<10">
-                    <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
+                    <img v-if="user.data.avatar" class="avatar" :src="$store.getters.getAwsImg(user.data.avatar)" @error.once="$event.target.src=user.data.avatar"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                   </template>
                 </template>
@@ -159,7 +159,7 @@
               <div class="avatar-list">
                 <template v-for="(user,index) in item.data.follow">
                   <template v-if="index<10">
-                    <img v-if="user.data.avatar" class="avatar" :src="user.data.avatar"/>
+                    <img v-if="user.data.avatar" class="avatar" :src="$store.getters.getAwsImg(user.data.avatar)" @error.once="$event.target.src=user.data.avatar"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                   </template>
                 </template>

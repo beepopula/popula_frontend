@@ -6,7 +6,7 @@
         <template v-if="community.communityId && from!='community' && from!='detail'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
-              <img v-if="community.avatar"  class="avatar avatar-community" :src="community.avatar">
+              <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
               <img v-else  class="avatar avatar-community" src="@/assets/images/test/community.png">
             </template>
             <template v-if="community.data">
@@ -32,7 +32,7 @@
         <template v-else>
           <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
             <template #reference>
-              <img v-if="user.avatar" class="avatar" :src="user.avatar" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
+              <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
               <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
             </template>
             <template v-if="showUser && from!='detail'">
@@ -103,7 +103,7 @@
         </div>
         <!-- images -->
         <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-          <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
+          <img class="img" v-for="(img,index) in images" :src="$store.getters.getAwsImg(img)" @error.once="$event.target.src=img" @click.stop="imagePreview(index)">
         </div>
       </template>
       <!-- bottom edit -->
@@ -145,7 +145,7 @@
               <template v-if="nft.isPublicSale">
                 <div :class="['mint-users','mint-users'+nft.collectors.length]" @click="showCollectorList()">
                   <template v-for="(u,index) in nft.collectors">
-                    <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="u.avatar" />
+                    <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="$store.getters.getAwsImg(u.avatar)" @error.once="$event.target.src=u.avatar" />
                     <img v-else  :class="['avatar','avatar'+index]" src="@/assets/images/common/user-default.png" />
                   </template>
                 </div>
@@ -218,7 +218,7 @@
           <div class="intro-item">Total sold：<span class="price">{{nft.total}}</span></div>
           <div :class="['mint-users','mint-users'+nft.collectors.length]" @click="showCollectorList()">
             <template v-for="(u,index) in nft.collectors">
-              <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="u.avatar" />
+              <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="$store.getters.getAwsImg(u.avatar)" @error.once="$event.target.src=u.avatar" />
               <img v-else  :class="['avatar','avatar'+index]" src="@/assets/images/common/user-default.png" />
             </template>
           </div>
@@ -264,7 +264,7 @@
               <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
                 <template #reference>
                   <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click="redirectPage('/user-profile/'+user.account_id,false)">
-                    <img v-if="user.avatar" class="avatar" :src="user.avatar" />
+                    <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar" />
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                     <div class="info">
                       <div class="name txt-wrap">{{user.name || user.account_id}}</div>

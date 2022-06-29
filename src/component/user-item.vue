@@ -1,7 +1,7 @@
 <template>
   <div class="user-item" v-if="item" @click="redirectPage('/user-profile/'+detail.account_id,false)">
     <div class="user-info">
-      <img v-if="detail.avatar" class="avatar" :src="detail.avatar"/>
+      <img v-if="detail.avatar" class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar"/>
       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
       <div class="info">
         <div :class="['name','name-'+item.data.type]" v-if="name">
