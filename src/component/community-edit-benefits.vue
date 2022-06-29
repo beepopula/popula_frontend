@@ -1,5 +1,5 @@
 <template>
-  <div class="elastic-layer edit-layer" @click.self="closeEditLayer()">
+  <div class="elastic-layer edit-layer">
     <div class="edit-button close" @click="closeEditLayer()"></div>
     <div class="edit-box">
       <div class="edit-head">

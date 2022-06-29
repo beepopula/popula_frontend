@@ -1,6 +1,6 @@
 <template>
   <!-- edit layer-->
-  <div class="elastic-layer edit-layer" @click.self="closeEditLayer()">
+  <div class="elastic-layer edit-layer">
     <div class="edit-button close" @click="closeEditLayer()"></div>
     <div class="edit-box" v-if="showVerify">
       <div class="edit-head">

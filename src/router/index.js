@@ -66,15 +66,6 @@ const routes = [
         }
       },
       {
-        path: "/verify",
-        name: "Verify",
-        component: () => import("../views/verify.vue"),
-        meta:{
-          requireAuth:true,
-          redirectPage:'home',
-        }
-      },
-      {
         path: "/share/:id",
         name: "Share",
         component: () => import("../views/share.vue"),
