@@ -94,6 +94,11 @@ export default {
     });
 
     const init = async () => {
+      const image = '<img src=\"https://mbdp01.bdstatic.com/static/landing-pc/img/logo_top.79fdb8c2.png\" alt=\"到百度首页\" title=\"到百度首页\">';
+      const title = '<title>苹果iPhone13全系列型号？iPhone13系列有哪些型号？答案终于来了</title>'
+      console.log(title.match(new RegExp('<title>'+'(.*?)'+'<\/title>'))[1],'----title----',image.match(/<img[^>]+src=['"]([^'"]+)['"]+/)[1]);
+
+
       if(store.getters.isLogin){
         const res = await proxy.$axios.community.get_joined_community_list({
           accountId:store.getters.accountId,

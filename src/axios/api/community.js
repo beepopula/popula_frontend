@@ -21,6 +21,9 @@ export default {
   replacement_sequence(data) {
     return post("v1/communities/replacementSequence", data);
   },
+  read_url(data) {
+    return get("v1/user/getContentByHtml", data);
+  },
   get_benefit_list(data) {
     return get("v1/communities/getBenefitList", data);
   },

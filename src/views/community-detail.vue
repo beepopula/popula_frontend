@@ -13,7 +13,7 @@
           <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
           <img v-else  class="avatar" src="@/assets/images/test/community.png">
           <div class="info">
-            <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
+            <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
             <div class="creator">Created by 
               <el-popover placement="bottom-start"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
                 <template #reference>
@@ -141,7 +141,7 @@
         <!-- Community Information-->
         <div class="title" style="justify-content:flex-start;">
           Community Information
-          <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditContributorLayer"></div>
+          <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditContributorLayer"></div>
         </div>
         <div class="community-information">
           <div class="intro">{{detail.information}}</div>       
@@ -203,12 +203,12 @@
         <template v-if="benefits.length>0 || detail.data.createUser.account_id == $store.getters.accountId">
           <div class="title" style="justify-content:flex-start;">
             Benefits
-            <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBenefitsLayer"></div>
+            <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBenefitsLayer"></div>
           </div>
           <div class="benefits">
             <template v-for="(benefit,index) in benefits">
               <div :class="['benefit-item',index%2==1 ? 'mr0' : '']">
-                <div class="mini-title">{{benefit.title}}</div>
+                <div class="mini-title txt-wrap">{{benefit.title}}</div>
                 <div class="benefit-intro">
                   {{benefit.introduction}}
                 </div>
@@ -224,14 +224,14 @@
         <template v-if="news.length>0 || detail.data.createUser.account_id == $store.getters.accountId">
           <div class="title" style="justify-content:flex-start;">
             News
-            <div class="edit-btn" v-if="true || detail.data.createUser.account_id == $store.getters.accountId" @click="showEditNewsLayer"></div>
+            <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditNewsLayer"></div>
           </div>
           <div class="news">
             <template  v-for="(item,index) in news">
-              <div v-if="item.picture" class="news-item">
+              <div v-if="item.picture" class="news-item news-item-cover">
                 <img class="news-left-cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/>
                 <div class="news-right">
-                  <div class="mini-title">{{item.title}}</div>
+                  <div class="mini-title txt-wrap">{{item.title}}</div>
                   <div class="news-intro news-right-intro">{{item.introduction}}</div>
                   <!--
                   <div class="news-bottom">
@@ -243,7 +243,7 @@
               </div>
               <div v-else class="news-item">
                 <div class="news-right">
-                  <div class="mini-title">{{item.title}}</div>
+                  <div class="mini-title txt-wrap">{{item.title}}</div>
                   <div class="news-intro">{{item.introduction}}</div>
                   <!--
                   <div class="news-bottom">
@@ -1502,15 +1502,24 @@
           background: #28282D;
           border-radius: 24px;
           display:flex;
+          &.news-item-cover{
+            .news-right{
+              width:350px;
+            }
+          }
           .news-left-cover{
             width:180px;
             height:180px;
             border-radius: 10px;
             margin-right:20px;
+            object-fit: cover;
           }
           .news-right{
             width:650px;
             flex:1;
+            .mini-title{
+              width:100%;
+            }
             .news-intro{
               margin-top:10px;
               opacity: 0.7;

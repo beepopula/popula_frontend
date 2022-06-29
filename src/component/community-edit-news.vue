@@ -24,7 +24,7 @@
 
           <div class="form-title"> News</div>
           <div class="form-content">
-            <div class="news-item" v-for="(item,index) in news">
+            <div class="news-item" v-for="(item,index) in news" :key="''+index+index">
               <div class="form-item form-item-url" v-if="item.url">
                 <div class="form-item-label">News Url</div>
                 <div class="form-item-content">
@@ -74,9 +74,6 @@
         </div>
       </div>
     </div>
-    <div id="output">
-      <iframe name="sendMessage" id="iframe" src=""></iframe>
-    </div>
   </div>
 </template>
 
@@ -118,7 +115,7 @@
         emit('closeEditLayer');
       }
 
-      const readUrl = () => {
+      const readUrl = async () => {
         if(!state.link.trim()){
           proxy.$Message({
             message: "Link cannot be empty",
@@ -127,13 +124,22 @@
           return false
         }
 
-        // const iframe = document.getElementById('iframe');
-        // iframe.src = state.link;
-        // iframe.onload = function(e){
-        //   iframe.contentWindow.postmessage('give u a message', state.link);
-        //   //tuhao.com的脚本
-        //   window.addEventListener('message', receiver, false);
-        // }
+        const res = await proxy.$axios.community.read_url({url:state.link});
+        if(res.success && (res.data.title || res.data.image)){
+          const item = {
+            url:state.link,
+            title:res.data.title ? res.data.title.match(new RegExp('<title>'+'(.*?)'+'<\/title>'))[1] : '',
+            picture:res.data.image ? res.data.image.match(/<img[^>]+src=['"]([^'"]+)['"]+/)[1] : '',
+            introduction:''
+          }
+          state.news.unshift(item);
+          state.link = "";
+        }else{
+          proxy.$Message({
+            message: "Link read failed",
+            type: "error",
+          });
+        }
       }
 
       const addNews = () => {
