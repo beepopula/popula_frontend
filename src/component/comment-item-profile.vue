@@ -583,12 +583,22 @@ export default {
           ]
         }
         try{
+          let res = ''
           if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
-            const result = await mainContract.delContent(params); 
+            res = await mainContract.delContent(params); 
           }else{
             const communityContract = await CommunityContract.new(props.item.receiverId);
-            const result = await communityContract.delContent(params);
+            res = await communityContract.delContent(params);
           }
+          if (res == true) {
+            state.hasDelete = true;
+            proxy.$Message({
+              message: "delete success",
+              type: "success",
+            });
+          } else  if (res == false) {
+            throw new Error('error')
+          } else {}
         }catch(e){
           console.log("delete error:"+e);
           proxy.$Message({
@@ -597,11 +607,6 @@ export default {
           });
           return;
         }
-        state.hasDelete = true;
-        proxy.$Message({
-          message: "delete success",
-          type: "success",
-        });
       }
     }
 
@@ -617,12 +622,21 @@ export default {
           ]
         }
         try{
+          let res = ''
           if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
-            const result = await mainContract.report(params); 
+            reset = await mainContract.report(params); 
           }else{
             const communityContract = await CommunityContract.new(props.item.receiverId);
-            const result = await communityContract.report(params);
+            res = await communityContract.report(params);
           }
+          if (res == true) {
+            proxy.$Message({
+              message: "report success",
+              type: "success",
+            });
+          } else  if (res == false) {
+            throw new Error('error')
+          } else {}
         }catch(e){
           console.log("report error:"+e);
           proxy.$Message({
@@ -631,10 +645,6 @@ export default {
           });
           return;
         }
-        proxy.$Message({
-          message: "report success",
-          type: "success",
-        });
       }
     }
     const block = async () => {

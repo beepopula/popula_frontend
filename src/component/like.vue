@@ -119,12 +119,27 @@
             }
             
             //contract 
+            let res = ''
             if(state.communityId){
               const communityContract = await CommunityContract.new(state.communityId);
-              const res = state.isLiked ? await communityContract.unlike(params) : await communityContract.like(params) 
+              res = state.isLiked ? await communityContract.unlike(params) : await communityContract.like(params) 
             }else{
-              const res = state.isLiked ? await mainContract.unlike(params) : await mainContract.like(params)
+              res = state.isLiked ? await mainContract.unlike(params) : await mainContract.like(params)
             }
+            if (res == true) {
+              state.likeCount = state.isLiked ? Number(state.likeCount)-1 : Number(state.likeCount)+1;
+              state.likeActive = true;
+              setTimeout(()=>{
+                state.likeActive = false;
+                state.isLiked  = !state.isLiked;
+                state.isLiking = false;
+                if(props.type == 'comment'){
+                  emit('changeLike',{likeCount:state.likeCount,isLiked:state.isLiked});
+                }
+              },400)
+            } else  if (res == false) {
+              throw new Error('error')
+            } else {}
           }catch(e){
             state.isLiking = false;
             const message = state.isLiked ? 'Unlike Failed' : 'Like Failed';
@@ -135,16 +150,6 @@
             console.log("like error:"+e);
             return;
           }
-          state.likeCount = state.isLiked ? Number(state.likeCount)-1 : Number(state.likeCount)+1;
-          state.likeActive = true;
-          setTimeout(()=>{
-            state.likeActive = false;
-            state.isLiked  = !state.isLiked;
-            state.isLiking = false;
-            if(props.type == 'comment'){
-              emit('changeLike',{likeCount:state.likeCount,isLiked:state.isLiked});
-            }
-          },400)
         }else{
           state.showLogin = true
         }

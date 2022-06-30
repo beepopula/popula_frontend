@@ -69,27 +69,63 @@ export default class MainContract{
     }
 
     async delContent(param){
-        return await this.contract.del_content(param)
+        const transaction = {
+            methodName: "del_content",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async follow(param){
-        return await this.contract.follow(param)
+        const transaction = {
+            methodName: "follow",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async unfollow(param){
-        return await this.contract.unfollow(param)
+        const transaction = {
+            methodName: "unfollow",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async like(param){
-        return await this.contract.like(param)
+        const transaction = {
+            methodName: "like",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async unlike(param){
-        return await this.contract.unlike(param)
+        const transaction = {
+            methodName: "unlike",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async share(param){
-        return await this.contract.share(param)
+        const transaction = {
+            methodName: "share",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     constructor(account){

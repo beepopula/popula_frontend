@@ -630,10 +630,16 @@
               }]
             }
             const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-            if (!checkReceiptsSuccess(result)) {
-              return false
-            }
-            state.detail.data.isJoin = !state.detail.data.isJoin;
+            // if (!checkReceiptsSuccess(result)) {
+            //   return false
+            // }
+            // state.detail.data.isJoin = !state.detail.data.isJoin;
+            if (result == true) {
+              state.detail.data.isJoin = !state.detail.data.isJoin;
+            } else  if (res == false) {
+              throw new Error('error')
+            } else {}
+            
           }catch(e){
             const message = state.detail.data.isJoin ? 'Quit Failed' : 'Join Failed';
             proxy.$Message({

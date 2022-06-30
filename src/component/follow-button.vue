@@ -116,6 +116,16 @@
           state.isFollowing = true;
           try{
             const res = state.isFollowed ? await mainContract.unfollow({account_id:props.accountId}) : await mainContract.follow({account_id:props.accountId})
+            if (res == true) {
+              state.isFollowed  = !state.isFollowed;
+              state.isFollowing = false;
+              emit('follow',{
+                isFollow:state.isFollowed,
+                accountId:props.accountId
+              });
+            } else  if (res == false) {
+              throw new Error('error')
+            } else {}
           }catch(e){
             state.isFollowing = false;
             const message = state.isFollowed ? 'Unfollow Failed' : 'Follow Failed';
@@ -126,12 +136,6 @@
             console.log("follow error:"+e);
             return;
           }
-          state.isFollowed  = !state.isFollowed;
-          state.isFollowing = false;
-          emit('follow',{
-            isFollow:state.isFollowed,
-            accountId:props.accountId
-          });
         }else{
           if(props.from=='popup'){
             emit("login");

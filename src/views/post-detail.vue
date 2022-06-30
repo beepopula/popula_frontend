@@ -241,10 +241,16 @@ export default {
             }]
           }
           const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          if (!checkReceiptsSuccess(result)) {
-            return false
-          }
-          state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+          // if (!checkReceiptsSuccess(result)) {
+          //   return false
+          // }
+          // state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+          if (result == true) {
+            state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+          } else  if (res == false) {
+            throw new Error('error')
+          } else {}
+          
           
         }catch(e){
           const message = state.postCommunity.data.isJoin ? 'Quit Failed' : 'Join Failed';
