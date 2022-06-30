@@ -78,6 +78,9 @@ export function generatePhrase(entrophy) {
 }
 
 export function checkReceiptsSuccess(result) {
+  if (result == 'redirect') {
+    return 'redirect'
+  }
   if (result && !result.receipts_outcome) {
     return false
   }

@@ -608,7 +608,7 @@
         if(!store.getters.isLogin){
           state.showLogin = true
         }else{
-          //try{
+          try{
             const method = state.detail.data.isJoin ? 'quit' : 'join';
             const taskTransaction = {
               receiverId: route.params.id,
@@ -634,14 +634,14 @@
               return false
             }
             state.detail.data.isJoin = !state.detail.data.isJoin;
-          //}catch(e){
+          }catch(e){
             const message = state.detail.data.isJoin ? 'Quit Failed' : 'Join Failed';
             proxy.$Message({
               message,
               type: "error",
             });
             console.log(message+" error:"+e);
-          //}
+          }
         }
       }
 

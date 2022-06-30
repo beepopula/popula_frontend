@@ -1157,7 +1157,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }
         };
         postInput.value.innerHTML = "";
-        state.isPosting = false;
         
         if (res == true) {
           proxy.$Message({
@@ -1176,6 +1175,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           });
           // proxy.$Loading.hideLoading();
           state.isPosting = false;
+        } else {
         }
       }
       

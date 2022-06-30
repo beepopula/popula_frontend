@@ -179,10 +179,8 @@ export async function executeMultipleTransactions(
       const res = await window.near.requestSignTransactions({ transactions: nearTransactions });
       return res.response[0]
     } 
-    const currentUrl = window.location.href
     await store.state.walletConnection.requestSignTransactions(nearTransactions, callbackUrl);
-    while (window.location.href == currentUrl) {}
-    return
+    return 'redirect'
   };
 
 export async function generateAccessKey(accountId, contractId) {
