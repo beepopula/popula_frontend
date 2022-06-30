@@ -22,7 +22,7 @@
             </div>
             <template v-else-if="userList.length>0">
               <template v-for="user in userList">
-                <template>
+                <template v-if="user.name || user.avatar">
                   <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
                     <template #reference>
                       <div class="user-item" @click="onSelectSubmit(user)">
@@ -39,7 +39,7 @@
                     </template>
                   </el-popover>
                 </template>
-                <!-- <template v-else>
+                <template v-else>
                   <div class="user-item" @click="onSelectSubmit(user)">
                     <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
                     <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
@@ -48,7 +48,7 @@
                       <div class="user-account  txt-wrap">{{user.account_id}}</div>
                     </div>
                   </div>
-                </template> -->
+                </template>
               </template>
             </template>
             <div v-else class="nobody">Nobody yet.</div>
@@ -304,6 +304,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
   import Canvas from '@/component/canvas.vue';
   import * as nearAPI from 'near-api-js';
   import js_sha256 from 'js-sha256';
+  import axios from 'axios';
   export default {
     components: {
       LoginMask,
@@ -476,8 +477,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.focusOffset = selection.focusOffset;
         let start = Math.max(selection.focusOffset-21,0);
         let start_index = null;
-        
-        let str = "";
 
         for(let i = selection.focusOffset-1;i>=start;i--){
           if(text.substring(i,i+1)=="@"){
@@ -516,30 +515,32 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
 
       // const popUser = ref(null);
+      let CancelToken = axios.CancelToken;
       const searchUser = async (str) => {
+        if(state.cancel){
+            state.cancel();
+        }
         state.showUserList = true;
         state.isLoaingUserList = true;
-        const res = await proxy.$axios.post.at({
-          accountId:str,
-        });
-        if(res.success){
-          // const list = [];
-          // const len = Math.min(res.data.length,5)
-          // for(let i =0;i<len;i++){
-          //   const user = await proxy.$axios.profile.get_user_info({
-          //     accountId:res.data[i]['account_id'],
-          //     currentAccountId: store.getters.accountId || ''
-          //   });
-          //   if(user.success){
-          //     list.push(user.data);
-          //     // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
-          //   }else{
-          //     list.push({account_id:res.data[i]['account_id']});
-          //   }
-          // }
-          state.userList = res.data;
-          state.isLoaingUserList = false;
-        }
+        axios.get('/api/v1/communities/At', {
+            params: { accountId:str },
+            cancelToken: new CancelToken((c) => {
+                state.cancel = c;
+            })
+        }).then((res) => {
+            if(res.success){
+              state.userList = res.data;
+              state.isLoaingUserList = false;
+            }
+        })
+
+        // const res = await proxy.$axios.post.at({
+        //   accountId:str,
+        // });
+        // if(res.success){
+        //   state.userList = res.data;
+        //   state.isLoaingUserList = false;
+        // }
       }
       const debounce = (fn, delay) => {
         let timeout;

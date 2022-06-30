@@ -63,6 +63,7 @@
   import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
+  import axios from 'axios';
   export default {
     components: {
     },
@@ -118,19 +119,38 @@
         debounceInput(state.searchWord);
       }
 
+      let CancelToken = axios.CancelToken;
       const searchUser = async () => {
+        if(state.cancel){
+            state.cancel();
+        }
         state.nobody = false;
         state.isSearching = true;
-        const res = await proxy.$axios.post.at({
-          accountId:state.searchWord,
-        });
-        if(res.success){
-          state.searchList = res.data;
-          if(res.data.length==0){
-            state.nobody = true;
+
+        axios.get('/api/v1/communities/At', {
+          params: { accountId:state.searchWord },
+          cancelToken: new CancelToken((c) => {
+              state.cancel = c;
+          })
+        }).then((res) => {
+          if(res.success){
+            state.searchList = res.data;
+            if(res.data.length==0){
+              state.nobody = true;
+            }
           }
-        }
-        state.isSearching = false;
+          state.isSearching = false;
+        })
+        // const res = await proxy.$axios.post.at({
+        //   accountId:state.searchWord,
+        // });
+        // if(res.success){
+        //   state.searchList = res.data;
+        //   if(res.data.length==0){
+        //     state.nobody = true;
+        //   }
+        // }
+        // state.isSearching = false;
       }
 
       const debounce = (fn, delay) => {
