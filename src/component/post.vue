@@ -441,11 +441,24 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //@
       const onCheck = (e) => {
-        console.log(e,'-----');
-        if(e.key == 'v' && e.metaKey){
-          console.log(e.clipboardData,'============');
-        }
         if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
+          e.preventDefault();
+        }
+      }
+      const onPaste = (e) => {
+        let text = '';
+        let event = e.originalEvent || e ;
+        if (event.clipboardData && event.clipboardData.getData) {
+            text = event.clipboardData.getData('text/plain');
+        } else if (window.clipboardData && window.clipboardData.getData) {
+            text = window.clipboardData.getData('Text');
+        }
+        if(postInput.value.textContent.length + text.length >=1000 ){
+          if (document.queryCommandSupported('insertText')) {
+              document.execCommand('insertText', false, text.slice(0,1000-postInput.value.textContent.length));
+          } else {
+              document.execCommand('paste', false, text.slice(0,1000-postInput.value.textContent.length));
+          }
           e.preventDefault();
         }
       }
@@ -1189,6 +1202,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         onCheck,
         onClick,
         onChange,
+        onPaste,
         onSelectSubmit,
         postInput,
         checkLogin,

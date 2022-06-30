@@ -10,6 +10,7 @@
         @keyup.capture="onChange"
         @focus="checkLogin"
         @click="onClick"
+        @paste="onPaste"
       />
       <div v-if="!text" class="placeholder">Add a comment.</div>
       <div class="pop-user-box">
@@ -182,6 +183,23 @@ export default {
     //@
     const onCheck = (e) => {
       if(commentInput.value.textContent.length>=300 && e.key != 'Backspace'){
+        e.preventDefault();
+      }
+    }
+    const onPaste = (e) => {
+      let text = '';
+      let event = e.originalEvent || e ;
+      if (event.clipboardData && event.clipboardData.getData) {
+          text = event.clipboardData.getData('text/plain');
+      } else if (window.clipboardData && window.clipboardData.getData) {
+          text = window.clipboardData.getData('Text');
+      }
+      if(commentInput.value.textContent.length + text.length >=300 ){
+        if (document.queryCommandSupported('insertText')) {
+            document.execCommand('insertText', false, text.slice(0,300-commentInput.value.textContent.length));
+        } else {
+            document.execCommand('paste', false, text.slice(0,300-commentInput.value.textContent.length));
+        }
         e.preventDefault();
       }
     }
@@ -524,6 +542,7 @@ export default {
       onCheck,
       onClick,
       onChange,
+      onPaste,
       onSelectSubmit,
       checkLogin,
       setEmoji,
@@ -548,7 +567,7 @@ export default {
 
 <style lang="scss" scoped>
 .comment{
-  width: 690px;
+  width: 100%;
   padding:20px;
   background: #28282D;
   border-radius: 24px;

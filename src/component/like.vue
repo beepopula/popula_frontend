@@ -141,6 +141,9 @@
             state.likeActive = false;
             state.isLiked  = !state.isLiked;
             state.isLiking = false;
+            if(props.type == 'comment'){
+              emit('changeLike',{likeCount:state.likeCount,isLiked:state.isLiked});
+            }
           },400)
         }else{
           state.showLogin = true

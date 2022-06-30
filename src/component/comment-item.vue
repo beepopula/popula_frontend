@@ -131,7 +131,7 @@
             <template v-else>Reply</template>
           </div>
           <!-- like -->
-          <Like :item="like" :type="'comment'"/>
+          <Like :item="like" :type="'comment'" @changeLike="changeLike"/>
         </div>
       </div>
 
@@ -160,7 +160,7 @@
             <CommentItem 
               :community="$props.community"
               :post="post" 
-              :item="item" 
+              :item="detail" 
               :commentC="commentCount" 
               :from="'elastic-layer-parent'"
               :level="$props.level+1"
@@ -278,17 +278,18 @@ export default {
       //gas
       gasUsed:formatAmount(props.item.gas_used,24,4),
       //share & like & comment
+      detail:{},
       shareCount:props.item.data.shareCount,
       like:{
         hierarchies:props.item.hierarchies,
         accountId:props.item.accountId,
         likeCount:props.item.data.likeCount,
-        isLiked:props.item.data.isLike,
+        isLiked:props.item.data.isLiked,
         targetHash:props.item.target_hash,
         communityId:(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT) ? "" : props.item.receiverId
       },
-      //child comment
       commentCount:props.commentC || props.item.data.commentCount,
+      //child comment
       showCommentBox:false,
       showCommentList:false,
       currentTab:'',
@@ -408,6 +409,12 @@ export default {
     //showCommentLayer
     const showCommentLayer = () => {
       if(props.from=='elastic-layer-parent'){return;} // || props.level>=5
+      state.detail = {
+        ...props.item,
+      }
+      state.detail.data.likeCount = state.like.likeCount;
+      state.detail.data.isLiked = state.like.isLiked;
+      state.detail.data.shareCount = state.shareCount;
       document.getElementsByTagName('body')[0].classList.add("fixed");
       state.showCommentList = true;
       changeTab('hot');
@@ -538,6 +545,13 @@ export default {
         clipboard.destroy()
       })
     }
+
+    //changeLike
+    const changeLike = (res) => {
+      state.like.likeCount = res.likeCount;
+      state.like.isLiked = res.isLiked;
+    }
+
 
     //checkLogin
     const checkLogin = () => {
@@ -674,6 +688,7 @@ export default {
       copy_text,
       triggerCopy,
       handleCopyFun,
+      changeLike,
       showLoginMask,
       closeLoginMask,
       redirectPage,
