@@ -241,11 +241,9 @@ export default {
             }]
           }
           const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          if (result && result.response) {
-              if (!checkReceiptsSuccess(result.response[0])) {
-                return false
-              }
-            }
+          if (!checkReceiptsSuccess(result)) {
+            return false
+          }
           state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
           
         }catch(e){

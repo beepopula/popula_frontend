@@ -29,7 +29,7 @@ export default class NftContract{
             }]
         }]
         const result = await executeMultipleTransactions(this.contract.account, txs)
-        if (!checkReceiptsSuccess(result.response[0])) {
+        if (!checkReceiptsSuccess(result)) {
             return false
         }
         return true
