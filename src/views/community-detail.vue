@@ -1,9 +1,8 @@
 <template>
   <div class="main-box">
-    <div v-if="detail.cover" class="bg-box" :style="'background-image:url('+detail.cover+');'">
-      <div class="bg-mask"></div>
-    </div>
-    <div v-else class="bg-box">
+    <div class="bg-box">
+      <img v-if="detail.cover" :src="$store.getters.getAwsImg(detail.cover)" @error.once="$event.target.src=detail.cover">
+      <img v-else src="@/assets/images/community/bg.png">
       <div class="bg-mask"></div>
     </div>
     <!-- Community info  -->
@@ -925,11 +924,18 @@
       left:0;
       width:100vw;
       height:300px;
-      background:url('@/assets/images/community/bg.png') no-repeat center center;
-      background-size:cover;
+      img{
+        width:100vw;
+        height:100%;
+        object-fit: cover;
+      }
       .bg-mask{
+        position:absolute;
+        top:0;
+        left:0;
         width:100%;
         height:100%;
+        z-index: 2;
         background:url('@/assets/images/community/bg-mask.png') no-repeat center bottom;
         background-size:cover;
       }
