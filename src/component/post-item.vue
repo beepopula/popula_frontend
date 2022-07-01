@@ -6,15 +6,17 @@
         <template v-if="community.communityId && from!='community' && from!='detail'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
-              <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
-              <img v-else  class="avatar avatar-community" src="@/assets/images/test/community.png">
+              <div @click="redirectPage('/community-detail/'+community.communityId,false)">
+                <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
+                <img v-else  class="avatar avatar-community" src="@/assets/images/test/community.png">
+              </div>
             </template>
             <template v-if="community.data">
               <CommunityItem :item="community" :from="'popup'"/>
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name  txt-wrap">{{community.name}}</div>
+            <div class="name  txt-wrap" @click="redirectPage('/community-detail/'+community.communityId,false)">{{community.name}}</div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>
                 <div class="createtime">
@@ -32,8 +34,10 @@
         <template v-else>
           <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
             <template #reference>
-              <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
-              <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
+              <div @click="redirectPage('/user-profile/'+user.account_id,false)">
+                <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+                <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+              </div>
             </template>
             <template v-if="showUser && from!='detail'">
               <UserPopup :account="item.accountId" @login="showLogin=true"/>
@@ -41,7 +45,7 @@
           </el-popover>
           <div class="user-info">
             <div class="name" @click="redirectPage('/user-profile/'+user.account_id,false)">
-              <div class="name-txt txt-wrap">{{user.name || user.account_id}}</div>
+              <div class="name-txt txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
               <div class="user-flag co" v-if="community.accountId && community.accountId == user.account_id"></div>
             </div>
             <el-popover placement="bottom-start"  trigger="hover">

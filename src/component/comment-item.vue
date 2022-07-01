@@ -6,9 +6,11 @@
         <!-- avatar -->
         <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
           <template #reference>
-            <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar" @click="redirectPage('/user-profile/'+item.accountId,false)"/>
-            <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+item.accountId,false)"/>
-          </template>
+            <div @click="redirectPage('/user-profile/'+item.accountId,false)">
+              <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+              <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+            </div>
+         </template>
           <template v-if="showUser">
             <UserPopup :account="item.accountId" @login="showLogin=true"/>
           </template>

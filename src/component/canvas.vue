@@ -38,7 +38,7 @@ export default {
         context.font = "28px  D-DINExp normal"
         canvasTextAutoLine(props.text,canvas,400,392,32)
         canvas.toBlob((blob)=>{
-          emit('setDefalutCover',{
+          emit('setDefaultCover',{
             url:canvas.toDataURL('image/jpeg',1),
             file:blob,
           })

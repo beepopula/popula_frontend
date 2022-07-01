@@ -1156,6 +1156,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             copies:1000,
           }
         };
+        stateData.imgList = [];
+        stateData.count = 0;
         postInput.value.innerHTML = "";
         
         if (res == true) {
