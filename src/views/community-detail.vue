@@ -35,7 +35,7 @@
             <img class="token-icon" src="@/assets/images/test/token_icon2.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon3.png"/>
           </div>
-          <div class="button-border join-button" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT">
+          <div class="button-border join-button" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && detail.data.createUser.account_id != $store.getters.accountId">
             <div class="button" @click="changeJoinCommunity()">
               <template v-if="detail.data.isJoin">  Joined </template>
               <template v-else>  Join </template>

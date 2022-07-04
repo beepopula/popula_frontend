@@ -664,20 +664,22 @@ export default {
         }
         if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
           store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_shared", check_params).then(check_res => {
-            console.log(check_res,'----check_res----');
             if(!check_res){
-              mainContract.share(params).then(()=>{
-                state.shareCount++;
+              mainContract.share(params).then(res=>{
+                if(res){
+                  state.shareCount++;
+                }
               })
             }
           })
         }else{
           store.state.viewAccount.viewFunction(props.item.receiverId, "check_shared", check_params).then(check_res => {
-            console.log(check_res,'----check_res----');
             if(!check_res){
               CommunityContract.new(props.item.receiverId).then(communityContract=>{
-                communityContract.share(params).then(()=>{
-                  state.shareCount++;
+                communityContract.share(params).then(res=>{
+                  if(res){
+                    state.shareCount++;
+                  }
                 })
               })
             }

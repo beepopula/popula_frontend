@@ -16,7 +16,7 @@
                 <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
               </div>
             </div>
-            <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT" class="mini-button-border join-button" @click="changeJoinCommunity()">
+            <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT && postCommunity.accountId != $store.getters.accountId" class="mini-button-border join-button" @click="changeJoinCommunity()">
               <div class="mini-button" v-if="postCommunity.data.isJoin">  Joined  </div>
               <div class="mini-button" v-else>  Join  </div>
             </div>
