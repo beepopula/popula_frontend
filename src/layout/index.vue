@@ -38,6 +38,7 @@ export default {
     overflow-y: hidden;
     overflow-x: hidden;
     padding-bottom:100px;
+    min-height: 100vh;
     &.page-index{
       background: #020202;
       padding-bottom:0;

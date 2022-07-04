@@ -12,11 +12,11 @@
         <div v-else-if="list.length>0" class="list">
           <template v-for="item in list">
             <!-- reply -->
-            <div v-if="item.type=='comment' && item.data.count==0 && !item.data.At" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+            <div v-if="item.type != 'follow' && item.data.count==0 && !item.data.At" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
-                    <img v-if="item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                    <img v-if="item.user && item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                   </template>
                   <template v-if="item.showUser">
@@ -24,9 +24,10 @@
                   </template>
                 </el-popover>
 
+
                 <div class="user-info">
                   <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
-                    {{item.user.name || item.accountId}}
+                    {{ (item.user && item.user.name) ? item.user.name : item.accountId}}
                   </div> <br/>
                   <el-popover placement="bottom-start"  trigger="hover">
                     <template #reference>
@@ -44,12 +45,12 @@
             </div>
 
             <!-- @ -->
-            <template v-else-if="item.data.At">
+            <template v-else-if="item.type != 'follow' && item.data.count==0 && item.data.At">
               <div v-if="item.post" class="content-item" @click="redirectPage('/detail/'+item.post.target_hash,false)">
                 <div class="user">
                   <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
-                      <img v-if="item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                      <img v-if="item.user && item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                       <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     </template>
                     <template v-if="item.showUser">
@@ -59,7 +60,7 @@
 
                   <div class="user-info">
                     <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
-                      {{item.user.name || item.accountId}}
+                      {{(item.user && item.user.name) ? item.user.name : item.accountId}}
                     </div> <br/>
                     <el-popover placement="bottom-start"  trigger="hover">
                       <template #reference>
@@ -79,7 +80,7 @@
                 <div class="user">
                   <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
-                      <img v-if="item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
+                      <img v-if="item.user && item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                       <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     </template>
                     <template v-if="item.showUser">
@@ -89,7 +90,7 @@
 
                   <div class="user-info">
                     <div class="name txt-wrap" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
-                      {{item.user.name || item.accountId}}
+                      {{(item.user && item.user.name) ? item.user.name : item.accountId}}
                     </div> <br/>
                     <el-popover placement="bottom-start"  trigger="hover">
                       <template #reference>
@@ -257,7 +258,7 @@ export default {
         if(item.type!='follow' && item.data.count==0){ //reply & @
           //time
           item.time = getTimer(item.createAt)
-          
+          //user
           item.user = {}
           const res = await proxy.$axios.profile.get_user_info({
             accountId:item.type == 'comment' ? item.comment.accountId : item.post.accountId,
@@ -275,7 +276,7 @@ export default {
             }
           }else{
             item.text = item.type == 'comment' ? item.comment.text : item.post.text;
-          }
+          }   
         }else if(item.type!='follow' && item.data.count>0){ //like
           //url
           if(item.type=="comment"){

@@ -111,7 +111,7 @@
                 <div class="info">
                   <div :class="['name','name-'+item.data.type]">
                     <span class="name-txt txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</span>
-                    <div class="user-flag co" v-if="item.data.type=='creator'"></div>
+                    <div class="user-flag co" v-if="item.data.type=='creator' || item.account_id==detail.data.createUser.account_id"></div>
                     <div class="user-flag mod" v-else-if="item.data.type=='mod'"></div>
                   </div>
                   <div class="account txt-wrap">{{item.account_id}}</div>
