@@ -112,14 +112,6 @@ export default {}
         img.hover{
           display:none;
         }
-        &:hover{
-          img{
-            display:none;
-          }
-          img.hover{
-            display:block;
-          }
-        }
       }
     }
   }

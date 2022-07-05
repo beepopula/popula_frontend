@@ -126,31 +126,19 @@
         }
         state.nobody = false;
         state.isSearching = true;
-
-        axios.get('/api/v1/communities/At', {
-          params: { accountId:state.searchWord },
-          cancelToken: new CancelToken((c) => {
-              state.cancel = c;
-          })
-        }).then((res) => {
-          if(res.success){
-            state.searchList = res.data;
-            if(res.data.length==0){
-              state.nobody = true;
-            }
-          }
-          state.isSearching = false;
+        const cancelToken = new CancelToken((c) => {
+          state.cancel = c;
         })
-        // const res = await proxy.$axios.post.at({
-        //   accountId:state.searchWord,
-        // });
-        // if(res.success){
-        //   state.searchList = res.data;
-        //   if(res.data.length==0){
-        //     state.nobody = true;
-        //   }
-        // }
-        // state.isSearching = false;
+        const res = await proxy.$axios.post.at({
+          accountId:state.searchWord,
+        },cancelToken);
+        if(res.success){
+          state.searchList = res.data;
+          if(res.data.length==0){
+            state.nobody = true;
+          }
+        }
+        state.isSearching = false;
       }
 
       const debounce = (fn, delay) => {

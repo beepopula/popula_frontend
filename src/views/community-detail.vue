@@ -1460,7 +1460,6 @@
             font-size: 16px;
             color: #FFFFFF;
             letter-spacing: 0;
-            text-align: justify;
             line-height: 24px;
             font-weight: 400;
             overflow: hidden;
@@ -1537,7 +1536,6 @@
               font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
-              text-align: justify;
               line-height: 24px;
               font-weight: 400;
               overflow: hidden;

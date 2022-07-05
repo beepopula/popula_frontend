@@ -519,28 +519,21 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       const searchUser = async (str) => {
         if(state.cancel){
             state.cancel();
+            state.cancel = null;
         }
+        const cancelToken = new CancelToken((c) => {
+          state.cancel = c;
+        })
         state.showUserList = true;
         state.isLoaingUserList = true;
-        axios.get('/api/v1/communities/At', {
-            params: { accountId:str },
-            cancelToken: new CancelToken((c) => {
-                state.cancel = c;
-            })
-        }).then((res) => {
-            if(res.success){
-              state.userList = res.data;
-              state.isLoaingUserList = false;
-            }
-        })
 
-        // const res = await proxy.$axios.post.at({
-        //   accountId:str,
-        // });
-        // if(res.success){
-        //   state.userList = res.data;
-        //   state.isLoaingUserList = false;
-        // }
+        const res = await proxy.$axios.post.at({
+          accountId:str,
+        },cancelToken);
+        if(res.success){
+          state.userList = res.data;
+          state.isLoaingUserList = false;
+        }
       }
       const debounce = (fn, delay) => {
         let timeout;
@@ -1110,7 +1103,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             creator_id: store.getters.accountId,
             token_metadata: {
               title: "popula",
-              description: postInput.value.innerHTML,
+              description: postInput.value.textContent,
               media: cover,
               media_hash: js_sha256.sha256(coverBase64),
               copies:state.postForm.nft.isPublicSale ? Number(state.postForm.nft.copies) : 1,

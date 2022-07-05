@@ -44,8 +44,8 @@ export default {
   get_sign(data) {
     return post("v1/post/getSignByPostId", data);
   },
-  at(data) {
-    return get("v1/communities/At", data);
+  at(data,cancelToken) {
+    return get("v1/communities/At", data, cancelToken);
   },
   share_record(data) {
     return post("v1/user/share", data);
