@@ -30,7 +30,8 @@
 import { defineComponent,ref,reactive,toRefs,computed,nextTick,getCurrentInstance} from 'vue'
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { upload } from "@/utils/upload.js"
+import { upload } from "@/utils/upload.js";
+import { compress, compressAccurately } from 'image-conversion'
 
 export default defineComponent({
     props:{
@@ -67,9 +68,17 @@ export default defineComponent({
             //         emit('changeicon',e.target.result)
             //     }
             // }else{
+
+                let blob = state.blob;
+                if (blob.size / 1024 > 1024 * 5) { //1024 * 10
+                    compressAccurately(blob, 1024 * 5).then(res => {
+                        console.log(res,'----compressAccurately res---')
+                        blob = res;
+                    })
+                } 
                 state.isloading = true;
                 state.dialogVisible = false
-                const data =  await upload(state.blob);
+                const data =  await upload(blob);
                 state.isloading = false;
                 emit('changeicon',data)
             // }
@@ -138,7 +147,7 @@ export default defineComponent({
 				crop: () => {
 					cropper.getCroppedCanvas().toBlob((blob) => {
                         state.blob = blob;
-						state.preview  = window.URL.createObjectURL(blob)
+                        // state.preview  = window.URL.createObjectURL(blob)
 					});
 				},
 			});

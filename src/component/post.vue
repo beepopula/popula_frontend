@@ -305,6 +305,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
   import * as nearAPI from 'near-api-js';
   import js_sha256 from 'js-sha256';
   import axios from 'axios';
+  import { compress, compressAccurately } from 'image-conversion'
   export default {
     components: {
       LoginMask,
@@ -608,14 +609,24 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
       const beforeUpload = (file,fileList) => {
         stateData.count++;
-        if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
-            proxy.$Message({
-              message: "The maximum size is 10M",
-              type: "error",
-            });
-            return false
-        }
-        return file
+        // if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
+        //     proxy.$Message({
+        //       message: "The maximum size is 10M",
+        //       type: "error",
+        //     });
+        //     return false
+        // }
+        // return file
+        return new Promise((resolve, reject) => {
+          if (file.size / 1024 > 1024 * 5) { //1024 * 10
+            compressAccurately(file, 1024 * 5).then(res => {
+              console.log(res,'----compressAccurately res---')
+              resolve(res)
+            })
+          } else {
+            resolve(file)
+          } 
+        })
       }
       const uploadImg = ({ file }) => {
         //count check

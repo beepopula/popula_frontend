@@ -82,6 +82,7 @@
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
   import { upload } from "@/utils/upload.js";
+  import { compress, compressAccurately } from 'image-conversion'
   export default {
     components: {
     },
@@ -165,14 +166,24 @@
         elUploadInput.click();
       }
       const beforeUpload = (file,fileList) => {
-        if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
-            proxy.$Message({
-              message: "The maximum size is 2M",
-              type: "error",
-            });
-            return false
-        }
-        return file
+        // if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
+        //     proxy.$Message({
+        //       message: "The maximum size is 2M",
+        //       type: "error",
+        //     });
+        //     return false
+        // }
+        // return file
+        return new Promise((resolve, reject) => {
+          if (file.size / 1024 > 1024 * 5) { //1024 * 10
+            compressAccurately(file, 1024 * 5).then(res => {
+              console.log(res,'----compressAccurately res---')
+              resolve(res)
+            })
+          } else {
+            resolve(file)
+          } 
+        })
       }
       const uploadImg = ({ file }) => {
         upload(file).then(data=>{

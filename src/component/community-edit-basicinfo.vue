@@ -30,7 +30,7 @@
         <el-upload
           class="upload-cover"
           :show-file-list="false"
-          accept="image/png, image/jpeg, image/jpg"
+          accept="image/png, image/jpeg, image/jpg, image/gif"
           list-type="picture-card"
           :on-change="uploadCover"
           :auto-upload="false"
