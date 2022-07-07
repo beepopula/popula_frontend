@@ -21,7 +21,7 @@
         <div v-else class="right-nav-item user-photo">
           <el-popover
             popper-class="user-menu-box"
-            placement="bottom-end"
+            placement="bottom"
             :width="200"
             trigger="hover"
             >

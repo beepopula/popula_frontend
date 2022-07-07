@@ -32,7 +32,7 @@
         </div>
 
         <!-- edit -->
-        <el-popover placement="bottom-end"  trigger="hover">
+        <el-popover placement="bottom"  trigger="hover" popper-class="edit-popper">
           <template #reference>
             <img class="icon icon-edit" src="@/assets/images/post-item/icon-more.png"/>
           </template>
@@ -342,7 +342,6 @@ export default {
     )
 
     const init = async() => {
-      console.log(props.level);
       //filter blockList
       if(isInBlockList()) return;
       state.isBlocked = false;

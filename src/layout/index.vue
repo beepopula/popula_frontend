@@ -354,6 +354,9 @@ export default {
       display:none;
     }
   }
+  .edit-popper{
+    margin-left:-58px!important;
+  }
   .pop-box{
     background: #000000;
     border: 1px solid rgba(255,255,255,0.2);

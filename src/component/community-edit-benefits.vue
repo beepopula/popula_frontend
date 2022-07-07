@@ -101,7 +101,6 @@
         const benefits = [];
         state.benefits.forEach(item=>{
           if(!(!item.title.trim() && !item.introduction.trim() && !item.type)){
-            console.log("111");
             if(!item.title.trim() || !item.introduction.trim() || !item.type){
               checkRes = false;
             }

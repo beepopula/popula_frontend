@@ -75,8 +75,8 @@ export default defineComponent({
             // }
         }
 		const uploads = (file) => {
-            const maxSize  = props.maxSize || 1024 * 2;
-            if (file.size/1024 > maxSize) {// maxSize = 100KB
+            const maxSize  = props.maxSize || 1024 * 1024 * 10;
+            if (file.size > maxSize) {// maxSize = 10M
                 proxy.$Message({
                     message: `The maximum size is ${maxSize}KB`,
                     type: "error",

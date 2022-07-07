@@ -17,7 +17,7 @@
         <el-upload
           class="upload-avatar"
           :show-file-list="false"
-          accept="image/png, image/jpeg, image/jpg"
+          accept="image/png, image/jpeg, image/jpg, image/gif"
           list-type="picture-card"
           :on-change="uploadAvatar"
           :auto-upload="false"
@@ -31,7 +31,7 @@
         <el-upload
           class="upload-background"
           :show-file-list="false"
-          accept="image/png, image/jpeg, image/jpg"
+          accept="image/png, image/jpeg, image/jpg, image/gif"
           list-type="picture-card"
           :on-change="uploadBackground"
           :auto-upload="false"

@@ -165,7 +165,7 @@
         elUploadInput.click();
       }
       const beforeUpload = (file,fileList) => {
-        if (file.size > 1024 * 1024 * 2) {// maxSize = 2M
+        if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
             proxy.$Message({
               message: "The maximum size is 2M",
               type: "error",
