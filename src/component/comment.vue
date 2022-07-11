@@ -1,7 +1,7 @@
 <template>
   <div :class="['comment',from == 'list' ? 'comment-reply' : '']">
     <!-- text -->
-    <div :class="['input-box',text.trim().length>0 ? '' :'input-box-empty']">
+    <div :class="['input-box',text.trim().length>10 ? '' :'input-box-empty']">
       <div
         class="div-input"
         ref="commentInput"

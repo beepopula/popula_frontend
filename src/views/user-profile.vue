@@ -9,7 +9,22 @@
           <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
           <div class="btns">
             <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditBasicinfoLayer()"></div>
-            <div class="btn share" :data-clipboard-text="shareLink" @click="handleCopyFun()"></div>
+            <el-popover placement="bottom-start"  trigger="hover">
+              <template #reference>
+                <div class="btn share"></div>
+              </template>
+              <div class="pop-box pop-edit">
+                <div class="pop-edit-item" @click="shareTwitter()">
+                  <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
+                  Twitter
+                </div>
+                <div class="pop-edit-item" @click="triggerCopy()">
+                  <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
+                  Copy link
+                </div>
+              </div>
+            </el-popover>
+            
           </div>
           <div class="info">
             <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
@@ -26,7 +41,7 @@
             <div class="total">
               <div class="total-item" @click="showFollowList('followers')"><span>{{user.data.follows}}</span> Followers</div>
               <div class="total-item" @click="showFollowList('following')"><span>{{user.data.following}}</span> Following</div>
-              <div class="total-item"><span>{{user.data.postCount}}</span> Posts</div>
+              <div class="total-item" @click="showPostList()"><span>{{user.data.postCount}}</span> Posts</div>
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list-box">
@@ -73,7 +88,7 @@
           </div>
         </div>
         <!-- filter-menu  -->
-        <div class="filter-menu">
+        <div class="filter-menu" ref="profileList">
           <div :class="['filter-menu-item',currentTab == 'post' ? 'active' : '']" @click="changeTab('post')">Posts <span v-if="count.post">({{count.post}})</span></div>
           <div :class="['filter-menu-item',currentTab == 'reply' ? 'active' : '']" @click="changeTab('reply')">Reply <span v-if="count.reply">({{count.reply}})</span></div>
           <div :class="['filter-menu-item',currentTab == 'like' ? 'active' : '']" @click="changeTab('like')">Likes <span v-if="count.like">({{count.like}})</span></div>
@@ -120,7 +135,8 @@
             <div class="more" @click="showNftList()">More</div>
           </div>  
           <div class="nfts">
-            <div :class="['nft',index%3==2 ? 'mr0' : '']" v-for="(item,index) in nfts" @click="redirectPage('/detail/'+item.target_hash,false)">
+            <!-- @click="redirectPage('/detail/'+item.target_hash,false)" -->
+            <div :class="['nft',index%3==2 ? 'mr0' : '']" v-for="(item,index) in nfts" >
               <img class="avatar" :src="$store.getters.getAwsImg(item.metadata.media)" @error.once="$event.target.src=item.metadata.media" />
             </div>
           </div>
@@ -146,7 +162,7 @@
                 <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
               </template>
               <template v-if="user.showUser">
-                <UserPopup  :account="user.data.account_id" :hasBtn="false" @login="showLogin=true" />
+                <UserPopup  :account="user.data.account_id" :hideBtn="true"  @login="showLogin=true" />
               </template>
             </el-popover>
             <div class="info">
@@ -226,6 +242,9 @@
     <!-- login-mask -->
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 
+    <!-- #copy_text  display:none;  -->
+    <div :data-clipboard-text="shareLink" ref="copy_text"  id="copy_text"  @click="handleCopyFun"></div>
+
 
   </div>
 </template>
@@ -244,7 +263,7 @@
   import suspend from "@/component/suspend.vue";
   import ProfileEditBasicinfo from "@/component/profile-edit-basicinfo.vue";
   import ProfileEditMedia from "@/component/profile-edit-media.vue";
-  import ClipboardJS from 'clipboard';
+  import Clipboard from 'clipboard';
 
   export default {
     components: {
@@ -482,6 +501,14 @@
         }
       };
 
+      //postScroll
+      const profileList = ref()
+      const showPostList = () => {
+        console.log(profileList.value.getBoundingClientRect().top);
+        changeTab('post');
+        document.documentElement.scrollTop = profileList.value.getBoundingClientRect().top - 100;
+      }
+
       //follow list
       const showFollowList = async (type) => {
         document.getElementsByTagName('body')[0].classList.add("fixed");
@@ -593,8 +620,6 @@
       }
 
 
-
-
       //community-list
       const showCommunityList  = async () => {
         document.getElementsByTagName('body')[0].classList.add("fixed");
@@ -625,7 +650,6 @@
         //reset data
         state.nftCurrentTab = tab;
       }
-
       const getCreated = async () => {
         const created = await proxy.$axios.profile.get_user_nfts({
           accountId:state.accountId,
@@ -650,21 +674,32 @@
       }
 
       //share
+      const shareTwitter = () => {
+        window.open('https://twitter.com/intent/tweet?text='+state.shareLink);
+      }
+      //share -> handleCopy
+      const copy_text = ref()
+      const triggerCopy = async () => {
+        nextTick(() => {
+          copy_text.value.click();
+        });
+      }
       const handleCopyFun = () => {
-        const clipboard = new ClipboardJS('.btn.share')
+        const clipboard = new Clipboard('#copy_text')
+        console.log(clipboard,'---clipboard---');
         clipboard.on('success', e => {
           proxy.$Message({
             message: "copy success",
             type: "success",
           });
-          clipboard.destroy() 
+          clipboard.destroy();
         })
         clipboard.on('error', e => {
           proxy.$Message({
             message: "error",
             type: "error",
           });
-          clipboard.destroy()
+          clipboard.destroy();
         })
       }
       
@@ -694,6 +729,8 @@
         changeTab,
         handleScroll,
         redirectPage,
+        profileList,
+        showPostList,
         showFollowList,
         closeFollowList,
         changeFollowTab,
@@ -708,6 +745,9 @@
         showNftList,
         closeNftList,
         changeNftTab,
+        shareTwitter,
+        copy_text,
+        triggerCopy,
         handleCopyFun,
         checkUrl,
         showLoginMask,
@@ -804,9 +844,6 @@
               letter-spacing: 0;
               font-weight: 400;
               cursor: pointer;
-              &:last-child{
-                cursor: default;
-              }
               span{
                 font-size: 16px;
                 color: #FFFFFF;

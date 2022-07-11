@@ -123,7 +123,7 @@
               </div>
               <div class="pop-edit-item" @click="triggerCopy(post.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
-                Cory link
+                Copy link
               </div>
             </div>
           </el-popover>

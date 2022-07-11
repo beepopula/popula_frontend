@@ -16,42 +16,43 @@
         <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
         
         <div class="pop-user-box" :id="'pop-user'+location">
-          <div v-show="showUserList" ref="popUser" class="user-list">
-            <div class="loading-box" v-if="isLoaingUserList">
-              <img class="white-loading" src="@/assets/images/common/loading.png"/>
-            </div>
-            <template v-else-if="userList.length>0">
-              <template v-for="user in userList">
-                <template v-if="user.name || user.avatar">
-                  <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
-                    <template #reference>
-                      <div class="user-item" @click="onSelectSubmit(user)">
-                        <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
-                        <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                        <div class="user-info">
-                          <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                          <div class="user-account  txt-wrap">{{user.account_id}}</div>
+          <div v-show="showUserList" ref="popUser" class="user-list-box">
+            <div class="user-list" v-if="isLoaingUserList || userList.length>0">
+              <div class="loading-box" v-if="isLoaingUserList">
+                <img class="white-loading" src="@/assets/images/common/loading.png"/>
+              </div>
+              <template v-else-if="userList.length>0">
+                <template v-for="user in userList">
+                  <template v-if="user.name || user.avatar">
+                    <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
+                      <template #reference>
+                        <div class="user-item" @click="onSelectSubmit(user)">
+                          <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+                          <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                          <div class="user-info">
+                            <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                            <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                          </div>
                         </div>
+                      </template>
+                      <template v-if="user.showCreateUser">
+                        <UserPopup :account="user.account_id" @login="showLogin=true"/>
+                      </template>
+                    </el-popover>
+                  </template>
+                  <template v-else>
+                    <div class="user-item" @click="onSelectSubmit(user)">
+                      <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+                      <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                      <div class="user-info">
+                        <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                        <div class="user-account  txt-wrap">{{user.account_id}}</div>
                       </div>
-                    </template>
-                    <template v-if="user.showCreateUser">
-                      <UserPopup :account="user.account_id" @login="showLogin=true"/>
-                    </template>
-                  </el-popover>
-                </template>
-                <template v-else>
-                  <div class="user-item" @click="onSelectSubmit(user)">
-                    <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
-                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                    <div class="user-info">
-                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
                     </div>
-                  </div>
+                  </template>
                 </template>
               </template>
-            </template>
-            <div v-else class="nobody">Nobody yet.</div>
+            </div>
           </div>
         </div>
         <!-- avatar -->
@@ -749,7 +750,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }else{//name|symbol search
             const list = []
             state.searchTokenList.forEach(item=>{
-              if(item.symbol.indexOf(str)>-1 || item.name.indexOf(str)>-1 || item.tokenId == str){
+              if(item.symbol.toLowerCase().indexOf(str.toLowerCase())>-1 || item.name.toLowerCase().indexOf(str.toLowerCase())>-1 || item.tokenId == str){
                 list.push(item);
               }
             });
@@ -1387,71 +1388,73 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
       .pop-user-box{
         position:relative;
-        .user-list{
+        .user-list-box{
           position:absolute;
           top:0;
           left:0;
           z-index:20;
-          background: #000000;
-          border: 1px solid rgba(255,255,255,0.2);
-          box-shadow: 0px 2px 30px 0px rgba(0,0,0,0.5);
-          border-radius: 10px;
-          width:200px;
-          .loading-box{
-            height:50px;
-            display:flex;
-            align-items: center;
-            justify-content:center;
-          }
-          .nobody{
-            height:50px;
-            display:flex;
-            align-items: center;
-            justify-content:center;
-            opacity: 0.5;
-            font-family: D-DINExp;
-            font-size: 14px;
-            color: #FFFFFF;
-            letter-spacing: 0;
-            text-align: center;
-            line-height: 14px;
-            font-weight: 400;
-          }
-          .user-item{
-            height:50px;
-            display:flex;
-            align-items: center;
-            padding:0 20px;
-            cursor:pointer;
-            &:hover{
-              background: rgba(40,40,45,0.5);
+          .user-list{
+            background: #000000;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0px 2px 30px 0px rgba(0,0,0,0.5);
+            border-radius: 10px;
+            width:200px;
+            .loading-box{
+              height:50px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
             }
-            .user-avatar{
-              width:30px;
-              height:30px;
-              border-radius:50%;
+            .nobody{
+              height:50px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
+              opacity: 0.5;
+              font-family: D-DINExp;
+              font-size: 14px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              text-align: center;
+              line-height: 14px;
+              font-weight: 400;
             }
-            .user-info{
-              margin-left:10px;
-              .user-name{
-                font-family: D-DINExp-Bold;
-                font-size: 14px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                line-height: 14px;
-                font-weight: 700;
-                width:90px;
+            .user-item{
+              height:50px;
+              display:flex;
+              align-items: center;
+              padding:0 20px;
+              cursor:pointer;
+              &:hover{
+                background: rgba(40,40,45,0.5);
               }
-              .user-account{
-                margin-top:2px;
-                opacity: 0.5;
-                font-family: D-DINExp;
-                font-size: 14px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                line-height: 14px;
-                font-weight: 400;
-                width:90px;
+              .user-avatar{
+                width:30px;
+                height:30px;
+                border-radius:50%;
+              }
+              .user-info{
+                margin-left:10px;
+                .user-name{
+                  font-family: D-DINExp-Bold;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  line-height: 14px;
+                  font-weight: 700;
+                  width:90px;
+                }
+                .user-account{
+                  margin-top:2px;
+                  opacity: 0.5;
+                  font-family: D-DINExp;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  line-height: 14px;
+                  font-weight: 400;
+                  width:90px;
+                }
               }
             }
           }

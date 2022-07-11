@@ -17,20 +17,20 @@
           </el-popover>
           <div class="user-info">
             <div class="name  txt-wrap" @click="redirectPage('/community-detail/'+community.communityId,false)">{{community.name}}</div>
-            <el-popover placement="bottom-start"  trigger="hover">
-              <template #reference>
-                <div class="createtime">
-                  <div>posted by </div>
-                  <div class="username"><div class="txt-wrap">{{user.name || user.account_id}}</div></div>
+            <div class="createtime">
+              <div>posted by </div>
+              <div class="username" @click="redirectPage('/user-profile/'+user.account_id,false)"><div class="txt-wrap">{{user.name || user.account_id}}</div></div>
+              <el-popover placement="bottom-start"  trigger="hover">
+                <template #reference>
                   <div class="time">{{time.showTime}}</div>
-                </div>
-              </template>
-              <div class="pop-box pop-tip">{{time.hoverTime}}</div>
-            </el-popover>
+                </template>
+                <div class="pop-box pop-tip">{{time.hoverTime}}</div>
+              </el-popover>
+            </div> 
           </div>
         </template>
 
-        <!-- user -->
+        <!-- user  :fallback-placements="[ 'bottom','left', 'top','right']" -->
         <template v-else>
           <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
             <template #reference>
@@ -202,7 +202,7 @@
               </div>
               <div class="pop-edit-item" @click="triggerCopy(item.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
-                Cory link
+                Copy link
               </div>
             </div>
           </el-popover>

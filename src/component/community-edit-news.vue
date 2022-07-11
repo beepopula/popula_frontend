@@ -130,7 +130,7 @@
           const item = {
             url:state.link,
             title:res.data.title ? res.data.title.match(new RegExp('<title>'+'(.*?)'+'<\/title>'))[1] : '',
-            picture:res.data.image ? res.data.image.match(/<img[^>]+src=['"]([^'"]+)['"]+/)[1] : '',
+            picture:res.data.image ? res.data.image.match(/src=[\'\"]?([^\'\"]*)[\'\"]?/i)[1] : '',
             introduction:''
           }
           state.news.unshift(item);

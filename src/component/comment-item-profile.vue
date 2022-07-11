@@ -76,10 +76,10 @@
       
 
       <!-- text -->
-      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" >
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click="redirectPage(`/detail/${item.hierarchies[0]['target_hash']}?comment=${item.target_hash}`,false)">
         This is a Tonken-gated content.
       </div>
-      <div v-else class="text text-ellipsis-wrapper" @click="showCommentLayer()">
+      <div v-else class="text text-ellipsis-wrapper" @click="redirectPage(`/detail/${item.hierarchies[0]['target_hash']}?comment=${item.target_hash}`,false)">
         <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']" :style="textStyleObject">
           <!--<pre>{{text}}</pre>-->
           <label class="btn" @click.stop="showall = !showall"></label>
@@ -128,7 +128,7 @@
               </div>
               <div class="pop-edit-item" @click="triggerCopy(post.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
-                Cory link
+                Copy link
               </div>
             </div>
           </el-popover>

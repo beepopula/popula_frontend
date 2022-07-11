@@ -12,8 +12,8 @@
           <div class="search-total">
             <div :class="[currentTab == 'all' ? 'active' : '']" @click="changeTab('all')">All	{{count.all}}</div>
             <div :class="[currentTab == 'community' ? 'active' : '']" @click="changeTab('community')">Communities  {{count.community}}</div>
-            <div :class="[currentTab == 'post' ? 'active' : '']" @click="changeTab('post')">Post  {{count.post}}</div>
             <div :class="[currentTab == 'people' ? 'active' : '']" @click="changeTab('people')">People  {{count.people}}</div>
+            <div :class="[currentTab == 'post' ? 'active' : '']" @click="changeTab('post')">Post  {{count.post}}</div>
           </div>
           <!-- Community -->
           <template v-if="communities.length>0 && (currentTab== 'all' || currentTab== 'community')">
@@ -33,24 +33,6 @@
             </div>
             <div class="no-more" v-if="currentTab != 'all' && isEnd.community">No more communities</div>
           </template>
-          <!-- Post -->
-          <template v-if="posts.length>0  && (currentTab== 'all' || currentTab== 'post')">
-            <div ref="post" class="title">
-              <div class="font20">Post</div>
-              <div v-if="posts.length>3 && currentTab== 'all'" class="more" @click="changeTab('post')">More</div>
-            </div>
-            <div class="post-list">
-              <template v-for="(item,index) in posts">
-                <template v-if="currentTab== 'post'">
-                  <PostItem :item="item" :searchWord="searchWord"/>
-                </template>
-                <template v-else-if="currentTab== 'all' && index<3">
-                  <PostItem :item="item" :searchWord="searchWord"/>
-                </template>
-              </template>
-            </div>
-            <div class="no-more" v-if="currentTab != 'all' && isEnd.post">No more posts</div>
-          </template>
           <!-- People  -->
           <template v-if="users.length>0  && (currentTab== 'all' || currentTab== 'people')">
             <div ref="people" class="title">
@@ -68,6 +50,24 @@
               </template>
             </div>
             <div class="no-more" v-if="currentTab != 'all' && isEnd.people">No more people</div>
+          </template>
+          <!-- Post -->
+          <template v-if="posts.length>0  && (currentTab== 'all' || currentTab== 'post')">
+            <div ref="post" class="title">
+              <div class="font20">Post</div>
+              <div v-if="posts.length>3 && currentTab== 'all'" class="more" @click="changeTab('post')">More</div>
+            </div>
+            <div class="post-list">
+              <template v-for="(item,index) in posts">
+                <template v-if="currentTab== 'post'">
+                  <PostItem :item="item" :searchWord="searchWord"/>
+                </template>
+                <template v-else-if="currentTab== 'all' && index<3">
+                  <PostItem :item="item" :searchWord="searchWord"/>
+                </template>
+              </template>
+            </div>
+            <div class="no-more" v-if="currentTab != 'all' && isEnd.post">No more posts</div>
           </template>
           <!-- no-results -->
           <div class="no-results" v-if="$store.state.searchWord && count[currentTab]==0">

@@ -17,7 +17,7 @@
           <div class="form-item">
             <div class="form-item-label"> Community Information</div>
             <div class="form-item-content">
-              <el-input  placeholder="" type="textarea" autosize  v-model="edit.information" maxlength="160" show-word-limit/>
+              <el-input  placeholder="" type="textarea" autosize  v-model="edit.information" maxlength="500" show-word-limit/>
             </div>
           </div>
 
