@@ -236,7 +236,7 @@
       </div>
 
       <!-- comment -->
-      <div class="comment-box" v-if="from!='detail' && showCommentBox">
+      <div class="comment-box" v-if="from!='detail' && showCommentBox && item.isComment">
         <Comment 
           :targetHash="item.target_hash" 
           :parentAccount="user.account_id"
@@ -570,7 +570,8 @@ export default {
         if(!textBox || !textDom || !textBox.value || !textDom.value){return;}
         const textBoxHeight = textBox.value.getBoundingClientRect().height;
         const textDomHeight = textDom.value.getBoundingClientRect().height
-        if(textBoxHeight>textDomHeight){
+        console.log(textBoxHeight,textDomHeight);
+        if(textBoxHeight>=textDomHeight){
           state.needWrap = false;
         }else{
           state.needWrap = true;
@@ -634,6 +635,7 @@ export default {
 
         //postDetail
         emit("focus");
+        emit("changeList");
       }
     }
 

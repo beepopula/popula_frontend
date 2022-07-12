@@ -324,7 +324,7 @@ export default {
         if(!textBox || !textDom){  return; }
         const textBoxHeight = textBox.value.getBoundingClientRect().height;
         const textDomHeight = textDom.value.getBoundingClientRect().height;
-        if(textBoxHeight>textDomHeight){
+        if(textBoxHeight>=textDomHeight){
           state.needWrap = false;
         }else{
           state.needWrap = true;

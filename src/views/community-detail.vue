@@ -83,7 +83,7 @@
         </div>
         <div class="post-list">
           <template v-for="item in postList[currentTab]">
-            <PostItem :item="item" :from="'community'"/>
+            <PostItem :item="item" :from="'community'" @changeList="changeList(item)"/>
           </template>
         </div>
 
@@ -842,6 +842,17 @@
         });
 
       }
+
+      //changeList 
+      const changeList = (item) => {
+        state.postList[state.currentTab].forEach(i=>{
+          if(i==item){
+            i.isComment = true;
+          }else{
+            i.isComment = false;
+          }
+        })
+      }
       
       //redirectPage
       const redirectPage = (path,need_login=true) => {
@@ -900,6 +911,7 @@
         updateNews,
         dragEnd,
         redirectPage,
+        changeList,
         backTop,
         popUp,
         closeSuspendLayer,

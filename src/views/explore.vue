@@ -20,7 +20,7 @@
 
         <div class="post-list">
           <template v-for="item in postList[currentTab]">
-            <PostItem :item="item"/>
+            <PostItem :item="item" @changeList="changeList(item)"/>
           </template>
         </div>
 
@@ -194,6 +194,18 @@ export default {
       }
     }
 
+    //changeList 
+    const changeList = (item) => {
+      state.postList[state.currentTab].forEach(i=>{
+        console.log(i,item);
+        if(i==item){
+          i.isComment = true;
+        }else{
+          i.isComment = false;
+        }
+      })
+    }
+
     //redirectPage
     const redirectPage = (path,need_login=true) => {
       if(!store.getters.isLogin && need_login){
@@ -222,6 +234,7 @@ export default {
       changeTab,
       handleScroll,
       redirectPage,
+      changeList,
       showLoginMask,
       closeLoginMask,
       postSuccess

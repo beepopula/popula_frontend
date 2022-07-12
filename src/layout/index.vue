@@ -614,6 +614,7 @@ export default {
     display: flex;
     overflow: hidden;
     .txt-wrap5 {
+      min-width:650px;
       font-size: 16px;
       color: #FFFFFF;
       letter-spacing: 0;
@@ -628,7 +629,7 @@ export default {
       transition: .3s max-height;
       &::before {
         content: '';
-        height: calc(100% - 26px);
+        height: calc(max(100%,130px) - 26px);
         float: right;
       }
       &::after {
