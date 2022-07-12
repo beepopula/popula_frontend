@@ -367,7 +367,7 @@
             // }
 
             state.user = res.data;
-            state.joinedCommunityList = state.user.data.joinedCommunities;
+            state.joinedCommunityList = state.user.data.joinedCommunities || [];
             state.joinedCommunities = state.joinedCommunityList.slice(0,6);
           }
 
@@ -475,6 +475,8 @@
           }
           state.page += 1;
           return res;
+        }else{
+          state.isEnd = true;
         }
         return {
           data:[],

@@ -302,7 +302,6 @@ export default {
       var spanNode1= document.createElement('span');
       var spanNode2 = document.createElement('span');
       spanNode1.className = 'atFont';
-      spanNode1.style="color:#FED23C;";
       spanNode1.innerHTML = '@' + item.account_id;
       spanNode1.contentEditable = false;
       spanNode2.innerHTML = '&nbsp;';
@@ -574,6 +573,7 @@ export default {
   border-radius: 24px;
   position:relative;
   &.comment-reply{
+    min-width: 650px;
     width:650px;
     padding:20px 0 0 0;
     .input-box{

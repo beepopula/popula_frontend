@@ -116,7 +116,12 @@
           </template>
         </div>
         <!-- community select -->
-        <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && joinedCommunities.length>0">
+        <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && isLoadingCommunity">
+          <div class="loading">
+            <img class="white-loading" src="@/assets/images/common/loading.png"/>
+          </div>
+        </div>
+        <div class="pop-box pop-intro pop-community-select" v-else-if="showCommunity && joinedCommunities.length>0">
           <div class="title">Choose Community</div>
           <div class="intro">Choose the community you want to share with.</div>
           <div class="joined-list" >
@@ -368,6 +373,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //community
         joinedCommunities:[],
         showCommunity:false,
+        isLoadingCommunity:false,
         //token
         showTokenBox:false,
         searchValue:'',
@@ -444,6 +450,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //@
       const onCheck = (e) => {
+        console.log(postInput.value.textContent.length,'---postInput.value.textContent.length-----');
         if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }
@@ -559,7 +566,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         var spanNode1= document.createElement('span');
         var spanNode2 = document.createElement('span');
         spanNode1.className = 'atFont';
-        spanNode1.style="color:#FED23C;";
         spanNode1.innerHTML = '@' + item.account_id;
         spanNode1.contentEditable = false;
         spanNode2.innerHTML = '&nbsp;';
@@ -698,17 +704,21 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //showCommunityBox
       const showCommunityBox = async () => {
         if(checkLogin()){
-          const res = await proxy.$axios.community.get_joined_community_list({
-            accountId:store.getters.accountId,
-            page:0,
-            limit:10000
-          });
-          if(res.success) {
-            //usedTokenList
-            const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
-            state.joinedCommunities =  deduplication(usedCommunities.concat(res.data),'community');
-          }
           state.showCommunity = !state.showCommunity;
+          if(state.showCommunity){
+            state.isLoadingCommunity = true;
+            const res = await proxy.$axios.community.get_joined_community_list({
+              accountId:store.getters.accountId,
+              page:0,
+              limit:10000
+            });
+            if(res.success) {
+              //usedTokenList
+              const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
+              state.joinedCommunities =  deduplication(usedCommunities.concat(res.data),'community');
+            }
+            state.isLoadingCommunity = false;
+          }
         }
       }
       const selectCommunity = (item) => {
@@ -1583,6 +1593,12 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           z-index:99;
           width:400px;
           padding:30px;
+          .loading{
+            height:100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
           .joined-list{
             margin-top:4px;
             display:flex;

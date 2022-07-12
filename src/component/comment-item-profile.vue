@@ -83,7 +83,7 @@
         <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']" :style="textStyleObject">
           <!--<pre>{{text}}</pre>-->
           <label class="btn" @click.stop="showall = !showall"></label>
-          <pre ref="textDom"><div v-html="text"></div></pre>
+          <pre ref="textDom"><div v-html="text" @click.stop="textJump"></div></pre>
         </div>
       </div>
       
@@ -160,7 +160,7 @@
     <!-- Comment List -->
     <div class="elastic-layer" v-if="showCommentList" @click.self="closeLayer()">
       <div class="edit-button close" @click="closeLayer()"></div>
-      <div class="layer-content" ref="commentLayer" @scroll="commentsScroll()">
+      <div class="layer-content" ref="commentLayer" @scroll="commentsScroll()" @click.self="closeLayer()">
         <div class="child-comments-box">
           <div class="parent-comment">
             <CommentItem 
@@ -572,6 +572,14 @@ export default {
       }
     };
 
+    const textJump = (e) => {
+      if(e.target.className=='atFont'){
+        redirectPage(`/user-profile/${e.target.textContent.trim().slice(1)}`,false)
+      }else{
+        redirectPage(`/detail/${props.item.hierarchies[0]['target_hash']}?comment=${props.item.target_hash}`,false)
+      }
+    }
+
     //edit
     const del = async () => {
       if(checkLogin()){
@@ -690,6 +698,7 @@ export default {
       showLoginMask,
       closeLoginMask,
       redirectPage,
+      textJump,
       del,
       report,
       block,

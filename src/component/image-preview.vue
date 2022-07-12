@@ -9,9 +9,7 @@
       @swiper="setListSwiper"
       >
       <swiper-slide  v-for="(item, index) in imgs"  :key="index" @click.self="close">
-      
           <img :src="$store.getters.getAwsImg(item)" @error.once="$event.target.src=item" :style="'transform:scale('+(ratioList[ratioIndex]/100)+')'"/>
-
       </swiper-slide>
     </swiper>
 
@@ -108,6 +106,7 @@
       align-items: center;
       width:100vw!important;
       height:100vh;
+      overflow: hidden;
       img{
         border-radius: 24px;
       }

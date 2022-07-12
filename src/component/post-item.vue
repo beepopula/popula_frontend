@@ -90,12 +90,12 @@
       <template v-else>
         <!-- text -->
         <div v-if="text" class="text" @click.stop="redirectPage('/detail/'+item.target_hash,false)">
-          <pre v-if="from=='detail'"><div v-html="text"></div></pre>
+          <pre v-if="from=='detail'"><div v-html="text" @click.stop="textJump"></div></pre>
           <div v-else class="text-ellipsis-wrapper">
             <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']">
               <!--<pre>{{text}}</pre>-->
               <label class="btn" @click.stop="showall = !showall"></label>
-              <pre ref="textDom"><div v-html="text"></div></pre>
+              <pre ref="textDom"><div v-html="text" @click.stop="textJump"></div></pre>
             </div>
           </div>
 
@@ -598,6 +598,14 @@ export default {
       }
     };
 
+    const textJump = (e) => {
+      if(e.target.className=='atFont'){
+        redirectPage(`/user-profile/${e.target.textContent.trim().slice(1)}`,false)
+      }else{
+        redirectPage(`/detail/${props.item.target_hash}`,false)
+      }
+    }
+
     const shareTwitter = () => {
       shareRecord();
       window.open('https://twitter.com/intent/tweet?text='+getShareLink());
@@ -843,6 +851,7 @@ export default {
       reply,
       getToken,
       redirectPage,
+      textJump,
       imagePreview,
       closePreview,
       copy_text,

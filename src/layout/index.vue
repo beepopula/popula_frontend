@@ -685,6 +685,20 @@ export default {
     }
   }
 
+  span.atFont{
+    font-family: D-DINExp;
+    font-size: 16px;
+    color: #FED23C;
+    letter-spacing: 0;
+    text-align: justify;
+    line-height: 24px;
+    font-weight: 400; 
+  }
+  
+  .text span.atFont{
+    cursor: pointer;
+  }
+
   @keyframes addcount {
     0% {
       opacity: 1;
