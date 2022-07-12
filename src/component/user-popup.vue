@@ -1,5 +1,5 @@
 <template>
-  <div class="pop-box pop-user" @click="redirectPage('/user-profile/'+user.account_id,false)">
+  <div class="pop-box pop-user" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
     <div class="loading-box" v-if="isLoading">
       <img class="white-loading" src="@/assets/images/common/loading.png"/>
     </div>

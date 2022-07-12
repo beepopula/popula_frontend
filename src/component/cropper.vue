@@ -119,7 +119,7 @@ export default defineComponent({
             viewMode:1,
             aspectRatio:props.aspectRatio,
             dragMode:'move',
-            autoCropArea:5/8,
+            autoCropArea:1,
             movable:true,
             cropBoxMovable:false,
             cropBoxResizable:false,

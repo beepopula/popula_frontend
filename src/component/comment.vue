@@ -1,7 +1,7 @@
 <template>
-  <div :class="['comment',from == 'list' ? 'comment-reply' : '']">
+  <div :class="['comment',from == 'list' ? 'comment-reply' : '']" @click.stop="">
     <!-- text -->
-    <div :class="['input-box',text.trim().length>10 ? '' :'input-box-empty']">
+    <div :class="['input-box',text.trim().length>0 ? '' :'input-box-empty']">
       <div
         class="div-input"
         ref="commentInput"
@@ -567,6 +567,7 @@ export default {
 
 <style lang="scss" scoped>
 .comment{
+  min-width: 690px;
   width: 100%;
   padding:20px;
   background: #28282D;

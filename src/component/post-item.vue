@@ -1,12 +1,12 @@
 <template>
   <div class="post-item-box" v-if="!isBlocked && !hasDelete" :key="item.target_hash">
-    <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox">
+    <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox" @click="redirectPage('/detail/'+item.target_hash,false)">
       <div class="user">
         <!-- community -->
         <template v-if="community.communityId && from!='community' && from!='detail'">
           <el-popover placement="bottom-start"  trigger="hover" >
             <template #reference>
-              <div @click="redirectPage('/community-detail/'+community.communityId,false)">
+              <div @click.stop="redirectPage('/community-detail/'+community.communityId,false)">
                 <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
                 <img v-else  class="avatar avatar-community" src="@/assets/images/test/community.png">
               </div>
@@ -16,10 +16,10 @@
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name  txt-wrap" @click="redirectPage('/community-detail/'+community.communityId,false)">{{community.name}}</div>
+            <div class="name  txt-wrap" @click.stop="redirectPage('/community-detail/'+community.communityId,false)">{{community.name}}</div>
             <div class="createtime">
               <div>posted by </div>
-              <div class="username" @click="redirectPage('/user-profile/'+user.account_id,false)"><div class="txt-wrap">{{user.name || user.account_id}}</div></div>
+              <div class="username" @click.stop="redirectPage('/user-profile/'+user.account_id,false)"><div class="txt-wrap">{{user.name || user.account_id}}</div></div>
               <el-popover placement="bottom-start"  trigger="hover">
                 <template #reference>
                   <div class="time">{{time.showTime}}</div>
@@ -34,7 +34,7 @@
         <template v-else>
           <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
             <template #reference>
-              <div @click="redirectPage('/user-profile/'+user.account_id,false)">
+              <div @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
                 <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
                 <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
               </div>
@@ -44,8 +44,8 @@
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name" @click="redirectPage('/user-profile/'+user.account_id,false)">
-              <div class="name-txt txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
+            <div class="name" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
+              <div class="name-txt txt-wrap" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
               <div class="user-flag co" v-if="community.accountId && community.accountId == user.account_id"></div>
             </div>
             <el-popover placement="bottom-start"  trigger="hover">
@@ -65,18 +65,18 @@
           <div class="pop-box pop-edit">
             <!-- self -->
             <template v-if="user.account_id == $store.getters.accountId">
-              <div class="pop-edit-item" @click="del()">
+              <div class="pop-edit-item" @click.stop="del()">
                 <img class="icon16" src="@/assets/images/post-item/icon-delete.png"/>
                 Delete
               </div>
             </template>
             <!-- other people -->
             <template v-else>
-              <div class="pop-edit-item" @click="report()">
+              <div class="pop-edit-item" @click.stop="report()">
                 <img class="icon16" src="@/assets/images/post-item/icon-report.png"/>
                 Report
               </div>
-              <div class="pop-edit-item" @click="block()">
+              <div class="pop-edit-item" @click.stop="block()">
                 <img class="icon16" src="@/assets/images/post-item/icon-block.png"/>
                 Block
               </div>
@@ -84,12 +84,12 @@
           </div>
         </el-popover>
       </div>
-      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click="redirectPage('/detail/'+item.target_hash,false)">
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click.stop="redirectPage('/detail/'+item.target_hash,false)">
         This is a Tonken-gated content.
       </div>
       <template v-else>
         <!-- text -->
-        <div v-if="text" class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
+        <div v-if="text" class="text" @click.stop="redirectPage('/detail/'+item.target_hash,false)">
           <pre v-if="from=='detail'"><div v-html="text"></div></pre>
           <div v-else class="text-ellipsis-wrapper">
             <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']">
@@ -106,7 +106,7 @@
           -->
         </div>
         <!-- images -->
-        <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
+        <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']">
           <img class="img" v-for="(img,index) in images" :src="$store.getters.getAwsImg(img)" @error.once="$event.target.src=img" @click.stop="imagePreview(index)">
         </div>
       </template>
@@ -147,7 +147,7 @@
             </template>
             <div class="pop-box pop-intro pop-nft-intro" v-if="showNftPop">
               <template v-if="nft.isPublicSale">
-                <div :class="['mint-users','mint-users'+nft.collectors.length]" @click="showCollectorList()">
+                <div :class="['mint-users','mint-users'+nft.collectors.length]" @click.stop="showCollectorList()">
                   <template v-for="(u,index) in nft.collectors">
                     <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="$store.getters.getAwsImg(u.avatar)" @error.once="$event.target.src=u.avatar" />
                     <img v-else  :class="['avatar','avatar'+index]" src="@/assets/images/common/user-default.png" />
@@ -157,7 +157,7 @@
                 <div class="intro-item">Copies：<span>{{nft.supply}}/{{nft.copies}}</span></div>
                 <div class="intro-item">Price：<span class="price">{{nft.price}}</span></div>
                 <div :class="['button-border','button-mint-nft',nft.supply>=nft.copies?'disabled':'']">
-                  <div class="button" @click="mintNft()">Buy now</div>
+                  <div class="button" @click.stop="mintNft()">Buy now</div>
                 </div>
               </template>
               <div v-else class="intro-item" style="margin-bottom:0;">Copies：<span>1</span></div>
@@ -183,7 +183,7 @@
             <div class="pop-box pop-intro pop-hash">
               <div class="hash-txt">
                 <a  class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
-                <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
+                <img class="icon-copy" @click.stop="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
               </div>
             </div>
           </el-popover>
@@ -196,18 +196,18 @@
               <div class="share">{{shareCount}}</div>
             </template>
             <div class="pop-box pop-edit">
-              <div class="pop-edit-item" @click="shareTwitter()">
+              <div class="pop-edit-item" @click.stop="shareTwitter()">
                 <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
                 Twitter
               </div>
-              <div class="pop-edit-item" @click="triggerCopy(item.target_hash,true)">
+              <div class="pop-edit-item" @click.stop="triggerCopy(item.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
                 Copy link
               </div>
             </div>
           </el-popover>
           
-          <div :class="['comment',addCount ? 'add-count' : '']" @click="reply()">
+          <div :class="['comment',addCount ? 'add-count' : '']" @click.stop="reply()">
             <template v-if="commentCount">{{commentCount}}</template>
             <template v-else>Reply</template>
           </div>
@@ -220,7 +220,7 @@
         <div class="nft">NFT</div>
         <template v-if="nft.isPublicSale">
           <div class="intro-item">Total sold：<span class="price">{{nft.total}}</span></div>
-          <div :class="['mint-users','mint-users'+nft.collectors.length]" @click="showCollectorList()">
+          <div :class="['mint-users','mint-users'+nft.collectors.length]" @click.stop="showCollectorList()">
             <template v-for="(u,index) in nft.collectors">
               <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="$store.getters.getAwsImg(u.avatar)" @error.once="$event.target.src=u.avatar" />
               <img v-else  :class="['avatar','avatar'+index]" src="@/assets/images/common/user-default.png" />
@@ -229,7 +229,7 @@
           <div class="intro-item" style="margin-left:0;">Copies：<span>{{nft.supply}}/{{nft.copies}}</span></div>
           <div class="intro-item">Price：<span class="price">{{nft.price}}</span></div>
           <div :class="['mini-button-border','button-mint-nft',nft.supply>=nft.copies?'disabled':'']">
-            <div class="mini-button" @click="mintNft()">Buy now</div>
+            <div class="mini-button" @click.stop="mintNft()">Buy now</div>
           </div>
         </template>
         <div v-else class="intro-item">Copies：<span>1</span></div>
@@ -255,8 +255,8 @@
     </template>
 
     <!-- Collectors layer -->
-    <div class="elastic-layer" v-if="showCollectors && item.type=='nft'" @click.self="closeCollectorList()">
-      <div class="edit-button close" @click="closeCollectorList()"></div>
+    <div class="elastic-layer" v-if="showCollectors && item.type=='nft'" @click="closeCollectorList()">
+      <div class="edit-button close" @click.stop="closeCollectorList()"></div>
       <div class="layer-content">
         <div class="elastic-content">
           <div class="title">Collectors</div>
@@ -267,7 +267,7 @@
             <template v-for="(user,index) in nft.collectorList">
               <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
                 <template #reference>
-                  <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click="redirectPage('/user-profile/'+user.account_id,false)">
+                  <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
                     <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar" />
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                     <div class="info">
@@ -897,7 +897,7 @@ export default {
       }
       .user-info{
         margin-left:12px;
-        width:300px;
+        max-width:300px;
         .name{
           height:20px;
           display:flex;
@@ -944,7 +944,7 @@ export default {
           line-height:16px;
           display:flex;
           align-items: center;
-          width:300px;
+          max-width:300px;
           cursor: pointer;
           .username{
             color: rgba(255,255,255,1);

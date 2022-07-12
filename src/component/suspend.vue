@@ -6,8 +6,8 @@
         <img src="@/assets/images/post/icon-post.png"/>
       </div>
     </div>
-    <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="showLayer=false">
-      <div class="edit-button close" @click="showLayer=false"></div>
+    <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeLayer()">
+      <div class="edit-button close" @click="closeLayer()"></div>
       <div class="elastic-layer-content">
         <Post :location="'suspend'" @postSuccess="postSuccess()"/>
       </div>
@@ -53,6 +53,11 @@
           document.getElementsByTagName('body')[0].classList.add("fixed");
         }
       }
+
+      const closeLayer = () => {
+        state.showLayer=false;
+        document.getElementsByTagName('body')[0].classList.remove("fixed")
+      }
       //LoginMask
       const showLoginMask = () => {
         state.showLogin = true
@@ -72,6 +77,7 @@
         ...toRefs(state),
         backTop,
         popUp,
+        closeLayer,
         showLoginMask,
         closeLoginMask,
         postSuccess,

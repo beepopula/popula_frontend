@@ -1,5 +1,5 @@
 <template>
-  <div :id="'pop-like-notice'+item.targetHash" :class="['like',likeActive?'like-active':'',isLiked?'liked':'']" @click="changeLike()">
+  <div :id="'pop-like-notice'+item.targetHash" :class="['like',likeActive?'like-active':'',isLiked?'liked':'']" @click.stop="changeLike()">
     <template v-if="likeCount">{{likeCount}}</template>
     <template v-else>Like</template>
     <!-- like notice -->
@@ -10,7 +10,7 @@
         <div class="mini-button-border button-cancle" @click.stop="showNotice=false">
           <div class="mini-button">Cancle</div>
         </div>
-        <div class="mini-button-border" @click="confirmLike()">
+        <div class="mini-button-border" @click.stop="confirmLike()">
           <div class="mini-button">Confirm</div>
         </div>
       </div>

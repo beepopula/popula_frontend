@@ -1,12 +1,12 @@
 <template>
   <div class="comment-item-box" v-if="!isBlocked && !hasDelete">
-    <div :class="['comment-item']" @click.self="showCommentLayer()">
+    <div :class="['comment-item']" @click="redirectPage(`/detail/${item.hierarchies[0]['target_hash']}?comment=${item.target_hash}`,false)">
       <!-- user -->
       <div class="user" v-if="$props.item.data">
         <!-- avatar -->
         <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
           <template #reference>
-            <div @click="redirectPage('/user-profile/'+item.accountId,false)">
+            <div @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
               <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
               <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
             </div>
@@ -18,7 +18,7 @@
 
         <!-- userinfo -->
         <div class="user-info">
-          <div class="name" @click="redirectPage('/user-profile/'+item.accountId,false)">
+          <div class="name" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
             <div class="name-txt txt-wrap">{{item.accountId}}</div>
             <!--
             <div class="user-flag co" v-if="$props.community.accountId == item.accountId"></div>
@@ -41,18 +41,18 @@
           <div class="pop-box pop-edit">
             <!-- self -->
             <template v-if="user.account_id == $store.getters.accountId">
-              <div class="pop-edit-item" @click="del()">
+              <div class="pop-edit-item" @click.stop="del()">
                 <img class="icon16" src="@/assets/images/post-item/icon-delete.png"/>
                 Delete
               </div>
             </template>
             <!-- other people -->
             <template v-else>
-              <div class="pop-edit-item" @click="report()">
+              <div class="pop-edit-item" @click.stop="report()">
                 <img class="icon16" src="@/assets/images/post-item/icon-report.png"/>
                 Report
               </div>
-              <div class="pop-edit-item" @click="block()">
+              <div class="pop-edit-item" @click.stop="block()">
                 <img class="icon16" src="@/assets/images/post-item/icon-block.png"/>
                 Block
               </div>
@@ -76,10 +76,10 @@
       
 
       <!-- text -->
-      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click="redirectPage(`/detail/${item.hierarchies[0]['target_hash']}?comment=${item.target_hash}`,false)">
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content">
         This is a Tonken-gated content.
       </div>
-      <div v-else class="text text-ellipsis-wrapper" @click="redirectPage(`/detail/${item.hierarchies[0]['target_hash']}?comment=${item.target_hash}`,false)">
+      <div v-else class="text text-ellipsis-wrapper">
         <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']" :style="textStyleObject">
           <!--<pre>{{text}}</pre>-->
           <label class="btn" @click.stop="showall = !showall"></label>
@@ -110,7 +110,7 @@
             <div class="pop-box pop-intro pop-hash">
               <div class="hash-txt">
                 <a class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
-                <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
+                <img class="icon-copy" @click.stop="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
               </div>
             </div>
           </el-popover>
@@ -122,18 +122,18 @@
               <div class="share">35</div>
             </template>
             <div class="pop-box pop-edit">
-              <div class="pop-edit-item" @click="shareTwitter()">
+              <div class="pop-edit-item" @click.stop="shareTwitter()">
                 <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
                 Twitter
               </div>
-              <div class="pop-edit-item" @click="triggerCopy(post.target_hash,true)">
+              <div class="pop-edit-item" @click.stop="triggerCopy(post.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
                 Copy link
               </div>
             </div>
           </el-popover>
           <!-- reply -->
-          <div :class="['comment',addCount ? 'add-count' : '']" @click="reply()">
+          <div :class="['comment',addCount ? 'add-count' : '']" @click.stop="reply()">
             <template v-if="commentCount>0">{{commentCount}}</template>
             <template v-else>Reply</template>
           </div>
