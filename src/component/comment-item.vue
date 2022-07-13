@@ -138,7 +138,7 @@
       </div>
 
       <!-- comment -->
-      <div class="comment-box" v-if="from!='elastic-layer-parent' && showCommentBox">
+      <div class="comment-box" v-if="from!='elastic-layer-parent' && $props.item.isComment">
         <Comment 
           :targetHash="item.target_hash" 
           :parentAccount="item.accountId"
@@ -149,6 +149,7 @@
           :focus="focusComment"
           @comment="comment"
         />
+        ...
       </div>
     </div>
 
@@ -185,7 +186,15 @@
           </div>
           <div class="child-comments">
             <template v-for="item in commentList[currentTab]">
-              <CommentItem :community="$props.community" :level="$props.level+1" :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
+              <CommentItem 
+              :community="$props.community" 
+              :level="$props.level+1" 
+              :post="post" 
+              :item="item" 
+              from="elastic-layer" 
+              :hasBack="true" 
+              @closeLayer="closeLayer"
+              @changeCommentListStatus="changeCommentListStatus(item,$event)" />
             </template>
           </div>
           <div class="no-more" v-if="isEnd">
@@ -292,7 +301,7 @@ export default {
       },
       commentCount:props.commentC || props.item.data.commentCount,
       //child comment
-      showCommentBox:false,
+      // showCommentBox:false,
       showCommentList:false,
       currentTab:'',
       commentList:{
@@ -387,11 +396,17 @@ export default {
       if(checkLogin()){
         // if(props.level>=5){return}
         state.focusComment=true;
-        state.showCommentBox=!state.showCommentBox;
+        // state.showCommentBox=!state.showCommentBox;
+        if(props.item.isComment){
+          emit("changeCommentListStatus",true);
+        }else{
+          emit("changeCommentListStatus");
+        }
       }
     }
     const comment = (res) => {
-      state.showCommentBox = false;
+      // state.showCommentBox = false;
+      emit("changeCommentListStatus",true);
       state.addCount = true;
       emit('comment');
       setTimeout(()=>{
@@ -459,7 +474,7 @@ export default {
       return [];
     }
 
-    //membersScroll
+    //commentsScroll
     const commentLayer = ref();
     const commentsScroll = async () => {
       const commentBox = commentLayer.value;
@@ -467,6 +482,17 @@ export default {
         const res = await getChildComments();
         state.commentList[state.currentTab] = state.commentList[state.currentTab].concat(res);
       }
+    }
+
+    //changeCommentListStatus
+    const changeCommentListStatus = (item,close=false) => {
+      state.commentList[state.currentTab].forEach(i=>{
+        if(i==item && !close){
+          i.isComment = true;
+        }else{
+          i.isComment = false;
+        }
+      })
     }
 
     //shareLink
@@ -704,6 +730,7 @@ export default {
       changeTab,
       commentLayer,
       commentsScroll,
+      changeCommentListStatus,
       copy_text,
       triggerCopy,
       handleCopyFun,

@@ -55,7 +55,14 @@
           </div>
           <div class="all-comments">
             <template v-for="item in comments[currentTab]">
-              <CommentItem :level="1" :community="postCommunity" :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
+              <CommentItem 
+              :level="1" 
+              :community="postCommunity" 
+              :post="postDetail" 
+              :item="item" 
+              :defaultComment="$route.query.comment" 
+              @comment="comment" 
+              @changeCommentListStatus="changeCommentListStatus(item,$event)"/>
             </template>
           </div>
 
@@ -340,6 +347,16 @@ export default {
       }
     };
 
+    const changeCommentListStatus = (item,close=false) => {
+      state.comments[state.currentTab].forEach(i=>{
+        if(i==item && !close){
+          i.isComment = true;
+        }else{
+          i.isComment = false;
+        }
+      })
+    }
+
     //backTop
     const backTop = () => {
       document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -365,6 +382,7 @@ export default {
       changeTab,
       handleScroll,
       redirectPage,
+      changeCommentListStatus,
       backTop,
       popUp,
       closeSuspendLayer

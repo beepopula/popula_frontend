@@ -170,6 +170,7 @@ export default {
     watch(
       () => props.focus,
 			() => {
+        console.log('hhhhhh');
         commentInput.value.focus()
 			}
 		)

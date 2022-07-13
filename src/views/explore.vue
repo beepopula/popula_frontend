@@ -20,7 +20,7 @@
 
         <div class="post-list">
           <template v-for="item in postList[currentTab]">
-            <PostItem :item="item" @changeList="changeList(item,$event)"/>
+            <PostItem :item="item" @changePostListStatus="changePostListStatus(item,$event)"/>
           </template>
         </div>
 
@@ -194,8 +194,8 @@ export default {
       }
     }
 
-    //changeList 
-    const changeList = (item,close=false) => {
+    //changePostListStatus 
+    const changePostListStatus = (item,close=false) => {
       state.postList[state.currentTab].forEach(i=>{
         if(i==item && !close){
           i.isComment = true;
@@ -233,7 +233,7 @@ export default {
       changeTab,
       handleScroll,
       redirectPage,
-      changeList,
+      changePostListStatus,
       showLoginMask,
       closeLoginMask,
       postSuccess

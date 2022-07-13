@@ -615,7 +615,7 @@ export default {
     //comment
     const comment = (res) => {
       // state.showCommentBox = false;
-      emit("changeList",true);
+      emit("changePostListStatus",true);
       state.addCount = true;
       setTimeout(()=>{
         state.addCount = false;
@@ -637,9 +637,9 @@ export default {
         //postDetail
         emit("focus");
         if(props.item.isComment){
-          emit("changeList",true);
+          emit("changePostListStatus",true);
         }else{
-          emit("changeList");
+          emit("changePostListStatus");
         }
       }
     }

@@ -83,7 +83,7 @@
         </div>
         <div class="post-list">
           <template v-for="item in postList[currentTab]">
-            <PostItem :item="item" :from="'community'" @changeList="changeList(item,$event)"/>
+            <PostItem :item="item" :from="'community'" @changePostListStatus="changePostListStatus(item,$event)"/>
           </template>
         </div>
 
@@ -843,8 +843,8 @@
 
       }
 
-      //changeList 
-      const changeList = (item,close=false) => {
+      //changePostListStatus 
+      const changePostListStatus = (item,close=false) => {
         state.postList[state.currentTab].forEach(i=>{
           if(i==item && !close){
             i.isComment = true;
@@ -911,7 +911,7 @@
         updateNews,
         dragEnd,
         redirectPage,
-        changeList,
+        changePostListStatus,
         backTop,
         popUp,
         closeSuspendLayer,

@@ -97,10 +97,13 @@
         <div class="list">
           <template v-for="item in list[currentTab]">
             <template v-if="item.postId">
-              <CommentItemProfile :item="item" :user="user"/>
+              <CommentItemProfile 
+              :item="item" 
+              :user="user"
+              @changeCommentListStatus="changeCommentListStatus(item,$event)" />
             </template>
             <template v-else>
-              <PostItem :item="item" @changeList="changeList(item,$event)"/>
+              <PostItem :item="item" @changePostListStatus="changePostListStatus(item,$event)"/>
             </template>
           </template>
         </div>
@@ -703,8 +706,18 @@
         })
       }
 
-      //changeList 
-      const changeList = (item,close=false) => {
+      //changePostListStatus 
+      const changePostListStatus = (item,close=false) => {
+        state.list[state.currentTab].forEach(i=>{
+          if(i==item && !close){
+            i.isComment = true;
+          }else{
+            i.isComment = false;
+          }
+        })
+      }
+
+      const changeCommentListStatus = (item,close=false) => {
         state.list[state.currentTab].forEach(i=>{
           if(i==item && !close){
             i.isComment = true;
@@ -760,7 +773,8 @@
         copy_text,
         triggerCopy,
         handleCopyFun,
-        changeList,
+        changePostListStatus,
+        changeCommentListStatus,
         checkUrl,
         showLoginMask,
         closeLoginMask,

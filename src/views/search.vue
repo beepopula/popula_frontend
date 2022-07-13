@@ -60,10 +60,10 @@
             <div class="post-list">
               <template v-for="(item,index) in posts">
                 <template v-if="currentTab== 'post'">
-                  <PostItem :item="item" :searchWord="searchWord" @changeList="changeList(item,$event)"/>
+                  <PostItem :item="item" :searchWord="searchWord" @changePostListStatus="changePostListStatus(item,$event)"/>
                 </template>
                 <template v-else-if="currentTab== 'all' && index<3">
-                  <PostItem :item="item" :searchWord="searchWord" @changeList="changeList(item,$event)"/>
+                  <PostItem :item="item" :searchWord="searchWord" @changePostListStatus="changePostListStatus(item,$event)"/>
                 </template>
               </template>
             </div>
@@ -236,8 +236,8 @@ export default {
       }
     }
 
-    //changeList 
-    const changeList = (item,close=false) => {
+    //changePostListStatus 
+    const changePostListStatus = (item,close=false) => {
       state.posts.forEach(i=>{
         if(i==item && !close){
           i.isComment = true;
@@ -252,7 +252,7 @@ export default {
       init,
       changeTab,
       handleScroll,
-      changeList
+      changePostListStatus
     }
   },
   mounted(){
