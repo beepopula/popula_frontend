@@ -12,7 +12,7 @@
         <div v-else-if="list.length>0" class="list">
           <template v-for="item in list">
             <!-- reply -->
-            <div v-if="item.type != 'follow' && item.data.count==0 && !item.data.At" class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+            <div v-if="item.type != 'follow' && item.data.count==0 && !item.data.At" class="content-item" @click="redirectPage('/detail/'+item.comment.commentPostId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
@@ -76,7 +76,7 @@
                   This is a Tonken-gated content.
                 </div>
               </div>
-              <div v-else class="content-item" @click="redirectPage('/detail/'+item.comment.postId+'?comment='+item.comment.target_hash,false)">
+              <div v-else class="content-item" @click="redirectPage('/detail/'+item.comment.commentPostId+'?comment='+item.comment.target_hash,false)">
                 <div class="user">
                   <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
@@ -252,63 +252,67 @@ export default {
 
     const handleData = async (data) => {
       const list = [];
-      const length = Math.min(data.length,100);
+      const length = Math.min(data.length,50);
       for(let i = 0;i<length;i++){//data.length
         const item = data[i];
-        if(item.type!='follow' && item.data.count==0){ //reply & @
-          //time
-          item.time = getTimer(item.createAt)
-          //user
-          item.user = {}
-          const res = await proxy.$axios.profile.get_user_info({
-            accountId:item.type == 'comment' ? item.comment.accountId : item.post.accountId,
-            currentAccountId: store.getters.accountId || ''
-          });
-          if(res.success){
-            item.user = res.data;
-          }
-          //text
-          if((item.type == 'comment' && item.comment.type == 'encrypt') || (item.type == 'post' && item.post.type == 'encrypt')){
-            const info = await checkAccess(item);
-            if(info.isAccess){
-              item.text = info.text;
-              item.isAccess = info.isAccess
+        try{
+          if(item.type!='follow' && item.data.count==0){ //reply & @
+            //time
+            item.time = getTimer(item.createAt)
+            //user
+            item.user = {}
+            const res = await proxy.$axios.profile.get_user_info({
+              accountId:(item.type == 'comment' || item.type == 'mainPost') ? item.comment.accountId : item.post.accountId,
+              currentAccountId: store.getters.accountId || ''
+            });
+            if(res.success){
+              item.user = res.data;
             }
-          }else{
-            item.text = item.type == 'comment' ? item.comment.text : item.post.text;
-          }   
-        }else if(item.type!='follow' && item.data.count>0){ //like
-          //url
-          if(item.type=="comment"){
-            item.url = `/detail/${item.comment.postId}?comment=${item.comment.target_hash}`
-          }else{
-            item.url = `/detail/${item.post.target_hash}`
-          }
-          //text
-          if(item.type == 'comment'){
-            if(item.comment.type== 'encrypt'){
+            //text
+            if(((item.type == 'comment' || item.type == 'mainPost') && item.comment.type == 'encrypt') || (item.type == 'post' && item.post.type == 'encrypt')){
               const info = await checkAccess(item);
               if(info.isAccess){
                 item.text = info.text;
                 item.isAccess = info.isAccess
               }
             }else{
-              item.text = item.comment.text;
-            }
-          }else if(item.type == 'post'){
-            if(item.post.type== 'encrypt'){
-              const info = await checkAccess(item);
-              if(info.isAccess){
-                item.text = info.text;
-                item.isAccess = info.isAccess
-              }
+              item.text = (item.type == 'comment' || item.type == 'mainPost') ? item.comment.text : item.post.text;
+            }   
+          }else if(item.type!='follow' && item.data.count>0){ //like
+            //url
+            if(item.type=="comment"){
+              item.url = `/detail/${item.comment.commentPostId}?comment=${item.comment.target_hash}`
             }else{
-              item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
+              item.url = `/detail/${item.post.target_hash}`
             }
+            //text
+            if(item.type == 'comment'){
+              if(item.comment.type== 'encrypt'){
+                const info = await checkAccess(item);
+                if(info.isAccess){
+                  item.text = info.text;
+                  item.isAccess = info.isAccess
+                }
+              }else{
+                item.text = item.comment.text;
+              }
+            }else if(item.type == 'post'){
+              if(item.post.type== 'encrypt'){
+                const info = await checkAccess(item);
+                if(info.isAccess){
+                  item.text = info.text;
+                  item.isAccess = info.isAccess
+                }
+              }else{
+                item.text = item.post.text ? item.post.text : (item.post.imgs.length>0 ? '[Images]' : '') ;
+              }
+            }
+            
           }
-          
+          list.push(item);
+        }catch(e){
+
         }
-        list.push(item);
       }
       return list;
     }

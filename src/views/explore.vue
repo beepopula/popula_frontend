@@ -20,7 +20,7 @@
 
         <div class="post-list">
           <template v-for="item in postList[currentTab]">
-            <PostItem :item="item" @changeList="changeList(item)"/>
+            <PostItem :item="item" @changeList="changeList(item,$event)"/>
           </template>
         </div>
 
@@ -195,10 +195,9 @@ export default {
     }
 
     //changeList 
-    const changeList = (item) => {
+    const changeList = (item,close=false) => {
       state.postList[state.currentTab].forEach(i=>{
-        console.log(i,item);
-        if(i==item){
+        if(i==item && !close){
           i.isComment = true;
         }else{
           i.isComment = false;

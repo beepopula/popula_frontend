@@ -60,10 +60,10 @@
             <div class="post-list">
               <template v-for="(item,index) in posts">
                 <template v-if="currentTab== 'post'">
-                  <PostItem :item="item" :searchWord="searchWord" @changeList="changeList(item)"/>
+                  <PostItem :item="item" :searchWord="searchWord" @changeList="changeList(item,$event)"/>
                 </template>
                 <template v-else-if="currentTab== 'all' && index<3">
-                  <PostItem :item="item" :searchWord="searchWord" @changeList="changeList(item)"/>
+                  <PostItem :item="item" :searchWord="searchWord" @changeList="changeList(item,$event)"/>
                 </template>
               </template>
             </div>
@@ -162,9 +162,9 @@ export default {
 
     const getSearch = (keyword) => {
       state.isLoading = true; 
-      const promise1 = proxy.$axios.community.get_community_list({keyword,page:0});
-      const promise2 = proxy.$axios.post.get_post_list({type: 'hot',keyword,page:0});
-      const promise3 = proxy.$axios.profile.get_user_list({keyword,page:0,});
+      const promise1 = proxy.$axios.community.get_community_list({keyword,page:0,accountId:store.getters.accountId || ''});
+      const promise2 = proxy.$axios.post.get_post_list({type: 'hot',keyword,page:0,accountId:store.getters.accountId || ''});
+      const promise3 = proxy.$axios.profile.get_user_list({keyword,page:0,accountId:store.getters.accountId || ''});
       Promise.all([promise1, promise2, promise3]).then((resList) => {
         resList.forEach((res,index) => {
           if(res.success){
@@ -214,17 +214,17 @@ export default {
         const page = state['page'][state.currentTab];
         switch(state.currentTab){
           case 'community':
-            const community = await proxy.$axios.community.get_community_list({keyword,page});
+            const community = await proxy.$axios.community.get_community_list({keyword,page,accountId:store.getters.accountId || ''});
             state.communities = state.communities.concat(community.data);
             state.isEnd.community = community.data.length == 0 ;
             break;
           case 'post':
-            const post = await proxy.$axios.post.get_post_list({type: 'hot',keyword,page});
+            const post = await proxy.$axios.post.get_post_list({type: 'hot',keyword,page,accountId:store.getters.accountId || ''});
             state.posts = state.posts.concat(post.data);
             state.isEnd.post = post.data.length == 0 ;
             break;
           case 'people':
-            const user = await proxy.$axios.profile.get_user_list({keyword,page});
+            const user = await proxy.$axios.profile.get_user_list({keyword,page,accountId:store.getters.accountId || ''});
             state.users = state.users.concat(user.data);
             state.isEnd.people = user.data.length == 0 ;
             break;
@@ -237,12 +237,12 @@ export default {
     }
 
     //changeList 
-    const changeList = (item) => {
+    const changeList = (item,close=false) => {
       state.posts.forEach(i=>{
-        if(i!=item){
-          i.isComment = false;
-        }else{
+        if(i==item && !close){
           i.isComment = true;
+        }else{
+          i.isComment = false;
         }
       })
     }

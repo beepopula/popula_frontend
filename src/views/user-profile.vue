@@ -100,7 +100,7 @@
               <CommentItemProfile :item="item" :user="user"/>
             </template>
             <template v-else>
-              <PostItem :item="item"/>
+              <PostItem :item="item" @changeList="changeList(item,$event)"/>
             </template>
           </template>
         </div>
@@ -506,7 +506,6 @@
       //postScroll
       const profileList = ref()
       const showPostList = () => {
-        console.log(profileList.value.getBoundingClientRect().top);
         changeTab('post');
         document.documentElement.scrollTop = profileList.value.getBoundingClientRect().top - 100;
       }
@@ -688,7 +687,6 @@
       }
       const handleCopyFun = () => {
         const clipboard = new Clipboard('#copy_text')
-        console.log(clipboard,'---clipboard---');
         clipboard.on('success', e => {
           proxy.$Message({
             message: "copy success",
@@ -702,6 +700,17 @@
             type: "error",
           });
           clipboard.destroy();
+        })
+      }
+
+      //changeList 
+      const changeList = (item,close=false) => {
+        state.list[state.currentTab].forEach(i=>{
+          if(i==item && !close){
+            i.isComment = true;
+          }else{
+            i.isComment = false;
+          }
         })
       }
       
@@ -751,6 +760,7 @@
         copy_text,
         triggerCopy,
         handleCopyFun,
+        changeList,
         checkUrl,
         showLoginMask,
         closeLoginMask,

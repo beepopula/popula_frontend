@@ -236,7 +236,7 @@
       </div>
 
       <!-- comment -->
-      <div class="comment-box" v-if="from!='detail' && showCommentBox && item.isComment">
+      <div class="comment-box" v-if="from!='detail' && item.isComment">
         <Comment 
           :targetHash="item.target_hash" 
           :parentAccount="user.account_id"
@@ -569,8 +569,7 @@ export default {
       (newVal) => {
         if(!textBox || !textDom || !textBox.value || !textDom.value){return;}
         const textBoxHeight = textBox.value.getBoundingClientRect().height;
-        const textDomHeight = textDom.value.getBoundingClientRect().height
-        console.log(textBoxHeight,textDomHeight);
+        const textDomHeight = textDom.value.getBoundingClientRect().height;
         if(textBoxHeight>=textDomHeight){
           state.needWrap = false;
         }else{
@@ -615,7 +614,8 @@ export default {
 
     //comment
     const comment = (res) => {
-      state.showCommentBox = false;
+      // state.showCommentBox = false;
+      emit("changeList",true);
       state.addCount = true;
       setTimeout(()=>{
         state.addCount = false;
@@ -631,11 +631,16 @@ export default {
         }
         //post List
         state.focusComment = true;
-        state.showCommentBox=!state.showCommentBox;
+        // state.showCommentBox=!state.showCommentBox;
+        
 
         //postDetail
         emit("focus");
-        emit("changeList");
+        if(props.item.isComment){
+          emit("changeList",true);
+        }else{
+          emit("changeList");
+        }
       }
     }
 
