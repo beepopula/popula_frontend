@@ -1108,6 +1108,11 @@ export default {
         border-radius:10px;
         object-fit: cover;
       }
+      &.images1{
+        .img,img{
+          height:370px;
+        }
+      }
       &.images2{
         .img,img{
           width:314px;

@@ -32,7 +32,10 @@
         </div>
 
         <div class="no-more" v-if="isEnd">
-          <template v-if="communities[currentTab]['length'] == 0">No communities</template>
+          <div v-if="communities[currentTab]['length'] == 0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No communities
+          </div>
           <template v-else>No more communities</template>
         </div>
       </div>

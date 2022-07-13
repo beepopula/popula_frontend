@@ -148,6 +148,9 @@
       margin-top:0;
       background: #000000;
       transform:translateX(-1px);
+      .avatar-border{
+        background: #000000;
+      }
     }
     .cover{
       width: 100%;

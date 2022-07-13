@@ -259,7 +259,7 @@
 
 <style lang="scss" scoped>
   .edit-layer{
-    background: rgba(0,0,0,0.56);
+    background: rgba(0,0,0,0.9);
     .edit-box{
       position:absolute;
       top:50%;

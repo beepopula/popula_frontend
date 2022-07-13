@@ -67,7 +67,10 @@
           </div>
 
           <div class="no-more" v-if="isEnd">
-            <template v-if="commentCount == 0">No comments</template>
+            <div v-if="commentCount == 0" class="no-result">
+              <img src="@/assets/images/common/emoji-null.png"/>
+              No comments
+            </div>
             <template v-else>No more comments</template>
           </div>
         </template>

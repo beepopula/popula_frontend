@@ -108,7 +108,7 @@
           </template>
         </div>
         <div class="no-more" v-if="isEnd">
-          <div class="no-results"  v-if="list[currentTab]['length'] == 0">
+          <div class="no-result"  v-if="list[currentTab]['length'] == 0">
             <img src="@/assets/images/common/emoji-null.png"/>
             No data
           </div>
@@ -183,7 +183,7 @@
           </div>
           <div class="no-more" v-if="isEndFollow">No more</div>
         </div>
-        <div v-else-if="isEndFollow" class="no-results">
+        <div v-else-if="isEndFollow" class="no-result">
           <img src="@/assets/images/common/emoji-null.png"/>
           No data
         </div>
@@ -1192,24 +1192,6 @@
           line-height:16px;
         }
       }
-    }
-  }
-  .no-results{
-    padding:80px 0;
-    background: #28282D;
-    border-radius: 24px;
-    font-family: D-DINExp;
-    font-size: 14px;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0;
-    text-align: center;
-    font-weight: 400;
-    line-height:16px;
-    img{
-      display:block;
-      width: 60px;
-      height: 60px;
-      margin:0 auto 12px;
     }
   }
 </style>
