@@ -5,7 +5,6 @@ import { getAccountSign } from "./util";
 import js_sha256 from 'js-sha256';
 import fetch from './fetch.js'
 import Hash from 'ipfs-only-hash'
-import AWS from 'aws-sdk'
 
 export async function upload(file) {
 

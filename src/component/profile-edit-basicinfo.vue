@@ -126,7 +126,7 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
       //save
       const save = async () => {
         if(state.isLoading){ return; }
-        if(!state.editProfile.name.trim()){
+        if(!state.editProfile.name || !state.editProfile.name.trim()){
           state.nameError = true;
           return;
         }

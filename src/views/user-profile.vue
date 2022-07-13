@@ -48,38 +48,38 @@
               <div class="media-list">
                 <!-- Twitter -->
                 <a v-if="user.twitter && user.twitter.url" class="media-item" :href="checkUrl(user.twitter.url)" target="_blank">
-                  <img v-if="user.twitter.verified" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-twitter-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-twitter-grey.png"/>
                 </div>
 
                 <!-- Instagram -->
                 <a v-if="user.instagram && user.instagram.url" class="media-item" :href="checkUrl(user.instagram.url)" target="_blank">
-                  <img v-if="user.instagram.verified" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-instagram-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-instagram-grey.png"/>
                 </div>
 
                 <!-- TikTok -->
                 <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="checkUrl(user.tiktok.url)" target="_blank">
-                  <img v-if="user.tiktok.verified" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-tiktok-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok-grey.png"/>
                 </div>
 
                 <!-- YouTube -->
                 <a v-if="user.youtube && user.youtube.url" class="media-item" :href="checkUrl(user.youtube.url)" target="_blank">
-                  <img v-if="user.youtube.verified" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-youtube-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-grey.png"/>
                 </div>
 
               </div>
@@ -579,10 +579,10 @@
       //edit
       const showEditBasicinfoLayer = () => {
         state.editBasicinfo = {
-          name:state.user.name,
-          avatar:state.user.avatar,
-          background:state.user.background,
-          bio:state.user.bio,
+          name:state.user.name || '',
+          avatar:state.user.avatar || '',
+          background:state.user.background || '',
+          bio:state.user.bio || '',
 
           twitter:state.user.twitter || {url:'',verified:false},
           instagram:state.user.instagram || {url:'',verified:false},
@@ -901,6 +901,19 @@
                 margin-right:30px;
                 img{
                   height:24px;
+                }
+                img.hover{
+                  display:none;
+                }
+              }
+              a.media-item{
+                &:hover{
+                  img{
+                    display:none;
+                  }
+                  img.hover{
+                    display:block;
+                  }
                 }
               }
             }
