@@ -15,7 +15,9 @@ function initS3() {
   AWS.config.apiVersions = {
     s3: '2006-03-01',
   };
-  window.s3 = new AWS.S3();
+  window.s3 = new AWS.S3({
+    endpoint: new AWS.Endpoint('s3-accelerate.amazonaws.com')
+  });
 }
 
 async function initViewAccount() {
