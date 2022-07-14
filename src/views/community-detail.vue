@@ -66,7 +66,7 @@
           </div>
         </div>
       </div>
-      <div class="bio txt-wrap2">{{detail.info}}</div>
+      <div class="bio txt-wrap2" v-if="detail.info">{{detail.info}}</div>
     </div>
     <!-- Tab  -->
     <div class="page">
@@ -843,7 +843,7 @@
           media:state.media
         }
         state.showEditContributor = true;
-        
+
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateContributor = (info) => {
