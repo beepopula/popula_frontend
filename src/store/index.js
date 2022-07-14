@@ -110,7 +110,7 @@ const getters = {
     const nearConfig = getConfig();
     return (img)=>{
       if(img.indexOf(nearConfig.IPFS+'/ipfs')>-1){
-        return img.replace(nearConfig.IPFS+'/ipfs',nearConfig.AWS_STORAGE)+'.png'
+        return img.replace(nearConfig.IPFS+'/ipfs',nearConfig.AWS_STORAGE)
       }else{
         return img
       }

@@ -7,7 +7,6 @@ import fetch from './fetch.js'
 import Hash from 'ipfs-only-hash'
 
 export async function upload(file) {
-
   let reader = new FileReader();
   reader.readAsDataURL(file);
   let fileBase64 = await new Promise((resolve, reject) => {
@@ -23,7 +22,7 @@ export async function upload(file) {
   
   const s3Params = {
     Body: file,
-    Key: "user/" + cid + ".png",
+    Key: "user/" + cid,
     Bucket: "popula-frontend",
     ACL: "public-read",
   };
@@ -33,7 +32,7 @@ export async function upload(file) {
       if (err) {
         reject(err)
       } else {
-        resolve(`${store.state.nearConfig.AWS_STORAGE}/${cid}.png`)
+        resolve(`${store.state.nearConfig.AWS_STORAGE}/${cid}`)
       }
     });
   })
@@ -41,8 +40,8 @@ export async function upload(file) {
 
   let params = {
       args: {
+        hash: js_sha256.sha256(fileBase64),
         url: s3Location,
-        hash: js_sha256.sha256(fileBase64)
       },
       account_id: store.getters.accountId
   }
