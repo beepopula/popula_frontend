@@ -1,11 +1,11 @@
 <template>
   <div class="canvas-box">
     <canvas id="mycanvas" width="788" height="788" style="width:394px; height:394px"></canvas>
-    <img id="img1" src="@/assets/images/post/nft-bg1.png">
+    <!-- <img id="img1" src="@/assets/images/post/nft-bg1.png">
     <img id="img2" src="@/assets/images/post/nft-bg2.png">
     <img id="img3" src="@/assets/images/post/nft-bg3.png">
     <img id="img4" src="@/assets/images/post/nft-bg4.png">
-    <img id="mask" src="@/assets/images/post/nft-bg-mask.png">
+    <img id="mask" src="@/assets/images/post/nft-bg-mask.png"> -->
   </div>
 </template>
 
@@ -24,27 +24,44 @@ export default {
     const init = () => {
       const canvas = document.getElementById("mycanvas")
       const context = canvas.getContext('2d')
-      const image = document.getElementById('img'+Math.ceil(Math.random()*4),);
-      const mask = document.getElementById('mask');
-      image.onload = function(){
-        // context.globalAlpha = 0.74;
-        context.drawImage(image,-6,0,800,788)
-        // context.drawImage(mask,0,0,788,788)
-        // context.globalAlpha = 1;
-        context.textAlign = "center"
-        context.font = "36px  D-DINExp-Bold bolder"
-        context.fillStyle = '#FFFFFF'
-        context.fillText(`@${store.getters.accountId}`,400,328)
-        context.font = "28px  D-DINExp normal"
-        canvasTextAutoLine(props.text,canvas,400,392,32)
-        canvas.toBlob((blob)=>{
-          emit('setDefaultCover',{
-            url:canvas.toDataURL('image/jpeg',1),
-            file:blob,
-          })
-        })
+      // const image = document.getElementById('img'+Math.ceil(Math.random()*4),);
+      // const mask = document.getElementById('mask');
+      // image.onload = function(){
+      //   // context.globalAlpha = 0.74;
+      //   context.drawImage(image,-6,0,800,788)
+      //   // context.drawImage(mask,0,0,788,788)
+      //   // context.globalAlpha = 1;
+      //   context.textAlign = "center"
+      //   context.font = "36px  D-DINExp-Bold bolder"
+      //   context.fillStyle = '#FFFFFF'
+      //   context.fillText(`@${store.getters.accountId}`,400,328)
+      //   context.font = "28px  D-DINExp normal"
+      //   canvasTextAutoLine(props.text,canvas,400,392,32)
+      //   canvas.toBlob((blob)=>{
+      //     emit('setDefaultCover',{
+      //       url:canvas.toDataURL('image/jpeg',1),
+      //       file:blob,
+      //     })
+      //   })
 
-      }
+      // }
+
+      
+      const bgArr = ['#7133FF','#5D5FFF','#17D0AF','#FB62C7','#4A44FF','#6291FB','#15BEE9','#FF9669'];
+      context.fillStyle = bgArr[Math.ceil(Math.random()*8)];
+      context.fillRect(0,0, 788, 788);
+      context.textAlign = "center"
+      context.font = "36px  D-DINExp-Bold bolder"
+      context.fillStyle = '#FFFFFF'
+      context.fillText(`@${store.getters.accountId}`,400,328)
+      context.font = "28px  D-DINExp normal"
+      canvasTextAutoLine(props.text,canvas,400,392,32)
+      canvas.toBlob((blob)=>{
+        emit('setDefaultCover',{
+          url:canvas.toDataURL('image/jpeg',1),
+          file:blob,
+        })
+      })
       
     }
     const canvasTextAutoLine = (str,canvas,initX,initY,lineHeight) => {

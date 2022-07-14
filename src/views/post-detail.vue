@@ -7,7 +7,7 @@
           <!-- Community -->
           <div class="Community-info" v-if="postCommunity.data">
             <img v-if="postCommunity.avatar" @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" :src="$store.getters.getAwsImg(postCommunity.avatar)" @error.once="$event.target.src=postCommunity.avatar"/>
-            <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/test/community.png"/>
+            <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/community/default-avatar.png"/>
             <div class="info">
               <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
               <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
@@ -115,7 +115,7 @@
           <div class="communities" v-if="joinedCommunities.length>0">
             <div class="community-item" v-for="item in joinedCommunities" @click="redirectPage('/community-detail/'+item.communityId,false)">
               <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar"/>
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>
@@ -135,16 +135,15 @@
       </div>
       <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
         <div class="edit-button close" @click="closeSuspendLayer()"></div>
-        <div class="elastic-layer-content">
-          <Comment 
-            :targetHash="$route.params.id" 
-            :parentAccount="postDetail.accountId"
-            :hierarchies="[]"
-            :communityId="postDetail.receiverId" 
-            :postType="postDetail.type"
-            @comment="comment()"
-          />
-        </div>
+        <Comment 
+          :targetHash="$route.params.id" 
+          :parentAccount="postDetail.accountId"
+          :hierarchies="[]"
+          :communityId="postDetail.receiverId" 
+          :postType="postDetail.type"
+          :from="'suspend'"
+          @comment="comment()"
+        />
       </div>
     </div>
   </div>

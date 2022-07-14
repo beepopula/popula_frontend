@@ -1,5 +1,5 @@
 <template>
-  <div :class="['comment',from == 'list' ? 'comment-reply' : '']" @click.stop="">
+  <div :class="['comment','comment-reply-'+$props.from]" @click.stop="">
     <!-- text -->
     <div :class="['input-box',text.trim().length>0 ? '' :'input-box-empty']">
       <div
@@ -573,7 +573,7 @@ export default {
   background: #28282D;
   border-radius: 24px;
   position:relative;
-  &.comment-reply{
+  &.comment-reply-list{
     min-width: 650px;
     width:650px;
     padding:20px 0 0 0;
@@ -587,6 +587,9 @@ export default {
     .avatar{
       left:20px;
     }
+  }
+  &.comment-reply-suspend{
+    width: 690px;
   }
   .input-box{
     position: relative;

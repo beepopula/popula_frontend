@@ -128,7 +128,7 @@
           <div class="communities">
             <div :class="['community',index%3==2 ? 'mr0' : '']" v-for="(item,index) in joinedCommunities" @click="redirectPage('/community-detail/'+item.communityId,false)">
               <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>
@@ -201,7 +201,7 @@
           <div id="community-list" class="community-list" >
             <div v-for="(item,index) in joinedCommunityList" :class="['community-item',index%3==2 ? 'mr0' : '']" @click="redirectPage('/community-detail/'+item.communityId)">
               <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>

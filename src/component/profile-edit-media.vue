@@ -91,7 +91,7 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        editProfile:props.editInfo,
+        editProfile:{...props.editInfo},
         isLoading:false,
         showVerify:false,
         twitter:"",

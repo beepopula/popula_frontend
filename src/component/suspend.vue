@@ -8,9 +8,7 @@
     </div>
     <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeLayer()">
       <div class="edit-button close" @click="closeLayer()"></div>
-      <div class="elastic-layer-content">
-        <Post :location="'suspend'" @postSuccess="postSuccess()"/>
-      </div>
+      <Post :location="'suspend'" @postSuccess="postSuccess()"/>
     </div>
   </div>
 

@@ -89,7 +89,7 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        edit:props.editInfo,
+        edit:{...props.editInfo},
         // {
         //   avatar:'',  
         //   cover:'',

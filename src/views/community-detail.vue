@@ -10,7 +10,7 @@
       <div class="info-box">
         <div class="info-left">
           <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
-          <img v-else  class="avatar" src="@/assets/images/test/community.png">
+          <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
           <div class="info">
             <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
             <div class="creator">Created by 
@@ -30,16 +30,19 @@
           </div>
         </div>
         <div class="info-right">
+          <!--
           <div class="token-list" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && false">
             <img class="token-icon" src="@/assets/images/test/token_icon1.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon2.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon3.png"/>
           </div>
+          -->
           <div class="button-border join-button" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && detail.data.createUser.account_id != $store.getters.accountId">
             <div class="button" @click="changeJoinCommunity()">
               <template v-if="detail.data.isJoin">  Joined </template>
               <template v-else>  Join </template>
             </div>
+            <!--
             <div class="fail-tip" v-if="showJoinFailReason">
               <div class="title">Failed</div>
               <div class="reason">reason reason reason</div>
@@ -59,6 +62,7 @@
                 <div class="mini-button">confirm</div>
               </div>
             </div>
+            -->
           </div>
         </div>
       </div>
@@ -147,7 +151,7 @@
           <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditContributorLayer"></div>
         </div>
         <div class="community-information">
-          <div class="intro">{{detail.information}}</div>       
+          <div class="intro" v-if="detail.information">{{detail.information}}</div>       
           <div class="media">
             <a class="media-item website" :href="detail.website" target="_blank">Website</a>
             <a class="media-item governance" :href="detail.governance" target="_blank">Blog</a>
@@ -353,7 +357,7 @@
         <div class="pop-box pop-tip">All Communities</div>
       </el-popover>
     </div>
-    <div class="joined-communities" v-if="joinedList.length>0">
+    <div :class="['joined-communities',joinedList.length<=4?'joined-communities-noscroll':'']" v-if="joinedList.length>0">
       <draggable 
         v-model="joinedList" 
         group="people" 
@@ -369,7 +373,7 @@
               >
               <template #reference>
                 <img v-if="element.avatar" :src="$store.getters.getAwsImg(element.avatar)" @error.once="$event.target.src=element.avatar" @click="redirectPage('/community-detail/'+element.communityId)">
-                <img v-else src="@/assets/images/test/community.png" @click="redirectPage('/community-detail/'+element.communityId)">
+                <img v-else src="@/assets/images/community/default-avatar.png" @click="redirectPage('/community-detail/'+element.communityId)">
               </template>
               <div class="pop-box pop-tip" v-if="!drag">{{element.name}}</div>
             </el-popover>
@@ -408,9 +412,7 @@
     </div>
     <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
       <div class="edit-button close" @click="closeSuspendLayer()"></div>
-      <div class="elastic-layer-content">
-        <Post v-if="detail.data" :community="detail" :location="'suspend'" @postSuccess="postSuccess()"/>
-      </div>
+      <Post v-if="detail.data" :community="detail" :location="'suspend'" @postSuccess="postSuccess()"/>
     </div>
   </div>
 
@@ -804,8 +806,9 @@
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateContributor = (info) => {
+        console.log(info,'---info----');
         state.detail.information = info.information;
-        state.contributor = info.contributor;
+        state.contributors = [...info.contributor];
 
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showEditContributor = false;
@@ -1338,6 +1341,14 @@
         border-radius: 24px;
         padding:20px;
         margin-bottom:60px;
+        .media:first-child{
+          margin-top:10px;
+        }
+        .media:first-child:last-child{
+          margin-top:0px;
+          height:36px;
+        }
+          
         .intro{
           font-family: D-DINExp;
           font-size: 16px;
@@ -1810,7 +1821,7 @@
     }
     .joined-communities{
       margin-top:30px;
-      max-height:400px;
+      max-height:290px;
       overflow-y:auto;
       .joined-item{
         position:relative;
@@ -1843,6 +1854,11 @@
           height: 50px;
           border-radius:8px;
           object-fit: cover;
+        }
+      }
+      &.joined-communities-noscroll{
+        .joined-item{
+          left:0;
         }
       }
     }

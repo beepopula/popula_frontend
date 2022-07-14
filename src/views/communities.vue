@@ -10,7 +10,7 @@
             <template v-for="item in joinedList">
               <div v-if="item.name" class="joined-item" @click="redirectPage('/community-detail/'+item.communityId)">
                 <img v-if="item.avatar"  class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-                <img v-else  class="avatar" src="@/assets/images/test/community.png">
+                <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
                 <div class="name txt-wrap">{{item.name}}</div>
                 <div class="message" v-if="item.unRead">{{item.unRead}}</div>
               </div>

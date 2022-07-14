@@ -602,7 +602,8 @@ export default {
     }
 
     .suspend-elastic-layer{
-      .elastic-layer-content{
+      overflow-y: scroll;
+      .post,.comment{
         position:absolute;
         top:50%;
         left:50%;

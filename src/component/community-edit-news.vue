@@ -102,7 +102,7 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        news:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{url:'',title:''}],
+        news:props.editInfo && props.editInfo.length>0 ? [...props.editInfo] : [{url:'',title:''}],
         //other
         link:'',
         currentItem:null,

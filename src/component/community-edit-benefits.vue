@@ -74,7 +74,7 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        benefits:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{title:'',introduction:'',type:''}],
+        benefits:props.editInfo && props.editInfo.length>0 ? [...props.editInfo] : [{title:'',introduction:'',type:''}],
         //other
         isLoading : false
       })

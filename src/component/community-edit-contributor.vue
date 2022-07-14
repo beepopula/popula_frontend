@@ -85,7 +85,7 @@
       const state = reactive({
         edit:{
           information:props.editInfo.information,  
-          contributor:props.editInfo.contributor
+          contributor:[...props.editInfo.contributor]
         },
         //other
         searchWord:'',
