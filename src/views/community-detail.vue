@@ -10,7 +10,7 @@
       <div class="info-box">
         <div class="info-left">
           <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
-          <img v-else  class="avatar" src="@/assets/images/test/community.png">
+          <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
           <div class="info">
             <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
             <div class="creator">Created by 
@@ -24,22 +24,25 @@
               </el-popover>
             </div>
             <div class="total">
-              <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
-              <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+              <div class="total-item"><span>{{detail.data.membersCount}}</span>Members</div>
+              <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
             </div>
           </div>
         </div>
         <div class="info-right">
+          <!--
           <div class="token-list" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && false">
             <img class="token-icon" src="@/assets/images/test/token_icon1.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon2.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon3.png"/>
           </div>
+          -->
           <div class="button-border join-button" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && detail.data.createUser.account_id != $store.getters.accountId">
             <div class="button" @click="changeJoinCommunity()">
               <template v-if="detail.data.isJoin">  Joined </template>
               <template v-else>  Join </template>
             </div>
+            <!--
             <div class="fail-tip" v-if="showJoinFailReason">
               <div class="title">Failed</div>
               <div class="reason">reason reason reason</div>
@@ -59,6 +62,7 @@
                 <div class="mini-button">confirm</div>
               </div>
             </div>
+            -->
           </div>
         </div>
       </div>
@@ -88,9 +92,13 @@
         </div>
 
         <div class="no-more" v-if="isEnd">
-          <template v-if="postList[currentTab]['length'] == 0">No posts</template>
+          <div v-if="postList[currentTab]['length'] == 0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No posts
+          </div>
           <template v-else>No more posts</template>
         </div>
+
       </div>
       <!-- right -->
       <div class="right">
@@ -143,7 +151,7 @@
           <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditContributorLayer"></div>
         </div>
         <div class="community-information">
-          <div class="intro">{{detail.information}}</div>       
+          <div class="intro" v-if="detail.information">{{detail.information}}</div>       
           <div class="media">
             <a class="media-item website" :href="detail.website" target="_blank">Website</a>
             <a class="media-item governance" :href="detail.governance" target="_blank">Blog</a>
@@ -212,7 +220,7 @@
                   {{benefit.introduction}}
                 </div>
                 <div class="benefit-bottom">
-                  <div class="benefit-access">{{benefit.type}}</div>
+                  <div class="benefit-type">{{benefit.type}}</div>
                   <!--<div class="benefit-points">100 points</div>-->
                 </div>
               </div>
@@ -349,7 +357,7 @@
         <div class="pop-box pop-tip">All Communities</div>
       </el-popover>
     </div>
-    <div class="joined-communities" v-if="joinedList.length>0">
+    <div :class="['joined-communities',joinedList.length<=4?'joined-communities-noscroll':'']" v-if="joinedList.length>0">
       <draggable 
         v-model="joinedList" 
         group="people" 
@@ -365,7 +373,7 @@
               >
               <template #reference>
                 <img v-if="element.avatar" :src="$store.getters.getAwsImg(element.avatar)" @error.once="$event.target.src=element.avatar" @click="redirectPage('/community-detail/'+element.communityId)">
-                <img v-else src="@/assets/images/test/community.png" @click="redirectPage('/community-detail/'+element.communityId)">
+                <img v-else src="@/assets/images/community/default-avatar.png" @click="redirectPage('/community-detail/'+element.communityId)">
               </template>
               <div class="pop-box pop-tip" v-if="!drag">{{element.name}}</div>
             </el-popover>
@@ -404,9 +412,7 @@
     </div>
     <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
       <div class="edit-button close" @click="closeSuspendLayer()"></div>
-      <div class="elastic-layer-content">
-        <Post v-if="detail.data" :community="detail" :location="'suspend'" @postSuccess="postSuccess()"/>
-      </div>
+      <Post v-if="detail.data" :community="detail" :location="'suspend'" @postSuccess="postSuccess()"/>
     </div>
   </div>
 
@@ -800,8 +806,9 @@
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateContributor = (info) => {
+        console.log(info,'---info----');
         state.detail.information = info.information;
-        state.contributor = info.contributor;
+        state.contributors = [...info.contributor];
 
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showEditContributor = false;
@@ -929,7 +936,7 @@
 <style lang="scss" scoped>
   .main-box{
     padding-top:220px;
-    position:relative;
+    position:static;
     .bg-box{
       position: absolute;
       top:80px;
@@ -963,7 +970,9 @@
         display:flex;
         justify-content:space-between;
         align-items:center;
+        height: 90px;
         .info-left{
+          height: 90px;
           display:flex;
           .avatar{
             width: 90px;
@@ -972,18 +981,21 @@
             object-fit: cover;
           }
           .info{
+            height: 90px;
             display:flex;
             flex-direction: column;
             justify-content: center;
             margin-left:30px;
             .name{
               font-family: D-DINExp-Bold;
-              font-size: 18px;
+              font-size: 20px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
               display:flex;
               align-items: center;
+              line-height:22px;
+              height:22px;
               span{
                 max-width: 300px;
               }
@@ -995,6 +1007,7 @@
               color: rgba(255,255,255,0.5);
               letter-spacing: 0;
               font-weight: 400;
+              line-height:16px;
               span{
                 color: #FFFFFF;
                 cursor: pointer;
@@ -1010,11 +1023,13 @@
                 color: rgba(255,255,255,0.5);
                 letter-spacing: 0;
                 font-weight: 400;
+                line-height:18px;
                 span{
                   font-size: 16px;
                   color: #FFFFFF;
                   letter-spacing: 0;
                   font-weight: 700;
+                  margin-right:4px;
                 }
               }
             }
@@ -1326,6 +1341,14 @@
         border-radius: 24px;
         padding:20px;
         margin-bottom:60px;
+        .media:first-child{
+          margin-top:10px;
+        }
+        .media:first-child:last-child{
+          margin-top:0px;
+          height:36px;
+        }
+          
         .intro{
           font-family: D-DINExp;
           font-size: 16px;
@@ -1455,7 +1478,7 @@
         margin-bottom:40px;
         .benefit-item{
           width:335px;
-          height:233px;
+          height:161px;
           padding:20px;
           background: #28282D;
           border-radius: 24px;
@@ -1465,7 +1488,7 @@
             margin-right:0;
           }
           .benefit-intro{
-            height:120px;
+            height:48px;
             margin-top:10px;
             opacity: 0.7;
             font-family: D-DINExp;
@@ -1477,7 +1500,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 5;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             word-wrap:break-word;
           }
@@ -1486,16 +1509,17 @@
             height:24px;
             display:flex;
             align-items: center;
-            .benefit-access{
-              width:61px;
+            .benefit-type{
+              padding:0 10px;
               height:24px;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 4px;
+              background: #36363C;
+              border-radius: 12px;    
               display:flex;
               align-items: center;
               justify-content:center;
               font-family: D-DINExp;
               font-size: 12px;
+              line-height:24px;
               color: #FFFFFF;
               letter-spacing: 0;
               text-align: center;
@@ -1797,7 +1821,7 @@
     }
     .joined-communities{
       margin-top:30px;
-      max-height:400px;
+      max-height:290px;
       overflow-y:auto;
       .joined-item{
         position:relative;
@@ -1830,6 +1854,11 @@
           height: 50px;
           border-radius:8px;
           object-fit: cover;
+        }
+      }
+      &.joined-communities-noscroll{
+        .joined-item{
+          left:0;
         }
       }
     }

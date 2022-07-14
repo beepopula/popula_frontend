@@ -25,7 +25,10 @@
         </div>
 
         <div class="no-more" v-if="isEnd">
-          <template v-if="postList[currentTab]['length'] == 0">No posts</template>
+          <div v-if="postList[currentTab]['length'] == 0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No posts
+          </div>
           <template v-else>No more posts</template>
         </div>
       </div>

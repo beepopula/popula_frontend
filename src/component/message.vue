@@ -77,7 +77,7 @@ export default {
   animation-fill-mode: forwards;
   width:688px;
   height:168px;
-  background:url("@/assets/images/oldCommon/toast_shadow.png") no-repeat center center;
+  /*background:url("@/assets/images/oldCommon/toast_shadow.png") no-repeat center center;*/
 }
 .mvp-27s-message-item {
   width:600px;
@@ -85,8 +85,8 @@ export default {
   align-items: center;
   padding: 25px 30px;
   background: #000000;
-  border-radius: 20px;
-  box-shadow: 0 2px 5px 0 #000;
+  border-radius: 16px;
+  box-shadow: 0px 12px 30px 0px rgba(0,0,0,0.3);
 
   .icon {
     width: 30px;

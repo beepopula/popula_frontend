@@ -198,7 +198,10 @@
             </template>
           </div>
           <div class="no-more" v-if="isEnd">
-            <template v-if="commentCount == 0">No comments</template>
+            <div v-if="commentCount == 0" class="no-result">
+              <img src="@/assets/images/common/emoji-null.png"/>
+              No comments
+            </div>
             <template v-else>No more comments</template>
           </div>
         </div>
@@ -824,7 +827,7 @@ export default {
       line-height: 17px;
       font-weight: 400;
       span{
-        color: #0084FF;
+        color: #FED23C;
         cursor: pointer;
       }
     }

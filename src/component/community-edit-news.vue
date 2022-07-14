@@ -102,7 +102,7 @@
       const route = useRoute();
       const { proxy } = getCurrentInstance();
       const state = reactive({
-        news:props.editInfo && props.editInfo.length>0 ? props.editInfo : [{url:'',title:''}],
+        news:props.editInfo && props.editInfo.length>0 ? [...props.editInfo] : [{url:'',title:''}],
         //other
         link:'',
         currentItem:null,
@@ -259,7 +259,7 @@
 
 <style lang="scss" scoped>
   .edit-layer{
-    background: rgba(0,0,0,0.56);
+    background: rgba(0,0,0,0.9);
     .edit-box{
       position:absolute;
       top:50%;
@@ -280,7 +280,7 @@
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
-        background: #36363C;
+        background: #45454B;
         .mini-button-border{
           padding: 2px;
           width: 90px;

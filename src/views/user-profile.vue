@@ -5,8 +5,10 @@
       <div class="left">
         <!-- user-info -->
         <div class="user-info" v-if="user.data">
-          <img v-if="user.background" class="bg" :src="$store.getters.getAwsImg(user.background)" @error.once="$event.target.src=user.background" />
-          <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
+          <div class="bg-box">
+            <img v-if="user.background" class="bg" :src="$store.getters.getAwsImg(user.background)" @error.once="$event.target.src=user.background" />
+            <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
+          </div>
           <div class="btns">
             <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditBasicinfoLayer()"></div>
             <el-popover placement="bottom-start"  trigger="hover">
@@ -39,47 +41,47 @@
             <div class="name  txt-wrap">{{user.name || user.account_id}}</div>
             <div class="account  txt-wrap">{{user.account_id}}</div>
             <div class="total">
-              <div class="total-item" @click="showFollowList('followers')"><span>{{user.data.follows}}</span> Followers</div>
-              <div class="total-item" @click="showFollowList('following')"><span>{{user.data.following}}</span> Following</div>
-              <div class="total-item" @click="showPostList()"><span>{{user.data.postCount}}</span> Posts</div>
+              <div class="total-item" @click="showFollowList('followers')"><span>{{user.data.follows}}</span>Followers</div>
+              <div class="total-item" @click="showFollowList('following')"><span>{{user.data.following}}</span>Following</div>
+              <div class="total-item" @click="showPostList()"><span>{{user.data.postCount}}</span>Posts</div>
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list-box">
               <div class="media-list">
                 <!-- Twitter -->
                 <a v-if="user.twitter && user.twitter.url" class="media-item" :href="checkUrl(user.twitter.url)" target="_blank">
-                  <img v-if="user.twitter.verified" class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-twitter-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-twitter-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-twitter-grey.png"/>
                 </div>
 
                 <!-- Instagram -->
                 <a v-if="user.instagram && user.instagram.url" class="media-item" :href="checkUrl(user.instagram.url)" target="_blank">
-                  <img v-if="user.instagram.verified" class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-instagram.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-instagram-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-instagram-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-instagram-grey.png"/>
                 </div>
 
                 <!-- TikTok -->
                 <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="checkUrl(user.tiktok.url)" target="_blank">
-                  <img v-if="user.tiktok.verified" class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-tiktok-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-tiktok-grey.png"/>
                 </div>
 
                 <!-- YouTube -->
                 <a v-if="user.youtube && user.youtube.url" class="media-item" :href="checkUrl(user.youtube.url)" target="_blank">
-                  <img v-if="user.youtube.verified" class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
-                  <img v-else class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-youtube-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-hover.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-grey.png"/>
                 </div>
 
               </div>
@@ -108,7 +110,7 @@
           </template>
         </div>
         <div class="no-more" v-if="isEnd">
-          <div class="no-results"  v-if="list[currentTab]['length'] == 0">
+          <div class="no-result"  v-if="list[currentTab]['length'] == 0">
             <img src="@/assets/images/common/emoji-null.png"/>
             No data
           </div>
@@ -126,7 +128,7 @@
           <div class="communities">
             <div :class="['community',index%3==2 ? 'mr0' : '']" v-for="(item,index) in joinedCommunities" @click="redirectPage('/community-detail/'+item.communityId,false)">
               <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>
@@ -183,7 +185,7 @@
           </div>
           <div class="no-more" v-if="isEndFollow">No more</div>
         </div>
-        <div v-else-if="isEndFollow" class="no-results">
+        <div v-else-if="isEndFollow" class="no-result">
           <img src="@/assets/images/common/emoji-null.png"/>
           No data
         </div>
@@ -199,7 +201,7 @@
           <div id="community-list" class="community-list" >
             <div v-for="(item,index) in joinedCommunityList" :class="['community-item',index%3==2 ? 'mr0' : '']" @click="redirectPage('/community-detail/'+item.communityId)">
               <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>
@@ -579,10 +581,10 @@
       //edit
       const showEditBasicinfoLayer = () => {
         state.editBasicinfo = {
-          name:state.user.name,
-          avatar:state.user.avatar,
-          background:state.user.background,
-          bio:state.user.bio,
+          name:state.user.name || '',
+          avatar:state.user.avatar || '',
+          background:state.user.background || '',
+          bio:state.user.bio || '',
 
           twitter:state.user.twitter || {url:'',verified:false},
           instagram:state.user.instagram || {url:'',verified:false},
@@ -795,12 +797,29 @@
         background: #28282D;
         border-radius: 24px;
         position:relative;
-        .bg{
+        .bg-box{
           width:690px;
           height:240px;
-          object-fit: cover;
+          position:relative;
           border-top-left-radius: 24px;
           border-top-right-radius: 24px;
+          overflow: hidden;
+          .bg{
+            width:690px;
+            height:240px;
+            object-fit: cover;
+          }
+          &::after{
+            display:block;
+            content:'';
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:url("@/assets/images/profile/bg-mask.png") no-repeat center;
+            background-size:cover;
+          }
         }
         .btns{
           height:24px;
@@ -870,11 +889,14 @@
               letter-spacing: 0;
               font-weight: 400;
               cursor: pointer;
+              line-height:18px;
               span{
                 font-size: 16px;
                 color: #FFFFFF;
                 letter-spacing: 0;
                 font-weight: 700;
+                margin-right:4px;
+                text-decoration: underline;
               }
             }
           }
@@ -901,6 +923,19 @@
                 margin-right:30px;
                 img{
                   height:24px;
+                }
+                img.hover{
+                  display:none;
+                }
+              }
+              a.media-item{
+                &:hover{
+                  img{
+                    display:none;
+                  }
+                  img.hover{
+                    display:block;
+                  }
                 }
               }
             }
@@ -1192,24 +1227,6 @@
           line-height:16px;
         }
       }
-    }
-  }
-  .no-results{
-    padding:80px 0;
-    background: #28282D;
-    border-radius: 24px;
-    font-family: D-DINExp;
-    font-size: 14px;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0;
-    text-align: center;
-    font-weight: 400;
-    line-height:16px;
-    img{
-      display:block;
-      width: 60px;
-      height: 60px;
-      margin:0 auto 12px;
     }
   }
 </style>

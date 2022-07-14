@@ -20,15 +20,15 @@
       <div class="name  txt-wrap">{{user.name || user.account_id}}</div>
       <div class="account  txt-wrap">{{user.account_id}}</div>
       <div class="total">
-        <div class="total-item"><span>{{user.data.follows}}</span> Followers</div>
-        <div class="total-item"><span>{{user.data.following}}</span> Following</div>
-        <div class="total-item"><span>{{user.data.postCount}}</span> Posts</div>
+        <div class="total-item"><span>{{user.data.follows}}</span>Followers</div>
+        <div class="total-item"><span>{{user.data.following}}</span>Following</div>
+        <div class="total-item"><span>{{user.data.postCount}}</span>Posts</div>
       </div>
       <div class="bio txt-wrap2">{{user.bio}}</div>
       <div class="comunity-joined" v-if="joinedCommunities && joinedCommunities.length>0">
         <div class="community-item" v-for="item in joinedCommunities" @click.stop="redirectPage('/community-detail/'+item.communityId,false)">
           <img v-if="item.avatar"  class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-          <img v-else  class="avatar" src="@/assets/images/test/community.png">
+          <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
           <div class="name txt-wrap">{{item.name}}</div>
         </div>
       </div>
@@ -175,11 +175,13 @@
         color: rgba(255,255,255,0.5);
         letter-spacing: 0;
         font-weight: 400;
+        line-height:18px;
         span{
           font-size: 16px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 700;
+          margin-right:4px;
         }
       }
     }

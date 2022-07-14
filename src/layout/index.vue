@@ -124,7 +124,6 @@ export default {
 
   .no-more{
     margin-top:30px;
-    height: 17px;
     font-family: D-DINExp;
     font-size: 16px;
     color: rgba(255,255,255,0.5);
@@ -373,6 +372,7 @@ export default {
       display:flex;
       justify-content: center;
       align-items: center;
+      color:rgba(255,255,255,0.5);
     }
     &.pop-intro{
       width: 320px;
@@ -447,10 +447,11 @@ export default {
       background:rgba(0,0,0,1);
       overflow: hidden;
       .pop-edit-item{
+        padding:0 25px;
         height: 50px;
         border-radius: 1px;
         display:flex;
-        justify-content:center;
+        
         align-items:center;
         cursor:pointer;
         .icon16{
@@ -485,7 +486,7 @@ export default {
     left:0;
     right:0;
     bottom:0;
-    background: rgba(0,0,0,1);
+    background: rgba(0,0,0,0.9);
     z-index:99;
     .layer-content{
       overflow-x:hidden;
@@ -601,7 +602,8 @@ export default {
     }
 
     .suspend-elastic-layer{
-      .elastic-layer-content{
+      overflow-y: scroll;
+      .post,.comment{
         position:absolute;
         top:50%;
         left:50%;
@@ -694,6 +696,25 @@ export default {
     text-align: justify;
     line-height: 24px;
     font-weight: 400; 
+  }
+
+  .no-result{
+    padding:80px 0;
+    background: #28282D;
+    border-radius: 24px;
+    font-family: D-DINExp;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0;
+    text-align: center;
+    font-weight: 400;
+    line-height:16px;
+    img{
+      display:block;
+      width: 60px;
+      height: 60px;
+      margin:0 auto 12px;
+    }
   }
   
   .text span.atFont{

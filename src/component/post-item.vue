@@ -8,7 +8,7 @@
             <template #reference>
               <div @click.stop="redirectPage('/community-detail/'+community.communityId,false)">
                 <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
-                <img v-else  class="avatar avatar-community" src="@/assets/images/test/community.png">
+                <img v-else  class="avatar avatar-community" src="@/assets/images/community/default-avatar.png">
               </div>
             </template>
             <template v-if="community.data">
@@ -1107,6 +1107,11 @@ export default {
         width:650px;
         border-radius:10px;
         object-fit: cover;
+      }
+      &.images1{
+        .img,img{
+          height:370px;
+        }
       }
       &.images2{
         .img,img{

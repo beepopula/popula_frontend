@@ -69,8 +69,8 @@
             </div>
             <div class="no-more" v-if="currentTab != 'all' && isEnd.post">No more posts</div>
           </template>
-          <!-- no-results -->
-          <div class="no-results" v-if="$store.state.searchWord && count[currentTab]==0">
+          <!-- no-result -->
+          <div class="no-result" v-if="$store.state.searchWord && count[currentTab]==0">
             <img src="@/assets/images/common/emoji-null.png"/>
             no results
           </div>
@@ -327,24 +327,8 @@ export default {
       margin-top:20px;
     }
 
-    .no-results{
-      width:auto;
+    .no-result{
       margin:160px auto 0;
-      font-family: D-DINExp;
-      font-size: 14px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0;
-      font-weight: 400;
-      display:flex;
-      flex-direction: column;
-      align-items: center;
-      line-height:16px;
-      img{
-        display:block;
-        width: 60px;
-        height: 60px;
-        margin-bottom:12px;
-      }
     }
   }
 }

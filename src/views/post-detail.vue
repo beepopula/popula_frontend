@@ -7,13 +7,13 @@
           <!-- Community -->
           <div class="Community-info" v-if="postCommunity.data">
             <img v-if="postCommunity.avatar" @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" :src="$store.getters.getAwsImg(postCommunity.avatar)" @error.once="$event.target.src=postCommunity.avatar"/>
-            <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/test/community.png"/>
+            <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/community/default-avatar.png"/>
             <div class="info">
               <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
               <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
               <div class="total">
-                <div class="total-item"><span>{{postCommunity.data.membersCount}}</span> Members</div>
-                <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
+                <div class="total-item"><span>{{postCommunity.data.membersCount}}</span>Members</div>
+                <div class="total-item"><span>{{postCommunity.data.postCount}}</span>Posts</div>
               </div>
             </div>
             <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT && postCommunity.accountId != $store.getters.accountId" class="mini-button-border join-button" @click="changeJoinCommunity()">
@@ -67,7 +67,10 @@
           </div>
 
           <div class="no-more" v-if="isEnd">
-            <template v-if="commentCount == 0">No comments</template>
+            <div v-if="commentCount == 0" class="no-result">
+              <img src="@/assets/images/common/emoji-null.png"/>
+              No comments
+            </div>
             <template v-else>No more comments</template>
           </div>
         </template>
@@ -100,9 +103,9 @@
           
           <!-- account-total -->
           <div class="total">
-            <div class="total-item"><span>{{userDetail.data.follows}}</span> Followers</div>
-            <div class="total-item"><span>{{userDetail.data.following}}</span> Following</div>
-            <div class="total-item"><span>{{userDetail.data.postCount}}</span> Posts</div>
+            <div class="total-item"><span>{{userDetail.data.follows}}</span>Followers</div>
+            <div class="total-item"><span>{{userDetail.data.following}}</span>Following</div>
+            <div class="total-item"><span>{{userDetail.data.postCount}}</span>Posts</div>
           </div>
 
           <!-- bio -->
@@ -112,7 +115,7 @@
           <div class="communities" v-if="joinedCommunities.length>0">
             <div class="community-item" v-for="item in joinedCommunities" @click="redirectPage('/community-detail/'+item.communityId,false)">
               <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar"/>
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>
@@ -127,21 +130,20 @@
       <div id="backTop" class="back-top" @click="backTop()"></div>
       <div class="button-box" v-if="postDetail.type!='encrypt' || isAccess"  @click="popUp()">
         <div class="button">
-          <img src="@/assets/images/post-item/icon-comment.png"/>
+          <img src="@/assets/images/post/icon-comment-black.png"/>
         </div>
       </div>
       <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
         <div class="edit-button close" @click="closeSuspendLayer()"></div>
-        <div class="elastic-layer-content">
-          <Comment 
-            :targetHash="$route.params.id" 
-            :parentAccount="postDetail.accountId"
-            :hierarchies="[]"
-            :communityId="postDetail.receiverId" 
-            :postType="postDetail.type"
-            @comment="comment()"
-          />
-        </div>
+        <Comment 
+          :targetHash="$route.params.id" 
+          :parentAccount="postDetail.accountId"
+          :hierarchies="[]"
+          :communityId="postDetail.receiverId" 
+          :postType="postDetail.type"
+          :from="'suspend'"
+          @comment="comment()"
+        />
       </div>
     </div>
   </div>
@@ -443,6 +445,7 @@ export default {
             letter-spacing: 0;
             font-weight: 400;
             cursor:pointer;
+            line-height: 16px;
           }
           .total{
             margin-top:20px;
@@ -454,11 +457,13 @@ export default {
               color: rgba(255,255,255,0.5);
               letter-spacing: 0;
               font-weight: 400;
+              line-height:18px;
               span{
                 font-size: 16px;
                 color: #FFFFFF;
                 letter-spacing: 0;
                 font-weight: 700;
+                margin-right:4px;
               }
             }
           }
@@ -529,6 +534,7 @@ export default {
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 400;
+          line-height:18px;
           span{
             font-size: 16px;
             color: #FFFFFF;
@@ -536,6 +542,7 @@ export default {
             font-weight: 700;
             display:block;
             margin-bottom:4px;
+            line-height:18px;
           }
         }
       }

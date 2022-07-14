@@ -238,7 +238,7 @@ export default {
         }
         &.nav-hover {
           &::before{
-            display:block;
+            display:none;
             content:"";
             position:absolute;
             top:0;
@@ -251,7 +251,10 @@ export default {
             z-index:1;
           }
           &:hover{
+            font-family: D-DINExp-Bold;
+            font-weight: 700;
             &::before{
+              display:none;
               transition: opacity 0.5s linear;
               opacity: 1;
             }
@@ -259,8 +262,8 @@ export default {
         }
 
         &.action{
-          background:url('@/assets/images/header/action_bg.png') no-repeat center center;
-          background-size:contain;
+          // background:url('@/assets/images/header/action_bg.png') no-repeat center center;
+          // background-size:contain;
           font-family: D-DINExp-Bold;
           font-weight: 700;
           &::before{

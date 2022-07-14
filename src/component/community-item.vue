@@ -1,11 +1,11 @@
 <template>
   <div v-if="detail" :class="['community-item','community-item-'+from]" @click="redirectPage('/community-detail/'+detail.communityId,false,true)">
     <img v-if="detail.cover" class="cover" :src="$store.getters.getAwsImg(detail.cover)" @error.once="$event.target.src=detail.cover">
-    <img v-else class="cover" src="@/assets/images/test/bg.png">
+    <img v-else class="cover" src="@/assets/images/community/bg.png">
     <div class="info">
       <div class="avatar-border">
         <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
-        <img v-else  class="avatar" src="@/assets/images/test/community.png">
+        <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
       </div>
       <div class="item-token item-token-multiple3">
         <!--
@@ -28,8 +28,8 @@
       </el-popover>
 
       <div class="total">
-        <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
-        <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+        <div class="total-item"><span>{{detail.data.membersCount}}</span>Members</div>
+        <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
       </div>
       <div class="bio txt-wrap2">{{detail.info}}</div>
     </div>
@@ -148,6 +148,9 @@
       margin-top:0;
       background: #000000;
       transform:translateX(-1px);
+      .avatar-border{
+        background: #000000;
+      }
     }
     .cover{
       width: 100%;
@@ -244,11 +247,13 @@
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 400;
+          line-height:18px;
           span{
             font-size: 16px;
             color: #FFFFFF;
             letter-spacing: 0;
             font-weight: 700;
+            margin-right:4px;
           }
         }
       }

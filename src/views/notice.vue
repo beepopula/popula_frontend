@@ -199,7 +199,7 @@
           </template>
         </div>
 
-        <div class="no-results"  v-else>
+        <div class="no-result"  v-else>
           <img src="@/assets/images/common/emoji-null.png"/>
           No data
         </div>
@@ -440,7 +440,7 @@ export default {
           line-height: 17px;
           font-weight: 400;
           span{
-            color: #0084FF;
+            color: #FED23C;
             cursor: pointer;
           }
         }
@@ -560,25 +560,8 @@ export default {
       }
 
     }
-    .no-results{
-      width:690px;
+    .no-result{
       margin-top:20px;
-      padding:80px 0;
-      background: #28282D;
-      border-radius: 24px;
-      font-family: D-DINExp;
-      font-size: 14px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0;
-      text-align: center;
-      font-weight: 400;
-      line-height:16px;
-      img{
-        display:block;
-        width: 60px;
-        height: 60px;
-        margin:0 auto 12px;
-      }
     }
   }
 }

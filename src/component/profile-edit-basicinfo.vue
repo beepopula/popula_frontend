@@ -126,7 +126,7 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
       //save
       const save = async () => {
         if(state.isLoading){ return; }
-        if(!state.editProfile.name.trim()){
+        if(!state.editProfile.name || !state.editProfile.name.trim()){
           state.nameError = true;
           return;
         }
@@ -171,7 +171,7 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
 
 <style lang="scss" scoped>
   .edit-layer{
-    background: rgba(0,0,0,0.56);
+    background: rgba(0,0,0,0.9);
     .edit-box{
       position:absolute;
       top:50%;
@@ -194,7 +194,7 @@ import { ref, reactive, toRefs, getCurrentInstance, nextTick } from "vue";
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
-        background: #36363C;
+        background: #45454B;
         .mini-button-border{
           padding: 2px;
           width: 90px;
