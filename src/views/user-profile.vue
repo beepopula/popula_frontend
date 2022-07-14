@@ -5,8 +5,10 @@
       <div class="left">
         <!-- user-info -->
         <div class="user-info" v-if="user.data">
-          <img v-if="user.background" class="bg" :src="$store.getters.getAwsImg(user.background)" @error.once="$event.target.src=user.background" />
-          <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
+          <div class="bg-box">
+            <img v-if="user.background" class="bg" :src="$store.getters.getAwsImg(user.background)" @error.once="$event.target.src=user.background" />
+            <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
+          </div>
           <div class="btns">
             <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditBasicinfoLayer()"></div>
             <el-popover placement="bottom-start"  trigger="hover">
@@ -39,9 +41,9 @@
             <div class="name  txt-wrap">{{user.name || user.account_id}}</div>
             <div class="account  txt-wrap">{{user.account_id}}</div>
             <div class="total">
-              <div class="total-item" @click="showFollowList('followers')"><span>{{user.data.follows}}</span> Followers</div>
-              <div class="total-item" @click="showFollowList('following')"><span>{{user.data.following}}</span> Following</div>
-              <div class="total-item" @click="showPostList()"><span>{{user.data.postCount}}</span> Posts</div>
+              <div class="total-item" @click="showFollowList('followers')"><span>{{user.data.follows}}</span>Followers</div>
+              <div class="total-item" @click="showFollowList('following')"><span>{{user.data.following}}</span>Following</div>
+              <div class="total-item" @click="showPostList()"><span>{{user.data.postCount}}</span>Posts</div>
             </div>
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list-box">
@@ -795,12 +797,29 @@
         background: #28282D;
         border-radius: 24px;
         position:relative;
-        .bg{
+        .bg-box{
           width:690px;
           height:240px;
-          object-fit: cover;
+          position:relative;
           border-top-left-radius: 24px;
           border-top-right-radius: 24px;
+          overflow: hidden;
+          .bg{
+            width:690px;
+            height:240px;
+            object-fit: cover;
+          }
+          &::after{
+            display:block;
+            content:'';
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:url("@/assets/images/profile/bg-mask.png") no-repeat center;
+            background-size:cover;
+          }
         }
         .btns{
           height:24px;
@@ -870,11 +889,14 @@
               letter-spacing: 0;
               font-weight: 400;
               cursor: pointer;
+              line-height:18px;
               span{
                 font-size: 16px;
                 color: #FFFFFF;
                 letter-spacing: 0;
                 font-weight: 700;
+                margin-right:4px;
+                text-decoration: underline;
               }
             }
           }

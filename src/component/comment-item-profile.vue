@@ -827,7 +827,7 @@ export default {
       line-height: 17px;
       font-weight: 400;
       span{
-        color: #0084FF;
+        color: #FED23C;
         cursor: pointer;
       }
     }

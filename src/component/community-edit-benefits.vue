@@ -176,7 +176,7 @@
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
-        background: #36363C;
+        background: #45454B;
         .mini-button-border{
           padding: 2px;
           width: 90px;

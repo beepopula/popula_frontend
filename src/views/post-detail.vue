@@ -12,8 +12,8 @@
               <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
               <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
               <div class="total">
-                <div class="total-item"><span>{{postCommunity.data.membersCount}}</span> Members</div>
-                <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
+                <div class="total-item"><span>{{postCommunity.data.membersCount}}</span>Members</div>
+                <div class="total-item"><span>{{postCommunity.data.postCount}}</span>Posts</div>
               </div>
             </div>
             <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT && postCommunity.accountId != $store.getters.accountId" class="mini-button-border join-button" @click="changeJoinCommunity()">
@@ -103,9 +103,9 @@
           
           <!-- account-total -->
           <div class="total">
-            <div class="total-item"><span>{{userDetail.data.follows}}</span> Followers</div>
-            <div class="total-item"><span>{{userDetail.data.following}}</span> Following</div>
-            <div class="total-item"><span>{{userDetail.data.postCount}}</span> Posts</div>
+            <div class="total-item"><span>{{userDetail.data.follows}}</span>Followers</div>
+            <div class="total-item"><span>{{userDetail.data.following}}</span>Following</div>
+            <div class="total-item"><span>{{userDetail.data.postCount}}</span>Posts</div>
           </div>
 
           <!-- bio -->
@@ -130,7 +130,7 @@
       <div id="backTop" class="back-top" @click="backTop()"></div>
       <div class="button-box" v-if="postDetail.type!='encrypt' || isAccess"  @click="popUp()">
         <div class="button">
-          <img src="@/assets/images/post-item/icon-comment.png"/>
+          <img src="@/assets/images/post/icon-comment-black.png"/>
         </div>
       </div>
       <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
@@ -446,6 +446,7 @@ export default {
             letter-spacing: 0;
             font-weight: 400;
             cursor:pointer;
+            line-height: 16px;
           }
           .total{
             margin-top:20px;
@@ -457,11 +458,13 @@ export default {
               color: rgba(255,255,255,0.5);
               letter-spacing: 0;
               font-weight: 400;
+              line-height:18px;
               span{
                 font-size: 16px;
                 color: #FFFFFF;
                 letter-spacing: 0;
                 font-weight: 700;
+                margin-right:4px;
               }
             }
           }
@@ -532,6 +535,7 @@ export default {
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 400;
+          line-height:18px;
           span{
             font-size: 16px;
             color: #FFFFFF;
@@ -539,6 +543,7 @@ export default {
             font-weight: 700;
             display:block;
             margin-bottom:4px;
+            line-height:18px;
           }
         }
       }

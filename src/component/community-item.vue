@@ -28,8 +28,8 @@
       </el-popover>
 
       <div class="total">
-        <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
-        <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+        <div class="total-item"><span>{{detail.data.membersCount}}</span>Members</div>
+        <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
       </div>
       <div class="bio txt-wrap2">{{detail.info}}</div>
     </div>
@@ -247,11 +247,13 @@
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 400;
+          line-height:18px;
           span{
             font-size: 16px;
             color: #FFFFFF;
             letter-spacing: 0;
             font-weight: 700;
+            margin-right:4px;
           }
         }
       }

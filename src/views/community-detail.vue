@@ -24,8 +24,8 @@
               </el-popover>
             </div>
             <div class="total">
-              <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
-              <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+              <div class="total-item"><span>{{detail.data.membersCount}}</span>Members</div>
+              <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@
                   {{benefit.introduction}}
                 </div>
                 <div class="benefit-bottom">
-                  <div class="benefit-access">{{benefit.type}}</div>
+                  <div class="benefit-type">{{benefit.type}}</div>
                   <!--<div class="benefit-points">100 points</div>-->
                 </div>
               </div>
@@ -933,7 +933,7 @@
 <style lang="scss" scoped>
   .main-box{
     padding-top:220px;
-    position:relative;
+    position:static;
     .bg-box{
       position: absolute;
       top:80px;
@@ -967,7 +967,9 @@
         display:flex;
         justify-content:space-between;
         align-items:center;
+        height: 90px;
         .info-left{
+          height: 90px;
           display:flex;
           .avatar{
             width: 90px;
@@ -976,18 +978,21 @@
             object-fit: cover;
           }
           .info{
+            height: 90px;
             display:flex;
             flex-direction: column;
             justify-content: center;
             margin-left:30px;
             .name{
               font-family: D-DINExp-Bold;
-              font-size: 18px;
+              font-size: 20px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
               display:flex;
               align-items: center;
+              line-height:22px;
+              height:22px;
               span{
                 max-width: 300px;
               }
@@ -999,6 +1004,7 @@
               color: rgba(255,255,255,0.5);
               letter-spacing: 0;
               font-weight: 400;
+              line-height:16px;
               span{
                 color: #FFFFFF;
                 cursor: pointer;
@@ -1014,11 +1020,13 @@
                 color: rgba(255,255,255,0.5);
                 letter-spacing: 0;
                 font-weight: 400;
+                line-height:18px;
                 span{
                   font-size: 16px;
                   color: #FFFFFF;
                   letter-spacing: 0;
                   font-weight: 700;
+                  margin-right:4px;
                 }
               }
             }
@@ -1459,7 +1467,7 @@
         margin-bottom:40px;
         .benefit-item{
           width:335px;
-          height:233px;
+          height:161px;
           padding:20px;
           background: #28282D;
           border-radius: 24px;
@@ -1469,7 +1477,7 @@
             margin-right:0;
           }
           .benefit-intro{
-            height:120px;
+            height:48px;
             margin-top:10px;
             opacity: 0.7;
             font-family: D-DINExp;
@@ -1481,7 +1489,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 5;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             word-wrap:break-word;
           }
@@ -1490,16 +1498,17 @@
             height:24px;
             display:flex;
             align-items: center;
-            .benefit-access{
-              width:61px;
+            .benefit-type{
+              padding:0 10px;
               height:24px;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 4px;
+              background: #36363C;
+              border-radius: 12px;    
               display:flex;
               align-items: center;
               justify-content:center;
               font-family: D-DINExp;
               font-size: 12px;
+              line-height:24px;
               color: #FFFFFF;
               letter-spacing: 0;
               text-align: center;
