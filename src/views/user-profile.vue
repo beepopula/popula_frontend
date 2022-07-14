@@ -10,7 +10,7 @@
             <img v-else class="bg" src="@/assets/images/profile/bg.png"/>
           </div>
           <div class="btns">
-            <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditBasicinfoLayer()"></div>
+            <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditLayer()"></div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>
                 <div class="btn share"></div>
@@ -48,6 +48,15 @@
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list-box">
               <div class="media-list">
+                <!-- Website -->
+                <a v-if="user.website && user.website.url" class="media-item" :href="checkUrl(user.website.url)" target="_blank">
+                  <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/>
+                </div>
+
                 <!-- Twitter -->
                 <a v-if="user.twitter && user.twitter.url" class="media-item" :href="checkUrl(user.twitter.url)" target="_blank">
                   <img class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
@@ -85,7 +94,6 @@
                 </div>
 
               </div>
-              <div class="btn edit" v-if="accountId == $store.getters.accountId" @click="showEditMediaLayer()"></div>
             </div>
           </div>
         </div>
@@ -232,13 +240,9 @@
       </div>
     </div>
 
-    <!-- ProfileEditBasicinfo -->
-    <template v-if="showEditBasicinfo">
-      <ProfileEditBasicinfo :accountId="user.account_id" :editInfo="editBasicinfo" @updateInfo="updateBasicinfo" @closeEditLayer="showEditBasicinfo=false"/>
-    </template>
-    <!-- ProfileEditMedia -->
-    <template v-if="showEditMedia">
-      <ProfileEditMedia :accountId="user.account_id" :editInfo="editMedia" @updateInfo="updateMedia" @closeEditLayer="showEditMedia=false"/>
+    <!-- ProfileEdit -->
+    <template v-if="showEdit">
+      <ProfileEdit :accountId="user.account_id" :editInfo="editInfo" @updateInfo="updateInfo" @closeEditLayer="showEdit=false"/>
     </template>
 
     <!-- suspend -->
@@ -266,8 +270,7 @@
   import About from '@/component/about.vue';
   import loginMask from "@/component/login-mask.vue";
   import suspend from "@/component/suspend.vue";
-  import ProfileEditBasicinfo from "@/component/profile-edit-basicinfo.vue";
-  import ProfileEditMedia from "@/component/profile-edit-media.vue";
+  import ProfileEdit from "@/component/profile-edit.vue";
   import Clipboard from 'clipboard';
 
   export default {
@@ -279,8 +282,7 @@
       About,
       loginMask,
       suspend,
-      ProfileEditBasicinfo,
-      ProfileEditMedia
+      ProfileEdit
     },
     setup() {
       const store = useStore();
@@ -338,10 +340,8 @@
         // isEndNft:false,
         // isLoadingNft:false,
         //edit
-        showEditBasicinfo:false,
-        editBasicinfo:{},
-        showEditMedia:false,
-        editMedia:{},
+        showEdit:false,
+        editInfo:{},
         //other
         shareLink:`${window.location.protocol}//${window.location.host}/user-profile/${route.params.id || store.getters.accountId}`,
         showLogin:false,
@@ -579,29 +579,36 @@
       }
 
       //edit
-      const showEditBasicinfoLayer = () => {
-        state.editBasicinfo = {
+      const showEditLayer = () => {
+        state.editInfo = {
           name:state.user.name || '',
           avatar:state.user.avatar || '',
           background:state.user.background || '',
           bio:state.user.bio || '',
 
-          twitter:state.user.twitter || {url:'',verified:false},
-          instagram:state.user.instagram || {url:'',verified:false},
-          youtube:state.user.youtube || {url:'',verified:false},
-          tiktok:state.user.tiktok || {url:'',verified:false}
+          website:{...state.user.website} || {url:'',verified:false},
+          twitter:{...state.user.twitter} || {url:'',verified:false},
+          instagram:{...state.user.instagram} || {url:'',verified:false},
+          youtube:{...state.user.youtube} || {url:'',verified:false},
+          tiktok:{...state.user.tiktok} || {url:'',verified:false}
         };
         document.getElementsByTagName('body')[0].classList.add("fixed");
-        state.showEditBasicinfo = true;
+        state.showEdit = true;
       }
-      const updateBasicinfo = (info) => {
+      const updateInfo = (info) => {
         state.user.name = info.name;
         state.user.avatar = info.avatar;
         state.user.background = info.background;
         state.user.bio = info.bio;
 
+        state.user.website = info.website;
+        state.user.twitter = info.twitter;
+        state.user.instagram = info.instagram;
+        state.user.youtube = info.youtube;
+        state.user.tiktok = info.tiktok;
+
         document.getElementsByTagName('body')[0].classList.remove("fixed");
-        state.showEditBasicinfo = false;
+        state.showEdit = false;
       }
       const showEditMediaLayer = () => {
         state.editMedia = {
@@ -732,7 +739,7 @@
 
       //checkUrl
       const checkUrl = (url) => {
-        if(url.indexOf('http://')<0 || url.indexOf('https://')<0){
+        if(url.indexOf('http://')<0 && url.indexOf('https://')<0){
           return `http://${url}`
         }else{
           return url;
@@ -762,10 +769,8 @@
         changeFollowTab,
         followDiv,
         followScroll,
-        showEditBasicinfoLayer,
-        updateBasicinfo,
-        showEditMediaLayer,
-        updateMedia,
+        showEditLayer,
+        updateInfo,
         showCommunityList,
         closeCommunityList,
         showNftList,

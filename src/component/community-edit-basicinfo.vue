@@ -3,7 +3,7 @@
     <div class="edit-button close" @click="closeEditLayer()"></div>
     <div class="edit-box">
       <div class="edit-head">
-        Edit community
+        <div class="edit-btn"><span class="arrow form-close" @click="closeEditLayer()"></span>Edit community</div>
         <div class="mini-button-border">
           <div class="mini-button" @click="save()">
             <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
@@ -240,6 +240,32 @@
             font-weight: 700;
             position:relative;
             z-index:2;
+          }
+        }
+        .edit-btn{
+          height:24px;
+          line-height: 24px;
+          display:flex;
+          align-items:center;
+          font-family: D-DINExp-Bold;
+          font-size: 20px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          font-weight: 700;
+          cursor: pointer;
+          .arrow{
+            display:block;
+            width:24px;
+            height:24px;
+            margin-right:8px;
+            &.return{
+              background:url("@/assets/images/common/icon-arrow-left.png") no-repeat center center;
+              background-size:16px 16px;
+            }
+            &.form-close{
+              background:url("@/assets/images/common/icon-close.png") no-repeat center center;
+              background-size:16px 16px;
+            }
           }
         }
       }

@@ -77,7 +77,7 @@
     <div class="main main-post" v-if="currentPage == 'post'">
       <!-- left -->
       <div class="left">
-        <Post v-if="detail.data" :community="detail" @postSuccess="postSuccess()"/>
+        <Post v-if="detail.data" :community="detail" :location="'detail'" @postSuccess="postSuccess()"/>
         <div class="filter-menu">
           <div :class="['filter-menu-item',currentTab == 'hot' ? 'active' : '']" @click="changeTab('hot')">Hot</div>
           <div :class="['filter-menu-item',currentTab == 'new' ? 'active' : '']" @click="changeTab('new')">
@@ -153,10 +153,39 @@
         <div class="community-information">
           <div class="intro" v-if="detail.information">{{detail.information}}</div>       
           <div class="media">
-            <a class="media-item website" :href="detail.website" target="_blank">Website</a>
-            <a class="media-item governance" :href="detail.governance" target="_blank">Blog</a>
-            <a class="media-item twitter" :href="detail.twitter" target="_blank">Twitter</a>
-            <a class="media-item discord" :href="detail.discord" target="_blank">Discord</a>
+            <!-- Website -->
+            <a v-if="media.website && media.website.url" class="media-item" :href="checkUrl(media.website.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
+              Website
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/> 
+              Website
+            </div>
+
+
+            <!-- twitter -->
+            <a v-if="media.twitter && media.twitter.url" class="media-item" :href="checkUrl(media.twitter.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-twitter-hover.png"/>
+              Twitter
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-twitter-grey.png"/> 
+              Twitter
+            </div>
+
+            <!-- Discord -->
+            <a v-if="media.discord && media.discord.url" class="media-item" :href="checkUrl(media.discord.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-discord.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-discord-hover.png"/>
+              Discord
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-discord-grey1.png"/> 
+              Discord
+            </div>
           </div>
 
           <!-- creator -->
@@ -412,7 +441,7 @@
     </div>
     <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
       <div class="edit-button close" @click="closeSuspendLayer()"></div>
-      <Post v-if="detail.data" :community="detail" :location="'suspend'" @postSuccess="postSuccess()"/>
+      <Post v-if="detail.data" :community="detail" :location="'detail-suspend'" @postSuccess="postSuccess()"/>
     </div>
   </div>
 
@@ -518,6 +547,11 @@
         showCreateUser:false,
         showCreateUser2:false,
         //
+        media:{
+          // website:state.detail.website || {url:'',verified:false},
+          // twitter:state.detail.twitter || {url:'',verified:false},
+          // discord:state.detail.discord || {url:'',verified:false},
+        },
         contributors:[],
         benefits:[],
         news:[],
@@ -538,6 +572,11 @@
         if(res.success) {
           state.detail = res.data;
           state.contributors = state.detail.contributor ||  [];
+          state.media = {
+            website:state.detail.website || {url:'',verified:false},
+            twitter:state.detail.twitter || {url:'',verified:false},
+            discord:state.detail.discord || {url:'',verified:false},
+          }
         }
         //posts
         changeTab('hot');
@@ -800,15 +839,18 @@
       const showEditContributorLayer = () => {
         state.editContributor = {
           information:state.detail.information,
-          contributor:state.contributors || []
+          contributor:state.contributors || [],
+          media:state.media
         }
         state.showEditContributor = true;
+        
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateContributor = (info) => {
         console.log(info,'---info----');
         state.detail.information = info.information;
         state.contributors = [...info.contributor];
+        state.media = {...info.media}
 
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showEditContributor = false;
@@ -859,6 +901,15 @@
             i.isComment = false;
           }
         })
+      }
+
+      //checkUrl
+      const checkUrl = (url) => {
+        if(url.indexOf('http://')<0 && url.indexOf('https://')<0){
+          return `http://${url}`
+        }else{
+          return url;
+        }
       }
       
       //redirectPage
@@ -917,6 +968,7 @@
         showEditNewsLayer,
         updateNews,
         dragEnd,
+        checkUrl,
         redirectPage,
         changePostListStatus,
         backTop,
@@ -1363,7 +1415,9 @@
           display:flex;
           align-items: center;
           .media-item{
-            padding-left:27px;
+            display:flex;
+            height:20px;
+            align-items: center;
             margin-right:40px;
             font-family: D-DINExp;
             font-size: 14px;
@@ -1372,22 +1426,19 @@
             text-align: justify;
             font-weight: 400;
             cursor: pointer;
-            &:hover{
-              color: rgba(255,255,255,1);
+            img{
+              margin-right:11px;
+              height:16px;
             }
+            img.hover{
+              display:none;
+            }
+            /*
             &.website{
               background:url('@/assets/images/common/logo-link-hover.png') no-repeat left center;
               background-size:auto 16px;
               &:hover{
                 background:url('@/assets/images/common/logo-link.png') no-repeat left center;
-                background-size:auto 16px;
-              }
-            }
-            &.governance{
-              background:url('@/assets/images/common/logo-governance-hover.png') no-repeat left center;
-              background-size:auto 16px;
-              &:hover{
-                background:url('@/assets/images/common/logo-governance.png') no-repeat left center;
                 background-size:auto 16px;
               }
             }
@@ -1405,6 +1456,17 @@
               &:hover{
                 background:url('@/assets/images/common/logo-discord.png') no-repeat left center;
                 background-size:auto 16px;
+              }
+            }
+            */
+          }
+          a.media-item{
+            &:hover{
+              img{
+                display:none;
+              }
+              img.hover{
+                display:block;
               }
             }
           }

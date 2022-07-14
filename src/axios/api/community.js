@@ -42,4 +42,7 @@ export default {
   set_community_news(data) {
     return post("v1/communities/updateNews", data);
   },
+  verify_twitter(data) {
+    return post("v1/communities/verifyTwitter", data);
+  },
 };

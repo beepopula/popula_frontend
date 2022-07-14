@@ -115,38 +115,40 @@
             Community
           </template>
         </div>
-        <!-- community select -->
-        <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && isLoadingCommunity">
-          <div class="loading">
-            <img class="white-loading" src="@/assets/images/common/loading.png"/>
+        <template v-if="location!='detail' && location!='detail-suspend'">
+          <!-- community select -->
+          <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && isLoadingCommunity">
+            <div class="loading">
+              <img class="white-loading" src="@/assets/images/common/loading.png"/>
+            </div>
           </div>
-        </div>
-        <div class="pop-box pop-intro pop-community-select" v-else-if="showCommunity && joinedCommunities.length>0">
-          <div class="title">Choose Community</div>
-          <div class="intro">Choose the community you want to share with.</div>
-          <div class="joined-list" >
-            <template v-for="item in joinedCommunities">
-              <div v-if="item.name" :class="['joined-item',item.communityId == postForm.community.communityId ? 'active' : '']" @click="selectCommunity(item)">
-                <img v-if="item.avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
-                <img v-else src="@/assets/images/community/default-avatar.png">
-                <div class="txt-wrap">{{item.name}}</div>
+          <div class="pop-box pop-intro pop-community-select" v-else-if="showCommunity && joinedCommunities.length>0">
+            <div class="title">Choose Community</div>
+            <div class="intro">Choose the community you want to share with.</div>
+            <div class="joined-list" >
+              <template v-for="item in joinedCommunities">
+                <div v-if="item.name" :class="['joined-item',item.communityId == postForm.community.communityId ? 'active' : '']" @click="selectCommunity(item)">
+                  <img v-if="item.avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
+                  <img v-else src="@/assets/images/community/default-avatar.png">
+                  <div class="txt-wrap">{{item.name}}</div>
+                </div>
+              </template>
+            </div>
+          </div>
+          <!-- community join -->
+          <div class="pop-box pop-intro pop-community-join" v-else-if="showCommunity">
+            <div class="title">Choose Community</div>
+            <div class="intro">You  haven't  joined  the  community  yet. Please  join  or  create  it.</div>
+            <div class="button-box">
+              <div class="mini-button-border button-cancle" @click="showCommunity=false">
+                <div class="mini-button">Cancle</div>
               </div>
-            </template>
-          </div>
-        </div>
-        <!-- community join -->
-        <div class="pop-box pop-intro pop-community-join" v-else-if="showCommunity">
-          <div class="title">Choose Community</div>
-          <div class="intro">You  haven't  joined  the  community  yet. Please  join  or  create  it.</div>
-          <div class="button-box">
-            <div class="mini-button-border button-cancle" @click="showCommunity=false">
-              <div class="mini-button">Cancle</div>
-            </div>
-            <div class="mini-button-border" @click="redirectPage('/communities')">
-              <div class="mini-button">Go</div>
+              <div class="mini-button-border" @click="redirectPage('/communities')">
+                <div class="mini-button">Go</div>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </div>
       <!-- token -->
       <div class="post-type" >
@@ -1297,7 +1299,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
     :deep(.el-upload) {
       display:none;
     }
-    &#postsuspend{
+    &#postsuspend,&#postdetail-suspend{
       .post-form-box{
         padding:20px 0 20px 20px;
         .post-form{
@@ -1554,6 +1556,9 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         border-radius: 6px;
         border: 1px solid rgba(255,255,255,0.2);
         cursor: pointer;
+        &#pop-communitydetail,&#pop-communitydetail-suspend{
+          cursor:default;
+        }
         .community-selected{
           width: 124px;
           height: 34px;

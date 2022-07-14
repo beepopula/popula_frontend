@@ -1,9 +1,44 @@
 <template>
   <div class="elastic-layer edit-layer">
     <div class="edit-button close" @click="closeEditLayer()"></div>
-    <div class="edit-box">
+    <div class="edit-box" v-if="showVerify">
       <div class="edit-head">
-        Edit community
+        <div class="edit-btn"><span class="arrow return" @click="showVerify=false"></span>return</div>
+        <div class="mini-button-border">
+          <div class="mini-button" @click="verify()">
+            <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
+            <template v-else>verify</template>
+          </div>
+        </div>
+      </div>
+      <div class="edit-form">
+        <div class="mian-form">
+          <!-- Verify -->
+          <div class="verify">
+            <div class="step step1">
+              <div class="step-title">Step 1</div>
+              <div class="step-intro">
+                Please click this button below and tweet a verification message on Twitter
+              </div>
+              <a class="twitter-button" target="_blank" :href="'https://twitter.com/intent/tweet?text='+text">
+                <img src="@/assets/images/common/logo-twitter.png"/>
+                Tweet
+              </a>
+            </div>
+            <div class="step step2">
+              <div class="step-title">Step 2</div>
+              <div class="step-intro">
+                On your tweet, find the share button. Copy link and paste it here. Click the button to verify your account
+              </div>
+              <el-input  placeholder="Paste link here"  v-model="twitter"  />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="edit-box" v-else>
+      <div class="edit-head">
+        <div class="edit-btn"><span class="arrow form-close" @click="closeEditLayer()"></span>Edit community</div>
         <div class="mini-button-border">
           <div class="mini-button" @click="save()">
             <img v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
@@ -18,6 +53,23 @@
             <div class="form-item-label"> Community Information</div>
             <div class="form-item-content">
               <el-input  placeholder="" type="textarea" autosize  v-model="edit.information" maxlength="500" show-word-limit/>
+            </div>
+          </div>
+
+          <!-- Binding -->
+          <div class="form-item form-item-media">
+            <div class="form-item-label"> Binding</div>
+            <div class="form-item-content">
+              <div :class="[edit.media.website.url?'':'empty']">
+                <el-input class="website-input" placeholder="Paste link here  " v-model="edit.media.website.url" />
+              </div>
+              <div :class="['verify-box',edit.media.twitter.url?'':'empty']">
+                <el-input class="twitter-input" placeholder="Paste link here  " v-model="edit.media.twitter.url" />
+                <div class="verify-button" @click="showVerify=true">Verify</div>
+              </div>
+              <div :class="[edit.media.discord.url?'':'empty']">
+                <el-input class="discord-input" placeholder="Paste link here  " v-model="edit.media.discord.url" />
+              </div>
             </div>
           </div>
 
@@ -64,6 +116,7 @@
   import { useRouter, useRoute } from "vue-router";
   import { useStore } from 'vuex';
   import axios from 'axios';
+  import { getAccountSign } from '../utils/util';
   export default {
     components: {
     },
@@ -85,6 +138,7 @@
       const state = reactive({
         edit:{
           information:props.editInfo.information,  
+          media:JSON.parse(JSON.stringify(props.editInfo.media)),
           contributor:[...props.editInfo.contributor]
         },
         //other
@@ -94,19 +148,33 @@
         nobody:false,
         hasSearchBorder:false,
         isLoading:false,
+
+        showVerify:false,
+        twitter:"",
+        signtrue:"",
+        text:"",
       })
 
-      const init = () => {
-        // const contributors = props.editInfo.contributor;
-        // for(let i= 0;i<contributors.length;i++){
-        //   const user = await proxy.$axios.profile.get_user_info({
-        //     accountId:contributors[i],
-        //   });
-        //   if(user.success){
-        //     list.push(user.data);
-        //   }
-        // }
-        // state.edit.contributor = list;
+      const init = async () => {
+        state.signtrue = await getAccountSign(store.getters.accountId);
+        state.text = 'popula. '+ state.signtrue;
+
+      }
+      init();
+
+
+      const verify = async () => {
+        if(!state.twitter.trim()){
+          proxy.$Message({message: "Please copy the tweet link first and paste it into the input box in the second step",type: ""});
+        }
+        const res = await proxy.$axios.community.verify_twitter({twitter: state.twitter, sign: state.signtrue,communityId:route.params.id});
+        if(res.success){
+          proxy.$Message({message: "Twitter account verified successfully",type: "success"});
+          state.edit.media.twitter.url = res.data.author_url;
+          state.showVerify = false;
+        }else{
+          proxy.$Message({message: "Twitter Account verification failed",type: "error"});
+        }
       }
 
       const closeEditLayer = () => {
@@ -190,6 +258,9 @@
           communityId:props.communityId,
           information:state.edit.information,
           contributor:contributorList,
+          website:state.edit.media.website.url,
+          twitter:state.edit.media.twitter.url,
+          discord:state.edit.media.discord.url,
         }
         try{
           // console.log(param);
@@ -218,6 +289,7 @@
         deleteContributor,
         save,
         closeEditLayer,
+        verify,
       }
     }
   }
@@ -293,6 +365,32 @@
             font-weight: 700;
             position:relative;
             z-index:2;
+          }
+        }
+        .edit-btn{
+          height:24px;
+          line-height: 24px;
+          display:flex;
+          align-items:center;
+          font-family: D-DINExp-Bold;
+          font-size: 20px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          font-weight: 700;
+          cursor: pointer;
+          .arrow{
+            display:block;
+            width:24px;
+            height:24px;
+            margin-right:8px;
+            &.return{
+              background:url("@/assets/images/common/icon-arrow-left.png") no-repeat center center;
+              background-size:16px 16px;
+            }
+            &.form-close{
+              background:url("@/assets/images/common/icon-close.png") no-repeat center center;
+              background-size:16px 16px;
+            }
           }
         }
       }
@@ -490,8 +588,154 @@
                 }
               }
             }
+            &.form-item-media{
+              .empty{
+                :deep(.el-input){
+                  padding-bottom:15px;
+                  &.website-input{
+                    input{
+                      background-image:url('@/assets/images/common/logo-link-hover.png');
+                    }
+                  }
+                  &.twitter-input{
+                    input{
+                      background-image:url('@/assets/images/common/logo-twitter-hover.png');
+                    }
+                  }
+                  &.discord-input{
+                    input{
+                      background-image:url('@/assets/images/common/logo-discord-hover.png');
+                    }
+                  }
+                }
+                
+              }
+              :deep(.el-input){
+                padding-bottom:15px;
+                input{
+                  padding-left:44px;
+                }
+                &.website-input{
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-link.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
+                }
+                &.twitter-input{
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-twitter.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
+                }
+                &.discord-input{
+                  padding-bottom:0;
+                  input{
+                    background:#36363C url('@/assets/images/common/logo-discord.png') no-repeat 16px center;
+                    background-size:16px;
+                  }
+                }
+              }
+              .verify-box{
+                position:relative;
+                .verify-button{
+                  position: absolute;
+                  top:0;
+                  right:20px;
+                  display:flex;
+                  align-items: center;
+                  height:50px;
+                  font-family: D-DINExp;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  font-weight: 400;
+                  padding-right:16px;
+                  cursor: pointer;
+                  background:url("@/assets/images/common/icon-arrow-right.png") no-repeat right center;
+                  background-size:12px 12px;
+                }
+                :deep(.el-input){
+                  padding-bottom:15px;
+                  input{
+                    padding-right:85px;
+                  }
+                }
+              }
+            }
           }
+          .step{
+            padding:20px 0;
+            .step-title{
+              font-family: D-DINExp-Bold;
+              font-size: 18px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              font-weight: 700;
+              line-height:20px;
+            }
+            .step-intro{
+              margin-top:9px;
+              font-family: D-DINExp;
+              font-size: 14px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              line-height: 22px;
+              font-weight: 400;
+            }
+            .twitter-button{
+              margin:20px 0;
+              width:240px;
+              height:50px;
+              border: 2px solid #FED23C;
+              border-radius: 40px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
+              font-family: D-DINExp-Bold;
+              font-size: 16px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              text-align: center;
+              font-weight: 700;
+              img{
+                width:16px;
+                margin-right: 8px;
+              }
 
+            }
+            :deep(.el-input){
+              margin-top:20px;
+              width:100%;
+              input{
+                width:100%;
+                height: 50px;
+                line-height:48px;
+                background: #36363C;
+                border-radius: 10px;
+                padding:0 16px;
+                border:1px solid transparent;
+                font-family: D-DINExp;
+                font-size: 16px;
+                color: #FFFFFF;
+                letter-spacing: 0;
+                font-weight: 400;
+              }
+              .el-input__count{
+                background:transparent;
+                .el-input__count-inner{
+                  padding:0 10px;
+                  background:transparent;
+                  opacity: 0.5;
+                  font-family: D-DINExp;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  text-align: right;
+                  font-weight: 400;
+                }
+              }
+            }
+          }
         }
       }
     }
