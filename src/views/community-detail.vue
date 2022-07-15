@@ -119,8 +119,31 @@
                 <div class="info">
                   <div :class="['name','name-'+item.data.type]">
                     <span class="name-txt txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</span>
-                    <div class="user-flag co" v-if="item.data.type=='creator' || item.account_id==detail.data.createUser.account_id"></div>
-                    <div class="user-flag mod" v-else-if="item.data.type=='mod'"></div>
+                    <!-- CO -->
+                    <template v-if="item.data.type=='creator' || item.account_id==detail.data.createUser.account_id">
+                      <el-popover
+                        placement="bottom-start"
+                        trigger="hover"
+                        >
+                        <template #reference>
+                          <div class="user-flag co"></div>
+                        </template>
+                        <div class="pop-box pop-tip pop-user-flag">cocococococococococococococococococococococococococococococo</div>
+                      </el-popover>
+                    </template>
+                    <!-- MOD -->
+                    <template v-else-if="item.data.type=='mod'">
+                      <el-popover
+                        placement="bottom-start"
+                        trigger="hover"
+                        >
+                        <template #reference>
+                          <div class="user-flag mod"></div>
+                        </template>
+                        <div class="pop-box pop-tip pop-user-flag">modmodmodmodmodmodmodmodmodmodmodmodmodmodmodmodmodmod</div>
+                      </el-popover>
+                    </template>
+
                   </div>
                   <div class="account txt-wrap">{{item.account_id}}</div>
                 </div>
@@ -137,8 +160,6 @@
             </template>
           </div>
         </div>
-        <!-- About -->
-        <About/>
       </div>
     </div>
 
@@ -297,12 +318,12 @@
       <!-- right -->
       <div class="right">
         <!-- Points Amount-->
-        <template v-if="$route.params.id == 't3.community-genesis2.bhc8521.testnet'">
+        <!-- <template>
           <div class="title">Points Amount</div>
           <div class="points-amount">
             <img style="width:100%" src="@/assets/images/community/coming-soon.png"/>
           </div>
-        </template>
+        </template> -->
         
         
         <!--
@@ -366,8 +387,15 @@
           </template>
         </div>
         -->
-        <!-- About -->
-        <About/>
+
+        <div class="title">Token Contract</div>
+        <div class="token-contract">
+          <div class="token-contract-type">
+            NEAR Chain(NEP-141)
+            <a class="jump-contract" :href="$store.state.nearConfig.explorerUrl+'/accounts/'+$route.params.id" target="_blank"></a>
+          </div>
+          <div class="token-contract-address">{{$route.params.id}}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1849,6 +1877,44 @@
               font-weight: 400;
             }
           }
+        }
+      }
+      .token-contract{
+        margin-bottom:20px;
+        width:320px;
+        padding:20px;
+        background: #000000;
+        border-radius: 20px;
+        .token-contract-type{
+          display:flex;
+          align-items: center;
+          font-family: D-DINExp;
+          font-size: 14px;
+          letter-spacing: 0;
+          font-weight: 400;
+          line-height:20px;
+          color: rgba(255,255,255,0.5);
+          .jump-contract{
+            display:block;
+            width:20px;
+            height:20px;
+            background: url(/src/assets/images/post-item/icon-jump.png) no-repeat center;
+            background-size: 12px 12px;
+            cursor: pointer;
+          }
+        }
+        .token-contract-address{
+          font-family: D-DINExp-Bold;
+          font-size: 16px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          font-weight: 700;
+          line-height:20px;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 10px;
+          margin-top:10px;
+          padding:14px 16px;
+          word-break: break-all;
         }
       }
     }

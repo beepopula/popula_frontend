@@ -4,15 +4,34 @@
       <img v-if="detail.avatar" class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar"/>
       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
       <div class="info">
-        <div :class="['name','name-'+item.data.type]" v-if="name">
-          <div class="name-txt txt-wrap" v-html="name"></div>
-          <div class="user-flag co" v-if="detail.data.type=='creator'"></div>
-          <div class="user-flag mod" v-else-if="detail.data.type=='mod'"></div>
-        </div>
-        <div :class="['name','name-'+item.data.type]" v-else>
-          <div class="name-txt txt-wrap" v-html="accountId"></div>
-          <div class="user-flag co" v-if="detail.data.type=='creator'"></div>
-          <div class="user-flag mod" v-else-if="detail.data.type=='mod'"></div>
+        <div :class="['name','name-'+item.data.type]">
+          <div v-if="name" class="name-txt txt-wrap" v-html="name"></div>
+          <div v-else class="name-txt txt-wrap" v-html="accountId"></div>
+          <!-- CO -->
+          <template v-if="detail.data.type=='creator'">
+            <el-popover
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <div class="user-flag co"></div>
+              </template>
+              <div class="pop-box pop-tip pop-user-flag">cocococococococococococococococococococococococococococococo</div>
+            </el-popover>
+          </template>
+
+          <!-- MOD -->
+          <template v-else-if="detail.data.type=='mod'">
+            <el-popover
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <div class="user-flag mod"></div>
+              </template>
+              <div class="pop-box pop-tip pop-user-flag">modmodmodmodmodmodmodmodmodmodmodmodmodmodmodmodmodmod</div>
+            </el-popover>
+          </template>
         </div>
         <div class="account txt-wrap" v-html="accountId"></div>
         <div class="total">

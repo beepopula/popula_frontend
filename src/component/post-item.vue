@@ -4,7 +4,7 @@
       <div class="user">
         <!-- community -->
         <template v-if="community.communityId && from!='community' && from!='detail'">
-          <el-popover placement="bottom-start"  trigger="hover" >
+          <el-popover placement="bottom" :fallback-placements="[ 'top']"   trigger="hover" >
             <template #reference>
               <div @click.stop="redirectPage('/community-detail/'+community.communityId,false)">
                 <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
@@ -32,7 +32,7 @@
 
         <!-- user  :fallback-placements="[ 'bottom','left', 'top','right']" -->
         <template v-else>
-          <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
+          <el-popover placement="bottom" :fallback-placements="[ 'top']" trigger="hover" @show="showUser=true" @hide="showUser=false">
             <template #reference>
               <div @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
                 <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
@@ -46,7 +46,18 @@
           <div class="user-info">
             <div class="name" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
               <div class="name-txt txt-wrap" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
-              <div class="user-flag co" v-if="community.accountId && community.accountId == user.account_id"></div>
+              <!-- CO -->
+              <template v-if="community.accountId && community.accountId == user.account_id">
+                <el-popover
+                  placement="bottom-start"
+                  trigger="hover"
+                  >
+                  <template #reference>
+                    <div class="user-flag co"></div>
+                  </template>
+                  <div class="pop-box pop-tip pop-user-flag">cocococococococococococococococococococococococococococococo</div>
+                </el-popover>
+              </template>
             </div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>

@@ -4,7 +4,7 @@
       <!-- user -->
       <div class="user" v-if="$props.item.data">
         <!-- avatar -->
-        <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
+        <el-popover placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="showUser=true" @hide="showUser=false">
           <template #reference>
             <div @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
               <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
@@ -20,8 +20,30 @@
         <div class="user-info">
           <div class="name" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
             <div class="name-txt txt-wrap">{{item.accountId}}</div>
-            <div class="user-flag co" v-if="$props.community.accountId == item.accountId"></div>
-            <div class="user-flag po" v-if="$props.post.accountId == item.accountId"></div>
+            <!-- CO -->
+            <template v-if="$props.community.accountId == item.accountId">
+              <el-popover
+                placement="bottom-start"
+                trigger="hover"
+                >
+                <template #reference>
+                  <div class="user-flag co"></div>
+                </template>
+                <div class="pop-box pop-tip pop-user-flag">cocococococococococococococococococococococococococococococo</div>
+              </el-popover>
+            </template>
+            <!-- PO -->
+            <template v-if="$props.post.accountId == item.accountId">
+              <el-popover
+                placement="bottom-start"
+                trigger="hover"
+                >
+                <template #reference>
+                  <div class="user-flag po"></div>
+                </template>
+                <div class="pop-box pop-tip pop-user-flag">popopopopopopopopopopopopopopopopopopopopopopopopopo</div>
+              </el-popover>
+            </template>
           </div>
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>

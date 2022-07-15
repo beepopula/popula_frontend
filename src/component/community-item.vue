@@ -18,7 +18,7 @@
       <!--createUser-->
       <div class="creator txt-wrap" v-if="from=='popup' && detail.data.createUser">@{{detail.data.createUser.name || detail.data.createUser.account_id}}</div>
       <div class="creator txt-wrap" v-else-if="from=='popup'">@{{detail.accountId}}</div>
-      <el-popover v-else placement="bottom-start"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
+      <el-popover v-else placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
         <template #reference>
           <div class="creator txt-wrap" @click.stop="redirectPage('/user-profile/'+detail.accountId,false)">@{{detail.accountId}}</div>
         </template>

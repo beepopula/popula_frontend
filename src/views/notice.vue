@@ -14,7 +14,7 @@
             <!-- reply -->
             <div v-if="item.type != 'follow' && item.data.count==0 && !item.data.At" class="content-item" @click="redirectPage('/detail/'+item.comment.commentPostId+'?comment='+item.comment.target_hash,false)">
               <div class="user">
-                <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
+                <el-popover placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
                     <img v-if="item.user && item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
@@ -48,7 +48,7 @@
             <template v-else-if="item.type != 'follow' && item.data.count==0 && item.data.At">
               <div v-if="item.post" class="content-item" @click="redirectPage('/detail/'+item.post.target_hash,false)">
                 <div class="user">
-                  <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
+                  <el-popover placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                     <template #reference>
                       <img v-if="item.user && item.user.avatar" class="avatar" :src="$store.getters.getAwsImg(item.user.avatar)" @error.once="$event.target.src=item.user.avatar" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>
                       <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click.stop="redirectPage('/user-profile/'+item.accountId,false)"/>

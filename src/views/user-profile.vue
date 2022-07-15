@@ -169,7 +169,7 @@
         </div>
         <div v-if="followList[followCurrentTab]['length']>0" class="follow-list" ref="followDiv" @scroll="followScroll()">
           <div class="follow-item" v-for="user in followList[followCurrentTab]" :key="user.data.account_id" @click="redirectPage('/user-profile/'+user.data.account_id,false)">
-            <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
+            <el-popover placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
               <template #reference>
                 <img v-if="user.data.avatar" class="avatar" :src="$store.getters.getAwsImg(user.data.avatar)" @error.once="$event.target.src=user.data.avatar" />
                 <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
@@ -1054,6 +1054,7 @@
       height: calc(100vh - 120px);
       background: #28282D;
       border-radius: 24px;
+      overflow:visible;
       .tab-box{
         display:flex;
         align-items: center;

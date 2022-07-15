@@ -163,7 +163,7 @@
   .pop-notice{
     position:absolute;
     top:46px;
-    left:0;
+    right:0;
     .title{
       text-align: left;
     }
