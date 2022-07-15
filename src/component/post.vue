@@ -62,9 +62,10 @@
 
         <!-- images -->
         <div class="images" >
-          <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
+          <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in images" @click="imagePreview(index)">
             <div class="delete-image" @click.stop="handleRemove(index)"></div>
-            <img :src="$store.getters.getAwsImg(img)" @error.once="$event.target.src=img">
+            <img v-if="img" :src="img">
+            <img v-else :src="$store.getters.getAwsImg(postForm.imgs[index])" @error.once="$event.target.src=postForm.imgs[index]">
           </div>
         </div>
       </div>
@@ -254,8 +255,10 @@
         </div>
       </div>
       <div class="cover-preview">
-        <img v-if="postForm.nft.cover" :src="$store.getters.getAwsImg(postForm.nft.cover)" @error.once="$event.target.src=postForm.nft.cover" />
-        <img v-else :src="postForm.nft.defaultCover"/>
+        <!-- <img v-if="postForm.nft.cover" :src="$store.getters.getAwsImg(postForm.nft.cover)" @error.once="$event.target.src=postForm.nft.cover" />
+        <img v-else :src="postForm.nft.defaultCover"/> -->
+        <img v-if="nftCover" :src="nftCover" />
+        <img v-else :src="nftDefaultCover"/>
       </div>
       <div class="title mt40">Public offering</div>
       <div class="intro" v-if="postForm.nft.isPublicSale">Public offering gives you the option to set the 
@@ -286,7 +289,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
   <!-- Image Preview -->
   <template v-if="showPreview">
-    <ImagePreview :imgs="postForm.imgs" :index="index"  @closePreview = "closePreview" ></ImagePreview>
+    <ImagePreview :imgs="images" :index="index"  @closePreview = "closePreview" ></ImagePreview>
   </template>
 
   <!-- login-mask -->
@@ -365,6 +368,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             copies:1000,
           }
         },
+        images:[],
+        nftCover:'',
+        nftDefaultCover:'',
+
         defaultCommunity:{},
         focusNode:null,
         focusOffset:null,
@@ -589,11 +596,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.showUserList = false;
       }
 
-
-
-
-
-
       //checkLogin
       const postInput = ref();
       const checkLogin = () => {
@@ -656,11 +658,28 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         upload(file).then(data=>{
           stateData.count--;
           state.postForm.imgs[inx] = data;
+          blobToBase64(inx,file);
         })
+      }
+
+      const blobToBase64 = (inx,blob) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', ()=> {
+          console.log(inx,reader.result);
+          if(inx>=0){
+            state.images[inx] = reader.result;
+          }else if(inx==-1){
+            state.nftCover = reader.result;
+          }else if(inx==-2){
+            state.nftDefaultCover = reader.result;
+          }
+        });
+        reader.readAsDataURL(blob);
       }
       const handleRemove = (index) => {
         stateData.imgList.splice(index,1);
         state.postForm.imgs.splice(index,1);
+        state.images.splice(index,1);
       }
 
       //image preview
@@ -865,6 +884,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         fileByBase64(file)
         upload(file).then(data=>{
           state.postForm.nft.cover = data;
+          blobToBase64(-1,file);
         })
       }
       const fileByBase64 = (file) => {
@@ -878,6 +898,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // fileByBase64(obj.file)
         state.postForm.nft.defaultCover = obj.url;
         state.postForm.nft.defaultCoverFile = obj.file;
+        blobToBase64(-2,obj.file);
       }
 
 
@@ -1174,6 +1195,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             copies:1000,
           }
         };
+        state.images = [];
         stateData.imgList = [];
         stateData.count = 0;
         postInput.value.innerHTML = "";

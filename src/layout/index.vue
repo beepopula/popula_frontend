@@ -492,7 +492,7 @@ export default {
       overflow-x:hidden;
       overflow-y:scroll;
       padding:60px 10px 60px 0;
-      max-height:100vh;
+      height:100vh;
       width:100%;
     }
     .edit-button{

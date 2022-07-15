@@ -36,8 +36,10 @@
                 <div class="form-item-content">
                   <div class="cover-box">
                     <template v-if="item.picture">
-                      <img class="cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/>
-                      <div class="cover-delete-btn" @click="item.picture=''"></div>
+                      <!-- <img class="cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/> -->
+                      <img v-if="item.pictureFile" class="cover" :src="item.pictureFile"/>
+                      <img v-else class="cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/>
+                      <div class="cover-delete-btn" @click="item.picture='';item.pictureFile='';"></div>
                     </template>
                     <div class="upload-button" @click="uploadCover(item)"></div>
                   </div>
@@ -148,8 +150,6 @@
           picture:'',
           title:'',
           introduction:'',
-          creator:'',
-          time:''
         })
       }
 
@@ -188,9 +188,19 @@
       const uploadImg = ({ file }) => {
         upload(file).then(data=>{
           state.currentItem.picture = data;
-          state.currentItem = null;
+          blobToBase64(file);
           state.isUploading = false;
         })
+      }
+
+      const blobToBase64 = (blob) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', ()=> {
+          console.log(reader.result);
+          state.currentItem.pictureFile = reader.result;
+          state.currentItem = null;
+        });
+        reader.readAsDataURL(blob);
       }
 
       //edit

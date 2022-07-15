@@ -58,7 +58,8 @@
           :auto-upload="false"
         >
           <div class="avatar-box">
-            <img v-if="editProfile.avatar" class="avatar" :src="$store.getters.getAwsImg(editProfile.avatar)" @error.once="$event.target.src=editProfile.avatar" />
+            <img v-if="avatarFile" class="avatar" :src="avatarFile" />
+            <img v-else-if="editProfile.avatar" class="avatar" :src="$store.getters.getAwsImg(editProfile.avatar)" @error.once="$event.target.src=editProfile.avatar" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
@@ -72,7 +73,8 @@
           :auto-upload="false"
         >
           <div class="background-box">
-            <img v-if="editProfile.background" class="background" :src="$store.getters.getAwsImg(editProfile.background)" @error.once="$event.target.src=editProfile.background" />
+            <img v-if="backgroundFile" class="background" :src="backgroundFile" />
+            <img v-else-if="editProfile.background" class="background" :src="$store.getters.getAwsImg(editProfile.background)" @error.once="$event.target.src=editProfile.background" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
@@ -156,6 +158,8 @@
       const state = reactive({
         editProfile:{...props.editInfo},
         paramName:'',
+        avatarFile:'',
+        backgroundFile:'',
         nameError:false,
         isLoading:false,
         showVerify:false,
@@ -183,13 +187,23 @@
         state.paramName = 'background'
         backgroundCropper.value.uploads(file);
       }
-      const changeicon = (e) => {
-        state.editProfile[state.paramName] = e;
+      const changeicon = (res) => {
+        state.editProfile[state.paramName] = res.url;
+        blobToBase64(state.paramName,res.file);
       }
 
       const closeEditLayer = () => {
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         emit('closeEditLayer');
+      }
+
+      const blobToBase64 = (paramName,blob) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', ()=> {
+          console.log(reader.result);
+          state[paramName+'File'] = reader.result;
+        });
+        reader.readAsDataURL(blob);
       }
 
       const verify = async () => {

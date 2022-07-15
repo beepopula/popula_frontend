@@ -22,7 +22,8 @@
           :auto-upload="false"
         >
           <div class="avatar-box">
-            <img v-if="edit.avatar" class="avatar" :src="$store.getters.getAwsImg(edit.avatar)" @error.once="$event.target.src=edit.avatar" />
+            <img v-if="avatarFile" class="avatar" :src="avatarFile" />
+            <img v-else-if="edit.avatar" class="avatar" :src="$store.getters.getAwsImg(edit.avatar)" @error.once="$event.target.src=edit.avatar" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
@@ -36,7 +37,8 @@
           :auto-upload="false"
         >
           <div class="cover-box">
-            <img v-if="edit.cover" class="cover" :src="$store.getters.getAwsImg(edit.cover)" @error.once="$event.target.src=edit.cover" />
+            <img v-if="coverFile" class="cover" :src="coverFile" />
+            <img v-else-if="edit.cover" class="cover" :src="$store.getters.getAwsImg(edit.cover)" @error.once="$event.target.src=edit.cover" />
             <div class="upload-button"></div>
           </div>
         </el-upload>
@@ -97,6 +99,8 @@
         //   info:'',
         // },
         //other 
+        avatarFile:'',
+        coverFile:'',
         nameError:false,
         paramName:'',
         isLoading:false,
@@ -113,14 +117,24 @@
         state.paramName = 'cover'
         coverCropper.value.uploads(file);
       }
-      const changeicon = (e) => {
-        console.log(e,'----e-----');
-        state.edit[state.paramName] = e;
+      const changeicon = (res) => {
+        console.log(res,'----e-----');
+        state.edit[state.paramName] = res.url;
+        blobToBase64(state.paramName,res.file);
       }
 
       const closeEditLayer = () => {
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         emit('closeEditLayer');
+      }
+
+      const blobToBase64 = (paramName,blob) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', ()=> {
+          console.log(reader.result);
+          state[paramName+'File'] = reader.result;
+        });
+        reader.readAsDataURL(blob);
       }
 
       //edit
@@ -281,23 +295,23 @@
             height: 98px;
             padding:4px;
             border:0;
-            border-radius:50%;
+            border-radius:16px;
             background: rgba(40,40,45,1);
             .avatar-box{
               width: 90px;
               height: 90px;
-              border-radius:50%;
+              border-radius:16px;
               position:relative;
               .avatar{
                 width: 90px;
                 height: 90px;
                 object-fit: cover;
-                border-radius:50%;
+                border-radius:16px;
               }
               .upload-button{
                 width: 90px;
                 height: 90px;
-                border-radius:50%;
+                border-radius:16px;
                 background: rgba(0,0,0,0.50) url("@/assets/images/common/icon-upload.png") no-repeat center center;
                 background-size:30px;
                 position:absolute;

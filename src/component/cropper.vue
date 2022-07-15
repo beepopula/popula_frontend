@@ -77,7 +77,7 @@ export default defineComponent({
                 state.dialogVisible = false
                 const data =  await upload(blob);
                 state.isloading = false;
-                emit('changeicon',data)
+                emit('changeicon',{url:data,file:blob})
             // }
         }
 		const uploads = (file) => {
