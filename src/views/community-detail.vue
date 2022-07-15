@@ -847,7 +847,6 @@
         document.getElementsByTagName('body')[0].classList.add("fixed");
       }
       const updateContributor = (info) => {
-        console.log(info,'---info----');
         state.detail.information = info.information;
         state.contributors = [...info.contributor];
         state.media = {...info.media}

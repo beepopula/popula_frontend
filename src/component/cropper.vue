@@ -69,7 +69,6 @@ export default defineComponent({
                 let blob = state.blob;
                 if (blob.size / 1024 > 1024 * 5) { //1024 * 10
                     compressAccurately(blob, 1024 * 5).then(res => {
-                        console.log(res,'----compressAccurately res---')
                         blob = res;
                     })
                 } 

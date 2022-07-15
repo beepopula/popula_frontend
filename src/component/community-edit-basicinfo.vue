@@ -118,7 +118,6 @@
         coverCropper.value.uploads(file);
       }
       const changeicon = (res) => {
-        console.log(res,'----e-----');
         state.edit[state.paramName] = res.url;
         blobToBase64(state.paramName,res.file);
       }

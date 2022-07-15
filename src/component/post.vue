@@ -460,7 +460,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //@
       const onCheck = (e) => {
-        console.log(postInput.value.textContent.length,'---postInput.value.textContent.length-----');
         if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }
@@ -632,7 +631,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         return new Promise((resolve, reject) => {
           if (file.size / 1024 > 1024 * 5) { //1024 * 10
             compressAccurately(file, 1024 * 5).then(res => {
-              console.log(res,'----compressAccurately res---')
               resolve(res)
             })
           } else {

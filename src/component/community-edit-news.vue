@@ -177,7 +177,6 @@
         return new Promise((resolve, reject) => {
           if (file.size / 1024 > 1024 * 5) { //1024 * 10
             compressAccurately(file, 1024 * 5).then(res => {
-              console.log(res,'----compressAccurately res---')
               resolve(res)
             })
           } else {
