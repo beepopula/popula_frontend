@@ -1,15 +1,15 @@
 <template>
-  <div class="elastic-layer confirm-modal-box">
-    <div class="confirm-modal">
-      <div class="title">{{$props.title}}</div>
+  <div class="elastic-layer confirm-modal-box" @click.self="cancel">
+    <div :class="['confirm-modal','confirm-modal-'+$props.title.toLowerCase()]">
+      <div class="title">{{$props.title}} ?</div>
       <div class="intro">{{$props.intro}}</div>
       <div class="button-box">
-        <div class="mini-button-border button-cancle" @click="cancel">
-          <div class="mini-button">Cancle</div>
+        <div class="button-border button-cancle" @click="cancel">
+          <div class="button">Cancle</div>
         </div>
-        <div class="mini-button-border" @click="confirm()">
+        <div class="button-border" @click="confirm()">
           
-          <div class="mini-button">
+          <div class="button">
             <img  v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
             <template v-else>Confirm</template>
           </div>
@@ -82,12 +82,11 @@
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    width: 320px;
+    width: 500px;
     z-index:99;
-    padding:30px;
-    background: #000000;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0px 2px 30px 0px rgb(0 0 0 / 50%);
+    padding:50px;
+    background: #28282D;
+    border-radius: 24px;
     border-radius: 10px;
     font-family: D-DINExp;
     font-size: 14px;
@@ -96,19 +95,21 @@
 
     .title{
       font-family: D-DINExp-Bold;
-      font-size: 16px;
+      font-size: 20px;
       color: #FFFFFF;
       letter-spacing: 0;
+      text-align: center;
+      line-height: 28px;
       font-weight: 700;
     }
     .intro{
-      margin-top:8px;
+      margin-top:17px;
       font-family: D-DINExp;
-      font-size: 14px;
+      font-size: 16px;
       color: rgba(255,255,255,0.5);
       letter-spacing: 0;
-      text-align: left;
-      line-height: 22px;
+      text-align: center;
+      line-height: 24px;
       font-weight: 400;
       word-break: break-word;
       cursor: default;
@@ -116,14 +117,43 @@
     .button-box{
       display:flex;
       justify-content:space-between;
-      padding:30px 32px 0;
-      .mini-button{
-        background:#000;
+      margin-top:50px;
+      .button-border{
+        width:190px;
+        height:50px;
+        border-radius:25px;
+        .button{
+          background: #28282D;
+          width:186px;
+          height:46px;
+          border-radius:25px;
+        }
       }
+      
       .button-cancle{
         background:rgba(255,255,255,0.2);
         &::after{
           display:none;
+        }
+      }
+    }
+    &.confirm-modal-delete{
+      .button-border{
+        background: rgba(255, 255, 255, 0.2);
+        &:hover::after{
+          display:none;
+        }
+      }
+      .button-cancle{
+        background: #FED23C;
+        &::after{
+          display:block;
+        }
+        &:hover{
+          &::after {
+            display:block;
+            opacity:0.8;
+          }
         }
       }
     }

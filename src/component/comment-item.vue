@@ -86,7 +86,7 @@
         Replying to 
         <el-popover placement="bottom-start"  trigger="hover" @show="showReplyUser=true" @hide="showReplyUser=false">
           <template #reference>
-            <span>@{{item.data.replay}}</span>
+            <span @click.stop="redirectPage('/user-profile/'+item.data.replay,false)">@{{item.data.replay}}</span>
           </template>
           <template v-if="showReplyUser">
             <UserPopup :account="item.data.replay" @login="showLogin=true"/>
