@@ -1892,8 +1892,8 @@
           font-size: 14px;
           letter-spacing: 0;
           font-weight: 400;
-          line-height:20px;
-          color: rgba(255,255,255,0.5);
+          line-height:16px;
+          color: rgba(255,255,255,0.7);
           .jump-contract{
             display:block;
             width:20px;
@@ -1905,14 +1905,14 @@
         }
         .token-contract-address{
           font-family: D-DINExp-Bold;
-          font-size: 16px;
+          font-size: 14px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 700;
           line-height:20px;
           border: 1px solid rgba(255,255,255,0.2);
           border-radius: 10px;
-          margin-top:10px;
+          margin-top:16px;
           padding:14px 16px;
           word-break: break-all;
         }

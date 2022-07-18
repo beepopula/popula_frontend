@@ -303,6 +303,17 @@
 
     <!-- login-mask -->
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
+
+    <!-- ConfirmModal -->
+    <template v-if="showReportModal">
+      <ConfirmModal :title="'Report'" :intro="'I think this comments has offended me.'" @cancel="showReportModal=false" @confirm="reportConfirm"/>
+    </template>
+    <template v-if="showDeleteModal">
+      <ConfirmModal :title="'Delete'" :intro="'This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results.'" @cancel="showDeleteModal=false" @confirm="deleteConfirm"/>
+    </template>
+    <template v-if="showBlockModal">
+      <ConfirmModal :title="'Block'" :intro="'This will hide this comments from your posts as well as hide them from your view on your explore and other threads.'" @cancel="showBlockModal=false" @confirm="blockConfirm"/>
+    </template>
   </div>
 </template>
 
@@ -321,6 +332,7 @@ import ImagePreview from '@/component/image-preview.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
 import Comment from '@/component/comment.vue';
+import ConfirmModal from '@/component/confirm-modal.vue';
 import BN from 'bn.js';
 import * as bs58 from 'bs58';
 export default {
@@ -330,7 +342,8 @@ export default {
     ImagePreview,
     Like,
     LoginMask,
-    Comment
+    Comment,
+    ConfirmModal
   },
   props:{
     from:{
@@ -409,6 +422,10 @@ export default {
       commentCount:props.item.data.commentCount,
       showCommentBox:false,
       addCount:false,
+      //report | delete | block
+      showReportModal:false,
+      showDeleteModal:false,
+      showBlockModal:false,
       //other
 
       copyText:"",
@@ -578,13 +595,14 @@ export default {
     watch(
       () => textDom.value,
       (newVal) => {
-        if(!textBox || !textDom || !textBox.value || !textDom.value){return;}
-        const textBoxHeight = textBox.value.getBoundingClientRect().height;
-        const textDomHeight = textDom.value.getBoundingClientRect().height;
-        if(textBoxHeight>=textDomHeight){
-          state.needWrap = false;
-        }else{
-          state.needWrap = true;
+        if(newVal){
+          const textBoxHeight = textBox.value.getBoundingClientRect().height;
+          const textDomHeight = textDom.value.getBoundingClientRect().height;
+          if(textBoxHeight>=textDomHeight){
+            state.needWrap = false;
+          }else{
+            state.needWrap = true;
+          }
         }
       }
     )
@@ -762,6 +780,12 @@ export default {
     //edit
     const del = async () => {
       if(checkLogin()){
+        state.showDeleteModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const deleteConfirm = async () => {
+      if(checkLogin()){
         const params= {
           hierarchies : [{
             target_hash : props.item.target_hash,
@@ -777,15 +801,18 @@ export default {
             res = await communityContract.delContent(params);
           }
           if (res == true) {
+            state.showDeleteModal = false;
             state.hasDelete = true;
             proxy.$Message({
               message: "delete success",
               type: "success",
             });
           } else  if (res == false) {
+            state.showDeleteModal = false;
             throw new Error('error')
           } else {}
         }catch(e){
+          state.showDeleteModal = false;
           console.log("delete error:"+e);
           proxy.$Message({
             message: "Delete Failed",
@@ -795,7 +822,13 @@ export default {
         }
       }
     }
-    const report = async () => {
+    const report= async () => {
+      if(checkLogin()){
+        state.showReportModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const reportConfirm = async () => {
       if(checkLogin()){
         const params= {
           hierarchies : [{
@@ -812,14 +845,17 @@ export default {
             res = await communityContract.report(params);
           }
           if (res == true) {
+            state.showReportModal = false;
             proxy.$Message({
               message: "report success",
               type: "success",
             });
           } else  if (res == false) {
+            state.showReportModal = false;
             throw new Error('error')
           } else {}
         }catch(e){
+          state.showReportModal = false;
           console.log("report error:"+e);
           proxy.$Message({
             message: "Report Failed",
@@ -831,6 +867,12 @@ export default {
     }
     const block = async () => {
       if(checkLogin()){
+        state.showBlockModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const blockConfirm = async () => {
+      if(checkLogin()){
         const postBlockList = JSON.parse(localStorage.getItem("postBlockList")) || [];
         let isBlocked = false;
         postBlockList.forEach(item=>{
@@ -840,6 +882,7 @@ export default {
           postBlockList.push(props.item.target_hash);
           localStorage.setItem("postBlockList",JSON.stringify(postBlockList));
         }
+        state.showBlockModal = false;
         proxy.$Message({type: "success",message: "block success"});
         state.isBlocked = true;
       }
@@ -878,8 +921,11 @@ export default {
       showLoginMask,
       closeLoginMask,
       del,
+      deleteConfirm,
       report,
+      reportConfirm,
       block,
+      blockConfirm,
       mintNft,
       shareTwitter
     };
