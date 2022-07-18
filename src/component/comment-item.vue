@@ -29,7 +29,7 @@
                 <template #reference>
                   <div class="user-flag co"></div>
                 </template>
-                <div class="pop-box pop-tip pop-user-flag">cocococococococococococococococococococococococococococococo</div>
+                <div class="pop-box pop-tip pop-user-flag">Community Originator</div>
               </el-popover>
             </template>
             <!-- PO -->
@@ -39,9 +39,9 @@
                 trigger="hover"
                 >
                 <template #reference>
-                  <div class="user-flag po"></div>
+                  <div class="user-flag op"></div>
                 </template>
-                <div class="pop-box pop-tip pop-user-flag">popopopopopopopopopopopopopopopopopopopopopopopopopo</div>
+                <div class="pop-box pop-tip pop-user-flag">Original Poster</div>
               </el-popover>
             </template>
           </div>
@@ -870,8 +870,8 @@ export default {
             margin-left:4px;
             width: 20px;
             height: 14px;
-            &.po{
-              background:url("@/assets/images/common/po.png") no-repeat right center;
+            &.op{
+              background:url("@/assets/images/common/op.png") no-repeat right center;
               background-size:20px 14px;
             }
             &.co{

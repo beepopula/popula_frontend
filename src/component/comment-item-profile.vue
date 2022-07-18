@@ -22,7 +22,7 @@
             <div class="name-txt txt-wrap">{{item.accountId}}</div>
             <!--
             <div class="user-flag co" v-if="$props.community.accountId == item.accountId"></div>
-            <div class="user-flag po" v-if="$props.post.accountId == item.accountId"></div>
+            <div class="user-flag op" v-if="$props.post.accountId == item.accountId"></div>
             -->
           </div>
           <el-popover placement="bottom-start"  trigger="hover">
@@ -347,7 +347,7 @@ export default {
     watch(
       () => textDom.value,
       (newVal) => {
-        if(newValue){
+        if(newVal){
           const textBoxHeight = textBox.value.getBoundingClientRect().height;
           const textDomHeight = textDom.value.getBoundingClientRect().height;
           if(textBoxHeight>=textDomHeight){
@@ -831,8 +831,8 @@ export default {
             margin-left:4px;
             width: 20px;
             height: 14px;
-            &.po{
-              background:url("@/assets/images/common/po.png") no-repeat right center;
+            &.op{
+              background:url("@/assets/images/common/op.png") no-repeat right center;
               background-size:20px 14px;
             }
             &.co{

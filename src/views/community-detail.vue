@@ -128,7 +128,7 @@
                         <template #reference>
                           <div class="user-flag co"></div>
                         </template>
-                        <div class="pop-box pop-tip pop-user-flag">cocococococococococococococococococococococococococococococo</div>
+                        <div class="pop-box pop-tip pop-user-flag">Community Originator</div>
                       </el-popover>
                     </template>
                     <!-- MOD -->
@@ -140,7 +140,7 @@
                         <template #reference>
                           <div class="user-flag mod"></div>
                         </template>
-                        <div class="pop-box pop-tip pop-user-flag">modmodmodmodmodmodmodmodmodmodmodmodmodmodmodmodmodmod</div>
+                        <div class="pop-box pop-tip pop-user-flag">Moderator</div>
                       </el-popover>
                     </template>
 

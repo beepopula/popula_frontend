@@ -75,7 +75,7 @@ export default {
     const init = async () => {
       if(route.path.indexOf('/notice') == -1){
         const res = await initNotice();
-        if(res.success && res.data.length>0){
+        if(res.success && res.data.count>0){
           state.hasNotice  = true;
         }
       }
@@ -92,7 +92,7 @@ export default {
         if(route.path.indexOf('/notice') == -1){
           state.hasNotice  = false;
           initNotice().then(res=>{
-            if(res.success && res.data.length>0){
+            if(res.success && res.data.count>0){
               state.hasNotice  = true;
             }
           })
@@ -101,7 +101,7 @@ export default {
 		);
 
     const initNotice = async () => {
-      return await proxy.$axios.profile.get_user_notifications({
+      return await proxy.$axios.profile.get_user_new_notifications({
         accountId:store.getters.accountId,
         lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
       })

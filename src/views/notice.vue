@@ -4,10 +4,11 @@
       <!-- left -->
       <div class="left">
         <div class="title">Notifications</div>
-        <!-- loading -->
-        <div class="loading-box" v-if="isLoading">
-          <img class="white-loading" src="@/assets/images/common/loading.png"/>
+        <div class="no-result"  v-if="isEnd && list.length==0">
+          <img src="@/assets/images/common/emoji-null.png"/>
+          No data
         </div>
+
         <!-- list -->
         <div v-else-if="list.length>0" class="list">
           <template v-for="item in list">
@@ -199,9 +200,9 @@
           </template>
         </div>
 
-        <div class="no-result"  v-else>
-          <img src="@/assets/images/common/emoji-null.png"/>
-          No data
+        <!-- loading -->
+        <div class="loading-box" v-if="isLoading">
+          <img class="white-loading" src="@/assets/images/common/loading.png"/>
         </div>
 
       </div>
@@ -234,18 +235,35 @@ export default {
     //state
     const state = reactive({
       isLoading:false,
-      list:[]
+      list:[],
+      page:0,
+      limit:20,
+      isEnd:false,
     })
 
-    const init = async () => {
+    const init = () => {
+      getList()
+    }
+
+    const getList = async () => {
+      if(state.isLoading){return;}
+
       state.isLoading = true;
       const res = await proxy.$axios.profile.get_user_notifications({
         accountId:store.getters.accountId,
-        lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
+        // lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
+         page:state.page,
+         limit:state.limit
       });
       if(res.success){
-        state.list = await handleData(res.data);
-        localStorage.setItem("notice_last_time_"+store.getters.accountId,res.lastTime);
+        if(state.page==0){
+          localStorage.setItem("notice_last_time_"+store.getters.accountId,res.lastTime);
+        }
+        if(res.data.lenth==0){
+          state.isEnd = true;
+        }
+        state.page = state.page + 1;
+        state.list = state.list.concat(await handleData(res.data));
       }
       state.isLoading = false;
     }
@@ -256,7 +274,7 @@ export default {
       for(let i = 0;i<length;i++){//data.length
         const item = data[i];
         try{
-          if(item.type!='follow' && item.data.count==0){ //reply & @
+          if(item.type!='follow' && item.data.count==0 && !item.data.At){ //reply
             //time
             item.time = getTimer(item.createAt)
             //user
@@ -269,14 +287,36 @@ export default {
               item.user = res.data;
             }
             //text
-            if(((item.type == 'comment' || item.type == 'mainPost') && item.comment.type == 'encrypt') || (item.type == 'post' && item.post.type == 'encrypt')){
+            if(item.type == 'comment' && item.comment.type == 'encrypt'){
               const info = await checkAccess(item);
               if(info.isAccess){
                 item.text = info.text;
                 item.isAccess = info.isAccess
               }
             }else{
-              item.text = (item.type == 'comment' || item.type == 'mainPost') ? item.comment.text : item.post.text;
+              item.text = item.comment.text;
+            }   
+          }else if(item.type!='follow' && item.data.count==0 && item.data.At){ //@
+            //time
+            item.time = getTimer(item.createAt)
+            //user
+            item.user = {}
+            const res = await proxy.$axios.profile.get_user_info({
+              accountId:item.type == 'comment' ? item.comment.accountId : item.post.accountId,
+              currentAccountId: store.getters.accountId || ''
+            });
+            if(res.success){
+              item.user = res.data;
+            }
+            //text
+            if((item.type == 'comment' && item.comment.type == 'encrypt') || ((item.type == 'post' || item.type == 'mainPost')  && item.post.type == 'encrypt')){
+              const info = await checkAccess(item);
+              if(info.isAccess){
+                item.text = info.text;
+                item.isAccess = info.isAccess
+              }
+            }else{
+              item.text = item.type == 'comment' ? item.comment.text : ((item.type == 'post' || item.type == 'mainPost') ? item.post.text : '');
             }   
           }else if(item.type!='follow' && item.data.count>0){ //like
             //url
@@ -346,15 +386,24 @@ export default {
       }
     };
 
+    //handleScroll
+    const handleScroll = async () => {
+      if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd){
+        await getList();
+      }
+    }
+
     return {
       ...toRefs(state),
       init,
-      redirectPage
+      redirectPage,
+      handleScroll
     }
   },
   mounted(){
     this.$router.push({query: {}});
     this.init();
+    window.addEventListener('scroll',this.handleScroll);
   }
 }
 </script>
@@ -373,7 +422,7 @@ export default {
     .loading-box{
       width:690px;
       margin-top:20px;
-      min-height:300px;
+      min-height:100px;
       display:flex;
       align-items:center;
       justify-content:center;
