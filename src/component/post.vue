@@ -141,8 +141,8 @@
             <div class="title">Choose Community</div>
             <div class="intro">You  haven't  joined  the  community  yet. Please  join  or  create  it.</div>
             <div class="button-box">
-              <div class="mini-button-border button-cancle" @click="showCommunity=false">
-                <div class="mini-button">Cancle</div>
+              <div class="mini-button-border button-cancel" @click="showCommunity=false">
+                <div class="mini-button">Cancel</div>
               </div>
               <div class="mini-button-border" @click="redirectPage('/communities')">
                 <div class="mini-button">Go</div>
@@ -214,8 +214,8 @@
           <div class="title">Notice</div>
           <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on <a href="https://wallet.testnet.near.org/" target="_blank">Recent activity</a></div>
           <div class="button-box">
-            <div class="mini-button-border button-cancle" @click="showNotice=false">
-              <div class="mini-button">Cancle</div>
+            <div class="mini-button-border button-cancel" @click="showNotice=false">
+              <div class="mini-button">Cancel</div>
             </div>
             <div class="mini-button-border" @click="confirmPost()">
               <div class="mini-button">Confirm</div>

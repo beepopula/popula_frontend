@@ -471,7 +471,7 @@ export default {
       .mini-button{
         background:#000;
       }
-      .button-cancle{
+      .button-cancel{
         background:rgba(255,255,255,0.2);
         &::after{
           display:none;

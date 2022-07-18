@@ -4,14 +4,14 @@
       <div class="title">{{$props.title}} ?</div>
       <div class="intro">{{$props.intro}}</div>
       <div class="button-box">
-        <div class="button-border button-cancle" @click="cancel">
-          <div class="button">Cancle</div>
+        <div class="button-border button-cancel" @click="cancel">
+          <div class="button">Cancel</div>
         </div>
         <div class="button-border" @click="confirm()">
           
           <div class="button">
             <img  v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
-            <template v-else>Confirm</template>
+            <template v-else>Ok</template>
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@
         }
       }
       
-      .button-cancle{
+      .button-cancel{
         background:rgba(255,255,255,0.2);
         &::after{
           display:none;
@@ -144,7 +144,7 @@
           display:none;
         }
       }
-      .button-cancle{
+      .button-cancel{
         background: #FED23C;
         &::after{
           display:block;
