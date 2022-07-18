@@ -17,12 +17,18 @@
             <div class="unread-count" v-if="postCount.follow">{{postCount.follow}}</div>
           </div>
         </div>
-        <template v-for="item in postList[currentTab]">
-          <PostItem :item="item"/>
-        </template>
+
+        <div class="post-list">
+          <template v-for="item in postList[currentTab]">
+            <PostItem :item="item" @changePostListStatus="changePostListStatus(item,$event)"/>
+          </template>
+        </div>
 
         <div class="no-more" v-if="isEnd">
-          <template v-if="postList[currentTab]['length'] == 0">No posts</template>
+          <div v-if="postList[currentTab]['length'] == 0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No posts
+          </div>
           <template v-else>No more posts</template>
         </div>
       </div>
@@ -191,6 +197,17 @@ export default {
       }
     }
 
+    //changePostListStatus 
+    const changePostListStatus = (item,close=false) => {
+      state.postList[state.currentTab].forEach(i=>{
+        if(i==item && !close){
+          i.isComment = true;
+        }else{
+          i.isComment = false;
+        }
+      })
+    }
+
     //redirectPage
     const redirectPage = (path,need_login=true) => {
       if(!store.getters.isLogin && need_login){
@@ -219,6 +236,7 @@ export default {
       changeTab,
       handleScroll,
       redirectPage,
+      changePostListStatus,
       showLoginMask,
       closeLoginMask,
       postSuccess
@@ -238,6 +256,12 @@ export default {
 .main {
   .left{
     padding-right:20px;
+    .post-list{
+      background: #28282D;
+      border-radius: 24px;
+      padding:0 20px;
+      margin-top:20px;
+    }
   }
   .right{
     .new-communities{

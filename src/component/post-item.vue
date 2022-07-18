@@ -1,46 +1,64 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete" :key="item.target_hash">
-    <div class="post-item" ref="txtBox">
+  <div class="post-item-box" v-if="!isBlocked && !hasDelete" :key="item.target_hash">
+    <div :class="['post-item',from=='detail' ? 'post-item-detail' : '']" ref="txtBox" @click="redirectPage('/detail/'+item.target_hash,false)">
       <div class="user">
         <!-- community -->
-        <template v-if="community.communityId && from!='communityDetail'">
-          <el-popover placement="bottom-start"  trigger="hover" >
+        <template v-if="community.communityId && from!='community' && from!='detail'">
+          <el-popover placement="bottom" :fallback-placements="[ 'top']"   trigger="hover" >
             <template #reference>
-              <img v-if="community.avatar"  class="avatar avatar-community" :src="community.avatar">
-              <img v-else  class="avatar avatar-community" src="@/assets/images/test/community.png">
+              <div @click.stop="redirectPage('/community-detail/'+community.communityId,false)">
+                <img v-if="community.avatar"  class="avatar avatar-community" :src="$store.getters.getAwsImg(community.avatar)" @error.once="$event.target.src=community.avatar">
+                <img v-else  class="avatar avatar-community" src="@/assets/images/community/default-avatar.png">
+              </div>
             </template>
             <template v-if="community.data">
               <CommunityItem :item="community" :from="'popup'"/>
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name  txt-wrap">{{community.name}}</div>
-            <el-popover placement="bottom-start"  trigger="hover">
-              <template #reference>
-                <div class="createtime">
-                  <div>posted by </div>
-                  <div class="username"><div class="txt-wrap">{{user.name || user.account_id}}</div></div>
+            <div class="name  txt-wrap" @click.stop="redirectPage('/community-detail/'+community.communityId,false)">{{community.name}}</div>
+            <div class="createtime">
+              <div>posted by </div>
+              <div class="username" @click.stop="redirectPage('/user-profile/'+user.account_id,false)"><div class="txt-wrap">{{user.name || user.account_id}}</div></div>
+              <el-popover placement="bottom-start"  trigger="hover">
+                <template #reference>
                   <div class="time">{{time.showTime}}</div>
-                </div>
-              </template>
-              <div class="pop-box pop-tip">{{time.hoverTime}}</div>
-            </el-popover>
+                </template>
+                <div class="pop-box pop-tip">{{time.hoverTime}}</div>
+              </el-popover>
+            </div> 
           </div>
         </template>
 
-        <!-- user -->
+        <!-- user  :fallback-placements="[ 'bottom','left', 'top','right']" -->
         <template v-else>
-          <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
+          <el-popover placement="bottom" :fallback-placements="[ 'top']" trigger="hover" @show="showUser=true" @hide="showUser=false">
             <template #reference>
-              <img v-if="user.avatar" class="avatar" :src="user.avatar" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
-              <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+user.account_id,false)"/>
+              <div @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
+                <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+                <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+              </div>
             </template>
-            <template v-if="showUser">
+            <template v-if="showUser && from!='detail'">
               <UserPopup :account="item.accountId" @login="showLogin=true"/>
             </template>
           </el-popover>
           <div class="user-info">
-            <div class="name txt-wrap" @click="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
+            <div class="name" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
+              <div class="name-txt txt-wrap" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">{{user.name || user.account_id}}</div>
+              <!-- CO -->
+              <template v-if="community.accountId && community.accountId == user.account_id">
+                <el-popover
+                  placement="bottom-start"
+                  trigger="hover"
+                  >
+                  <template #reference>
+                    <div class="user-flag co"></div>
+                  </template>
+                  <div class="pop-box pop-tip pop-user-flag">Community Originator</div>
+                </el-popover>
+              </template>
+            </div>
             <el-popover placement="bottom-start"  trigger="hover">
               <template #reference>
                 <div class="createtime">{{time.showTime}}</div>
@@ -51,25 +69,25 @@
         </template>
 
         <!-- edit -->
-        <el-popover placement="bottom-end"  trigger="hover">
+        <el-popover placement="bottom"  trigger="hover" popper-class="edit-popper">
           <template #reference>
             <img class="icon icon-edit" src="@/assets/images/post-item/icon-more.png"/>
           </template>
           <div class="pop-box pop-edit">
             <!-- self -->
             <template v-if="user.account_id == $store.getters.accountId">
-              <div class="pop-edit-item" @click="del()">
+              <div class="pop-edit-item" @click.stop="del()">
                 <img class="icon16" src="@/assets/images/post-item/icon-delete.png"/>
                 Delete
               </div>
             </template>
             <!-- other people -->
             <template v-else>
-              <div class="pop-edit-item" @click="report()">
+              <div class="pop-edit-item" @click.stop="report()">
                 <img class="icon16" src="@/assets/images/post-item/icon-report.png"/>
                 Report
               </div>
-              <div class="pop-edit-item" @click="block()">
+              <div class="pop-edit-item" @click.stop="block()">
                 <img class="icon16" src="@/assets/images/post-item/icon-block.png"/>
                 Block
               </div>
@@ -77,59 +95,42 @@
           </div>
         </el-popover>
       </div>
-      <!-- token-list -->
-      <div class="token-list" v-if="item.methodName=='add_encrypt_post' && !isAccess && !isChecking">
-        <div class="token-item" v-for="item in access.conditions">
-          <img class="token-icon" :src="item.FTCondition.icon"/>
-          <div class="token-count">
-            <span class="balance">{{item.FTCondition.balance}} {{item.FTCondition.symbol}}</span>
-            <span class="total">/ {{item.FTCondition.amount_to_access}} {{item.FTCondition.symbol}}</span>
-          </div>
-          <!--
-          <div class="token-get" @click.stop="getToken(item.FTCondition.tokenId)">
-            How to get
-            <img class="more-arrow" src="@/assets/images/common/icon-arrow-right.png"/>
-          </div>
-          -->
-        </div>
-        <div class="token-tip">This is a token-gated content.</div>
+      <div v-if="item.type=='encrypt' && !isAccess" class="default-content" @click.stop="redirectPage('/detail/'+item.target_hash,false)">
+        This is a Tonken-gated content.
       </div>
-      <!-- text -->
-      <div class="text" @click="redirectPage('/detail/'+item.target_hash,false)">
-        <template v-if="(item.methodName=='add_post'|| item.type=='nft' || isAccess) && text">
-          <pre v-if="from=='detail'"><div v-html="text"></div></pre>
+      <template v-else>
+        <!-- text -->
+        <div v-if="text" class="text" @click.stop="redirectPage('/detail/'+item.target_hash,false)">
+          <pre v-if="from=='detail'"><div v-html="text" @click.stop="textJump"></div></pre>
           <div v-else class="text-ellipsis-wrapper">
             <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']">
               <!--<pre>{{text}}</pre>-->
               <label class="btn" @click.stop="showall = !showall"></label>
-              <pre ref="textDom"><div v-html="text"></div></pre>
+              <pre ref="textDom"><div v-html="text" @click.stop="textJump"></div></pre>
             </div>
           </div>
-        </template>
 
-        <div v-else-if="text" class="default">
-          <img class="text-default" src="@/assets/images/post-item/text-default.png"/>
+          <!--
+          <div v-else-if="text" class="default">
+            <img class="text-default" src="@/assets/images/post-item/text-default.png"/>
+          </div>
+          -->
         </div>
-
-      </div>
-      <!-- images -->
-      <div v-if="(item.methodName=='add_post' || item.type=='nft' || isAccess) && images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-        <img class="img" v-for="(img,index) in images" :src="img" @click.stop="imagePreview(index)">
-      </div>
-      <div v-else-if="blur_imgs.length>0" :class="['images', 'images'+blur_imgs.length, blur_imgs.length>3 ? 'images-multiple' : '']" @click.self="redirectPage('/detail/'+item.target_hash,false)">
-        <div class="img" v-for="(img,index) in blur_imgs">
-          <img :src="img">
-          <div class="icon-lock"></div>
+        <!-- images -->
+        <div v-if="images.length>0" :class="['images', 'images'+images.length, images.length>=3 ? 'images-multiple' : '']">
+          <img class="img" v-for="(img,index) in images" :src="$store.getters.getAwsImg(img)" @error.once="$event.target.src=img" @click.stop="imagePreview(index)">
         </div>
-      </div>
+      </template>
       <!-- bottom edit -->
       <div class="info-bottom">
         <div class="info-left">
           <!-- token -->
-          <el-popover placement="bottom-start"  trigger="hover" v-if="item.methodName=='add_encrypt_post' && isAccess">
+          <el-popover placement="bottom-start"  trigger="hover" v-if="item.type=='encrypt' && !isChecking">
             <template #reference>
               <div class="bottom-token-list">
-                <img v-for="item in access.conditions" class="token-icon" :src="item.FTCondition.icon"/>
+                <template v-for="item in access.conditions">
+                  <img  :class="['token-icon',item.FTCondition.access ? '' : 'token-icon-gray']" :src="item.FTCondition.icon"/>
+                </template>
               </div>
             </template>
             <div class="pop-box pop-intro pop-token-list">
@@ -139,9 +140,12 @@
                   <div class="token-symbol">{{item.FTCondition.symbol}}</div>
                 </div>
                 <div class="right-check">
-                  <div class="count">≥ {{item.FTCondition.amount_to_access}}</div>
+                  <div class="count">
+                    <span :class="[item.FTCondition.access ? '' : 'no-access']">{{item.FTCondition.balance}}</span>
+                     / {{item.FTCondition.amount_to_access}}
+                  </div>
                   <img v-if="item.FTCondition.access" class="check-status" src="@/assets/images/community/icon-right.png"/>
-                  <img v-else="item.FTCondition.access" class="check-status" src="@/assets/images/community/icon-error.png"/>
+                  <img v-else class="check-status" src="@/assets/images/community/icon-error.png"/>
                 </div>
               </div>
             </div>
@@ -154,9 +158,9 @@
             </template>
             <div class="pop-box pop-intro pop-nft-intro" v-if="showNftPop">
               <template v-if="nft.isPublicSale">
-                <div :class="['mint-users','mint-users'+nft.collectors.length]" @click="showCollectorList()">
+                <div :class="['mint-users','mint-users'+nft.collectors.length]" @click.stop="showCollectorList()">
                   <template v-for="(u,index) in nft.collectors">
-                    <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="u.avatar" />
+                    <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="$store.getters.getAwsImg(u.avatar)" @error.once="$event.target.src=u.avatar" />
                     <img v-else  :class="['avatar','avatar'+index]" src="@/assets/images/common/user-default.png" />
                   </template>
                 </div>
@@ -164,7 +168,7 @@
                 <div class="intro-item">Copies：<span>{{nft.supply}}/{{nft.copies}}</span></div>
                 <div class="intro-item">Price：<span class="price">{{nft.price}}</span></div>
                 <div :class="['button-border','button-mint-nft',nft.supply>=nft.copies?'disabled':'']">
-                  <div class="button" @click="mintNft()">Buy now</div>
+                  <div class="button" @click.stop="mintNft()">Buy now</div>
                 </div>
               </template>
               <div v-else class="intro-item" style="margin-bottom:0;">Copies：<span>1</span></div>
@@ -190,7 +194,7 @@
             <div class="pop-box pop-intro pop-hash">
               <div class="hash-txt">
                 <a  class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
-                <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
+                <img class="icon-copy" @click.stop="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
               </div>
             </div>
           </el-popover>
@@ -203,22 +207,22 @@
               <div class="share">{{shareCount}}</div>
             </template>
             <div class="pop-box pop-edit">
-              <div class="pop-edit-item" @click="shareTwitter()">
+              <div class="pop-edit-item" @click.stop="shareTwitter()">
                 <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
                 Twitter
               </div>
-              <div class="pop-edit-item" @click="triggerCopy(item.target_hash,true)">
+              <div class="pop-edit-item" @click.stop="triggerCopy(item.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
-                Cory link
+                Copy link
               </div>
             </div>
           </el-popover>
           
-          <div :class="['comment',addCount ? 'add-count' : '']" @click="reply()">
+          <div :class="['comment',addCount ? 'add-count' : '']" @click.stop="reply()">
             <template v-if="commentCount">{{commentCount}}</template>
             <template v-else>Reply</template>
           </div>
-          <Like :item="like"/>
+          <Like :item="like" :type="'post'"/>
         </div>
       </div>
 
@@ -227,27 +231,28 @@
         <div class="nft">NFT</div>
         <template v-if="nft.isPublicSale">
           <div class="intro-item">Total sold：<span class="price">{{nft.total}}</span></div>
-          <div :class="['mint-users','mint-users'+nft.collectors.length]" @click="showCollectorList()">
+          <div :class="['mint-users','mint-users'+nft.collectors.length]" @click.stop="showCollectorList()">
             <template v-for="(u,index) in nft.collectors">
-              <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="u.avatar" />
+              <img v-if="u.avatar" :class="['avatar','avatar'+index]" :src="$store.getters.getAwsImg(u.avatar)" @error.once="$event.target.src=u.avatar" />
               <img v-else  :class="['avatar','avatar'+index]" src="@/assets/images/common/user-default.png" />
             </template>
           </div>
           <div class="intro-item" style="margin-left:0;">Copies：<span>{{nft.supply}}/{{nft.copies}}</span></div>
           <div class="intro-item">Price：<span class="price">{{nft.price}}</span></div>
           <div :class="['mini-button-border','button-mint-nft',nft.supply>=nft.copies?'disabled':'']">
-            <div class="mini-button" @click="mintNft()">Buy now</div>
+            <div class="mini-button" @click.stop="mintNft()">Buy now</div>
           </div>
         </template>
         <div v-else class="intro-item">Copies：<span>1</span></div>
       </div>
 
       <!-- comment -->
-      <div class="comment-box" v-if="from!='detail' && showCommentBox">
+      <div class="comment-box" v-if="from!='detail' && item.isComment">
         <Comment 
           :targetHash="item.target_hash" 
+          :parentAccount="user.account_id"
           :communityId="item.receiverId" 
-          :methodName="item.methodName" 
+          :postType="item.type"
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
@@ -261,8 +266,8 @@
     </template>
 
     <!-- Collectors layer -->
-    <div class="elastic-layer" v-if="showCollectors && item.type=='nft'" @click.self="closeCollectorList()">
-      <div class="edit-button close" @click="closeCollectorList()"></div>
+    <div class="elastic-layer" v-if="showCollectors && item.type=='nft'" @click="closeCollectorList()">
+      <div class="edit-button close" @click.stop="closeCollectorList()"></div>
       <div class="layer-content">
         <div class="elastic-content">
           <div class="title">Collectors</div>
@@ -273,8 +278,8 @@
             <template v-for="(user,index) in nft.collectorList">
               <el-popover placement="bottom-start"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
                 <template #reference>
-                  <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click="redirectPage('/user-profile/'+user.account_id,false)">
-                    <img v-if="user.avatar" class="avatar" :src="user.avatar" />
+                  <div :class="['collector-item',index%2==1 ? 'mr0' : '']" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
+                    <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar" />
                     <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
                     <div class="info">
                       <div class="name txt-wrap">{{user.name || user.account_id}}</div>
@@ -298,6 +303,17 @@
 
     <!-- login-mask -->
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
+
+    <!-- ConfirmModal -->
+    <template v-if="showReportModal">
+      <ConfirmModal :title="'Report'" :intro="'I think this comments has offended me.'" @cancel="showReportModal=false" @confirm="reportConfirm"/>
+    </template>
+    <template v-if="showDeleteModal">
+      <ConfirmModal :title="'Delete'" :intro="'This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results.'" @cancel="showDeleteModal=false" @confirm="deleteConfirm"/>
+    </template>
+    <template v-if="showBlockModal">
+      <ConfirmModal :title="'Block'" :intro="'This will hide this comments from your posts as well as hide them from your view on your explore and other threads.'" @cancel="showBlockModal=false" @confirm="blockConfirm"/>
+    </template>
   </div>
 </template>
 
@@ -305,8 +321,9 @@
 import { ref, reactive, toRefs , nextTick, watch, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
+import MainContract from "@/contract/MainContract";
 import NftContract from "@/contract/NftContract";
-import EncryptionContract from "@/contract/EncryptionContract";
+import CommunityContract from "@/contract/CommunityContract";
 import { formatAmount, parseAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
 import CommunityItem from '@/component/community-item.vue';
@@ -315,7 +332,9 @@ import ImagePreview from '@/component/image-preview.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
 import Comment from '@/component/comment.vue';
-import BN from 'bn.js'
+import ConfirmModal from '@/component/confirm-modal.vue';
+import BN from 'bn.js';
+import * as bs58 from 'bs58';
 export default {
   components: {
     CommunityItem,
@@ -323,7 +342,8 @@ export default {
     ImagePreview,
     Like,
     LoginMask,
-    Comment
+    Comment,
+    ConfirmModal
   },
   props:{
     from:{
@@ -347,8 +367,8 @@ export default {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
+    const mainContract = new MainContract(store.state.account);
     const nftContract = new NftContract(store.state.account);
-    const encryptionContract = new EncryptionContract(store.state.account);
 
     //state
     const state = reactive({
@@ -384,7 +404,7 @@ export default {
       needWrap:true,
       //images
       images: props.item.type=="nft" ? [] : props.item.imgs ,
-      blur_imgs:props.item.blur_imgs || [],
+      // blur_imgs:props.item.blur_imgs || [],
       index:0,
       showPreview:false,
       //gas
@@ -395,13 +415,19 @@ export default {
         likeCount:props.item.data.likeCount,
         isLiked:props.item.data.isLike,
         targetHash:props.item.target_hash,
+        accountId:props.item.accountId,
         communityId:(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT) ? "" : props.item.receiverId
       },
       //comment
       commentCount:props.item.data.commentCount,
       showCommentBox:false,
       addCount:false,
+      //report | delete | block
+      showReportModal:false,
+      showDeleteModal:false,
+      showBlockModal:false,
       //other
+
       copyText:"",
       showall:false,
       showLogin:false,
@@ -439,12 +465,6 @@ export default {
         state.text = state.text.replace(/<\/?.+?>/g, "").replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
         // state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
       }
-      // else{
-      //   const reg = RegExp(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/,"g");
-      //   state.text = state.text.replace(reg,(match)=>{
-      //     return `<span class='emoji'>${match}</span>`
-      //   })
-      // }
 
       //time
       state.time = getTimer(props.item.createAt)
@@ -459,7 +479,7 @@ export default {
         state.community = res.data.postCommunity;
       }
       //access
-      if(props.item.methodName=='add_encrypt_post'){
+      if(props.item.type=='encrypt'){
         checkAccess();
       }else{
         state.isChecking = false
@@ -472,7 +492,6 @@ export default {
     }
 
     const initNft = async () => {
-      console.log(state.token_series_id)
       if(!state.token_series_id){return;}
       const nft_info = await nftContract.getSeries({token_series_id:state.token_series_id});
       const supply = await nftContract.getSupply({token_series_id:state.token_series_id});
@@ -541,24 +560,17 @@ export default {
         //comment
         emit("changeAccess");
         //decrypt
-        const result = await proxy.$axios.post.get_sign({
+        const res = await proxy.$axios.post.get_decode_content({
           postId:props.item.target_hash,
-          accountId:store.getters.accountId
+          accountId:store.getters.accountId || ''
         });
-        const param = {
-          cipher_text: JSON.parse(props.item.encrypt_args), 
-          contract_id: state.community.communityId, 
-          sign: result.data.text_sign
-        }
-        const res = await encryptionContract.decrypt(param);
-        state.text = res.text;
-        if(props.searchWord){
-          const reg = RegExp(props.searchWord,"ig");
-          state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
-        }
-        state.images = Object.values(JSON.parse(res.imgs));
-        state.isAccess = check_result.is_access;
-        if(store.getters.accountId==props.item.accountId){
+        if(res.success){
+          state.text = res.data.text;
+          if(props.searchWord){
+            const reg = RegExp(props.searchWord,"ig");
+            state.text = state.text.replace(reg,`<span style='color: #FFD23C;'>${props.searchWord}</span>`)
+          }
+          state.images = res.data.imgs;
           state.isAccess = true;
         }
       }
@@ -583,13 +595,14 @@ export default {
     watch(
       () => textDom.value,
       (newVal) => {
-        if(!textBox || !textDom){return;}
-        const textBoxHeight = textBox.value.getBoundingClientRect().height;
-        const textDomHeight = textDom.value.getBoundingClientRect().height
-        if(textBoxHeight>textDomHeight){
-          state.needWrap = false;
-        }else{
-          state.needWrap = true;
+        if(newVal){
+          const textBoxHeight = textBox.value.getBoundingClientRect().height;
+          const textDomHeight = textDom.value.getBoundingClientRect().height;
+          if(textBoxHeight>=textDomHeight){
+            state.needWrap = false;
+          }else{
+            state.needWrap = true;
+          }
         }
       }
     )
@@ -614,26 +627,24 @@ export default {
       }
     };
 
-    //shareRecord
-    const shareRecord = async () => {
-      const res = await proxy.$axios.post.share_record({
-        target_hash:props.item.target_hash,
-        accountId:store.getters.accountId
-      });
-      if(res.success){
-        state.shareCount = parseInt(state.shareCount) + 1;
+    const textJump = (e) => {
+      if(e.target.className=='atFont'){
+        redirectPage(`/user-profile/${e.target.textContent.trim().slice(1)}`,false)
+      }else{
+        redirectPage(`/detail/${props.item.target_hash}`,false)
       }
     }
 
-    const shareTwitter = async (str) => {
-      await shareRecord();
-      const text = `${window.location.protocol}//${window.location.host}/detail/${props.item.target_hash}`;
-      window.open('https://twitter.com/intent/tweet?text='+text);
+    const shareTwitter = () => {
+      shareRecord();
+      window.open('https://twitter.com/intent/tweet?text='+getShareLink());
     }
+    
 
     //comment
     const comment = (res) => {
-      state.showCommentBox = false;
+      // state.showCommentBox = false;
+      emit("changePostListStatus",true);
       state.addCount = true;
       setTimeout(()=>{
         state.addCount = false;
@@ -643,12 +654,22 @@ export default {
 
     const reply = () => {
       if(checkLogin()){
+        if(props.item.type=='encrypt' && !state.isAccess){
+          proxy.$Message({message: "You do not have permission to comment on the current post"});
+          return;
+        }
         //post List
         state.focusComment = true;
-        state.showCommentBox=!state.showCommentBox;
+        // state.showCommentBox=!state.showCommentBox;
+        
 
         //postDetail
         emit("focus");
+        if(props.item.isComment){
+          emit("changePostListStatus",true);
+        }else{
+          emit("changePostListStatus");
+        }
       }
     }
 
@@ -663,19 +684,65 @@ export default {
       document.getElementsByTagName('body')[0].classList.remove("fixed");
     }
 
+    //ShareLink 
+    const getShareLink = () => {
+      const parmsJson = JSON.stringify({
+        type:'content',
+        args:{
+          hierarchies:[{target_hash:props.item.target_hash,account_id : props.item.accountId}],
+          inviter_id:store.getters.accountId || '',
+          contract_id: props.item.receiverId
+        }
+      })
+      const signature = bs58.encode(Buffer.from(parmsJson));
+      return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
+    const shareRecord = () => {
+      if(checkLogin()){
+        const params = {hierarchies:[{target_hash:props.item.target_hash,account_id : props.item.accountId}]};
+        const check_params = {
+          ...params,
+          // inviter_id: store.getters.accountId,
+          account_id: store.getters.accountId,
+        }
+        if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+          store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_shared", check_params).then(check_res => {
+            if(!check_res){
+              mainContract.share(params).then(res=>{
+                if(res){
+                  state.shareCount++;
+                }
+              })
+            }
+          })
+        }else{
+          store.state.viewAccount.viewFunction(props.item.receiverId, "check_shared", check_params).then(check_res => {
+            if(!check_res){
+              CommunityContract.new(props.item.receiverId).then(communityContract=>{
+                communityContract.share(params).then(res=>{
+                  if(res){
+                    state.shareCount++;
+                  }
+                })
+              })
+            }
+          })
+        }
+      }
+    }
+
     //share -> handleCopy
     const copy_text = ref()
     const triggerCopy = async (str,isShare) => {
-      state.copyText = isShare ? `${window.location.protocol}//${window.location.host}/detail/${str}` : str;
+      state.copyText = isShare ? getShareLink() : str;
       nextTick(() => {
         copy_text.value.click();
       });
-      if(isShare){
-        await shareRecord();
-      }
     }
     const handleCopyFun = () => {
       const clipboard = new Clipboard('#copy_text')
+      shareRecord();
       clipboard.on('success', e => {
         proxy.$Message({
           message: "copy success",
@@ -713,35 +780,98 @@ export default {
     //edit
     const del = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.post.delete({
-          postId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-      
-        if(res.success){
+        state.showDeleteModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const deleteConfirm = async () => {
+      if(checkLogin()){
+        const params= {
+          hierarchies : [{
+            target_hash : props.item.target_hash,
+            account_id : state.user.account_id,
+          }]
+        };
+        try{
+          let res = ''
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            res = await mainContract.delContent(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            res = await communityContract.delContent(params);
+          }
+          if (res == true) {
+            state.showDeleteModal = false;
+            state.hasDelete = true;
+            proxy.$Message({
+              message: "delete success",
+              type: "success",
+            });
+          } else  if (res == false) {
+            state.showDeleteModal = false;
+            throw new Error('error')
+          } else {}
+        }catch(e){
+          state.showDeleteModal = false;
+          console.log("delete error:"+e);
           proxy.$Message({
-            message: "delete success",
-            type: "success",
+            message: "Delete Failed",
+            type: "error",
           });
-          state.hasDelete = true;
+          return;
         }
       }
     }
-    const report = async () => {
+    const report= async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.post.report({
-          postId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
+        state.showReportModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const reportConfirm = async () => {
+      if(checkLogin()){
+        const params= {
+          hierarchies : [{
+            target_hash : props.item.target_hash,
+            account_id : state.user.account_id,
+          }]
+        };
+        try{
+          let res = ''
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            res = await mainContract.report(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            res = await communityContract.report(params);
+          }
+          if (res == true) {
+            state.showReportModal = false;
+            proxy.$Message({
+              message: "report success",
+              type: "success",
+            });
+          } else  if (res == false) {
+            state.showReportModal = false;
+            throw new Error('error')
+          } else {}
+        }catch(e){
+          state.showReportModal = false;
+          console.log("report error:"+e);
           proxy.$Message({
-            message: "report success",
-            type: "success",
+            message: "Report Failed",
+            type: "error",
           });
+          return;
         }
       }
     }
     const block = async () => {
+      if(checkLogin()){
+        state.showBlockModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const blockConfirm = async () => {
       if(checkLogin()){
         const postBlockList = JSON.parse(localStorage.getItem("postBlockList")) || [];
         let isBlocked = false;
@@ -752,6 +882,7 @@ export default {
           postBlockList.push(props.item.target_hash);
           localStorage.setItem("postBlockList",JSON.stringify(postBlockList));
         }
+        state.showBlockModal = false;
         proxy.$Message({type: "success",message: "block success"});
         state.isBlocked = true;
       }
@@ -781,6 +912,7 @@ export default {
       reply,
       getToken,
       redirectPage,
+      textJump,
       imagePreview,
       closePreview,
       copy_text,
@@ -789,8 +921,11 @@ export default {
       showLoginMask,
       closeLoginMask,
       del,
+      deleteConfirm,
       report,
+      reportConfirm,
       block,
+      blockConfirm,
       mintNft,
       shareTwitter
     };
@@ -802,12 +937,22 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .post-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
+
   .post-item{
-    margin-top:20px;
+    padding:20px 0;
+    margin-top:0;
     background: #28282D;
     border-radius: 24px;
-    padding:20px;
     cursor: pointer;
+    &.post-item-detail{
+      cursor: default;
+    }
     .user{
       height:40px;
       display:flex;
@@ -825,14 +970,42 @@ export default {
       }
       .user-info{
         margin-left:12px;
-        width:300px;
+        max-width:300px;
         .name{
+          height:20px;
+          display:flex;
+          align-items: center;
           font-family: D-DINExp-Bold;
           font-size: 18px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 700;
-          width:100%;
+          max-width: 300px;
+          line-height:20px;
+          .name-txt{
+            max-width: 300px;
+            font-family: D-DINExp-Bold;
+            font-size: 18px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            line-height:20px;
+            cursor: pointer;
+          }
+          .user-flag{
+            margin-left:4px;
+            width: 20px;
+            height: 14px;
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              width:28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
+            }
+          }
         }
         .createtime{
           margin-top:4px;
@@ -844,7 +1017,8 @@ export default {
           line-height:16px;
           display:flex;
           align-items: center;
-          width:300px;
+          max-width:300px;
+          cursor: pointer;
           .username{
             color: rgba(255,255,255,1);
             display:flex;
@@ -868,6 +1042,20 @@ export default {
         right:0;
         cursor:pointer;
       }
+    }
+    .default-content{
+      padding: 120px 0 64px;
+      background: #36363C url('@/assets/images/post-item/icon-lock-gray.png') no-repeat center 64px;
+      background-size:40px 40px;
+      border-radius: 10px;
+      font-family: D-DINExp;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0;
+      text-align: center;
+      font-weight: 400;
+      line-height:16px;
+      margin-top:20px;
     }
     .token-list{
       margin-top:20px;
@@ -977,6 +1165,11 @@ export default {
         border-radius:10px;
         object-fit: cover;
       }
+      &.images1{
+        .img,img{
+          height:370px;
+        }
+      }
       &.images2{
         .img,img{
           width:314px;
@@ -1020,6 +1213,12 @@ export default {
             width: 24px;
             height: 24px;
             border-radius:50%;
+            &.token-icon-gray{
+              opacity: 0.5;
+            }
+            &:last-child{
+              margin-right: 0;
+            }
           }
         }
         .nft{
@@ -1031,6 +1230,9 @@ export default {
           font-weight: 700;
           cursor: pointer;
           margin-right:30px;
+          padding-right:16px;
+          background: url('@/assets/images/post-item/icon-nft.png') no-repeat right center;
+          background-size: 12px 12px;
         }
         .hash{
           margin-left:30px;
@@ -1108,6 +1310,9 @@ export default {
         letter-spacing: 0;
         font-weight: 700;
         cursor: pointer;
+        padding-right:16px;
+        background: url('@/assets/images/post-item/icon-nft.png') no-repeat right center;
+        background-size: 12px 12px;
       }
       .intro-item{
         font-family: PingFangSC-Regular;
@@ -1333,6 +1538,12 @@ export default {
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 700;
+          span{
+            color: rgba(255,255,255,1);
+            &.no-access{
+              color: #FF6868;
+            }
+          }
         }
         .check-status{
           margin-left:20px;

@@ -1,69 +1,77 @@
 <template>
   <div class="post" :id="'post'+location" :key="location">
-    <div class="postForm">
-      <!-- text -->
-      <div
-        class="div-input"
-        ref="postInput"
-        contenteditable
-        @keydown.capture="onCheck"
-        @keyup.capture="onChange"
-        @focus="checkLogin"
-      />
-      <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
-      <el-input @keyup="onKeyDown" v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
-      
-      <div class="pop-user-box" :id="'pop-user'+location">
-        <div v-show="showUserList" ref="popUser" class="user-list">
-          <div class="loading-box" v-if="isLoaingUserList">
-            <img class="white-loading" src="@/assets/images/common/loading.png"/>
-          </div>
-          <template v-else-if="userList.length>0">
-            <template v-for="user in userList">
-                <template v-if="user.outer">
-                  <div class="user-item" @click="onSelectSubmit(user)">
-                    <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                    <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                    <div class="user-info">
-                      <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                      <div class="user-account  txt-wrap">{{user.account_id}}</div>
-                    </div>
-                  </div>
-                </template>
-                <template v-else>
-                  <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
-                    <template #reference>
-                      <div class="user-item" @click="onSelectSubmit(user)">
-                        <img v-if="user.avatar" class="user-avatar" :src="user.avatar"/>
-                        <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
-                        <div class="user-info">
-                          <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
-                          <div class="user-account  txt-wrap">{{user.account_id}}</div>
+    <div class="post-form-box">
+      <div class="post-form">
+        <!-- text -->
+        <div
+          class="div-input"
+          ref="postInput"
+          contenteditable
+          @keydown.capture="onCheck"
+          @keyup.capture="onChange"
+          @focus="checkLogin"
+          @click="onClick"
+          @paste="onPaste"
+        />
+        <div v-if="!postForm.text" class="placeholder">Share your story with the community.</div>
+        
+        <div class="pop-user-box" :id="'pop-user'+location">
+          <div v-show="showUserList" ref="popUser" class="user-list-box">
+            <div class="user-list" v-if="isLoaingUserList || userList.length>0">
+              <div class="loading-box" v-if="isLoaingUserList">
+                <img class="white-loading" src="@/assets/images/common/loading.png"/>
+              </div>
+              <template v-else-if="userList.length>0">
+                <template v-for="user in userList">
+                  <template v-if="user.name || user.avatar">
+                    <el-popover placement="bottom-start"  trigger="hover" @show="user.showCreateUser=true" @hide="user.showCreateUser=false">
+                      <template #reference>
+                        <div class="user-item" @click="onSelectSubmit(user)">
+                          <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+                          <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                          <div class="user-info">
+                            <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                            <div class="user-account  txt-wrap">{{user.account_id}}</div>
+                          </div>
                         </div>
+                      </template>
+                      <template v-if="user.showCreateUser">
+                        <UserPopup :account="user.account_id" @login="showLogin=true"/>
+                      </template>
+                    </el-popover>
+                  </template>
+                  <template v-else>
+                    <div class="user-item" @click="onSelectSubmit(user)">
+                      <img v-if="user.avatar" class="user-avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+                      <img v-else  class="user-avatar" src="@/assets/images/common/user-default.png"/>
+                      <div class="user-info">
+                        <div class="user-name  txt-wrap" v-if="user.name">{{user.name}}</div>
+                        <div class="user-account  txt-wrap">{{user.account_id}}</div>
                       </div>
-                    </template>
-                    <template v-if="user.showCreateUser">
-                      <UserPopup :account="user.account_id" @login="showLogin=true"/>
-                    </template>
-                  </el-popover>
+                    </div>
+                  </template>
                 </template>
-            </template>
-          </template>
-          <div v-else class="nobody">Nobody yet.</div>
+              </template>
+            </div>
+          </div>
         </div>
-      </div>
-      <!-- avatar -->
-      <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.state.profile.avatar"/>
-      <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
-      <!-- images -->
-      <div class="images" >
-        <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in postForm.imgs" @click="imagePreview(index)">
-          <div class="delete-image" @click="handleRemove(index)"></div>
-          <img :src="img" >
+        <!-- avatar -->
+        <img class="avatar" v-if="$store.getters.isLogin && $store.state.profile.avatar" :src="$store.getters.getAwsImg($store.state.profile.avatar)" @error.once="$event.target.src=$store.state.profile.avatar"/>
+        <img class="avatar" v-else src="@/assets/images/common/user-default.png"/>
+
+
+        <!-- images -->
+        <div class="images" >
+          <div :class="['image-item',index%3==2?'mr0':'']" v-for="(img,index) in images" @click="imagePreview(index)">
+            <div class="delete-image" @click.stop="handleRemove(index)"></div>
+            <img v-if="img" :src="img">
+            <img v-else :src="$store.getters.getAwsImg(postForm.imgs[index])" @error.once="$event.target.src=postForm.imgs[index]">
+          </div>
         </div>
       </div>
 
 
+      <el-input v-model="postForm.text" @focus="checkLogin()"  placeholder="Share your story with the community." rows="1" :autosize="true" maxlength="1000"  type="textarea" :show-word-limit="postForm.text.trim().length>0" />
       <!-- img-emoji-box -->
       <div class="img-emoji-box">
         <!-- upload-image -->
@@ -88,9 +96,11 @@
             @update:value="value = $event"
             @emoji="setEmoji"
             @gif="setGif"
+            :apiKey="'LIVDSRZULELA'"
           />
         </div>
       </div>
+
     </div>
     <div class="edit">
       <!-- community -->
@@ -98,41 +108,48 @@
         <!-- community selected -->
         <div class="community-selected" @click="showCommunityBox()">
           <template v-if="postForm.community.communityId">
-            <img v-if="postForm.community.avatar" :src="postForm.community.avatar">
-            <img v-else src="@/assets/images/test/community.png">
+            <img v-if="postForm.community.avatar" :src="$store.getters.getAwsImg(postForm.community.avatar)" @error.once="$event.target.src=postForm.community.avatar">
+            <img v-else src="@/assets/images/community/default-avatar.png">
             <div class="txt-wrap">{{postForm.community.name}}</div>
           </template>
           <template v-else>
             Community
           </template>
         </div>
-        <!-- community select -->
-        <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && joinedCommunities.length>0">
-          <div class="title">Choose Community</div>
-          <div class="intro">Choose the community you want to share with.</div>
-          <div class="joined-list" >
-            <template v-for="item in joinedCommunities">
-              <div v-if="item.name" :class="['joined-item',item.communityId == postForm.community.communityId ? 'active' : '']" @click="selectCommunity(item)">
-                <img v-if="item.avatar" :src="item.avatar">
-                <img v-else src="@/assets/images/test/community.png">
-                <div class="txt-wrap">{{item.name}}</div>
+        <template v-if="location!='detail' && location!='detail-suspend'">
+          <!-- community select -->
+          <div class="pop-box pop-intro pop-community-select" v-if="showCommunity && isLoadingCommunity">
+            <div class="loading">
+              <img class="white-loading" src="@/assets/images/common/loading.png"/>
+            </div>
+          </div>
+          <div class="pop-box pop-intro pop-community-select" v-else-if="showCommunity && joinedCommunities.length>0">
+            <div class="title">Choose Community</div>
+            <div class="intro">Choose the community you want to share with.</div>
+            <div class="joined-list" >
+              <template v-for="item in joinedCommunities">
+                <div v-if="item.name" :class="['joined-item',item.communityId == postForm.community.communityId ? 'active' : '']" @click="selectCommunity(item)">
+                  <img v-if="item.avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
+                  <img v-else src="@/assets/images/community/default-avatar.png">
+                  <div class="txt-wrap">{{item.name}}</div>
+                </div>
+              </template>
+            </div>
+          </div>
+          <!-- community join -->
+          <div class="pop-box pop-intro pop-community-join" v-else-if="showCommunity">
+            <div class="title">Choose Community</div>
+            <div class="intro">You  haven't  joined  the  community  yet. Please  join  or  create  it.</div>
+            <div class="button-box">
+              <div class="mini-button-border button-cancel" @click="showCommunity=false">
+                <div class="mini-button">Cancel</div>
               </div>
-            </template>
-          </div>
-        </div>
-        <!-- community join -->
-        <div class="pop-box pop-intro pop-community-join" v-else-if="showCommunity">
-          <div class="title">Choose Community</div>
-          <div class="intro">You  haven't  joined  the  community  yet. Please  join  or  create  it.</div>
-          <div class="button-box">
-            <div class="mini-button-border button-cancle" @click="showCommunity=false">
-              <div class="mini-button">Cancle</div>
-            </div>
-            <div class="mini-button-border" @click="redirectPage('/communities')">
-              <div class="mini-button">Go</div>
+              <div class="mini-button-border" @click="redirectPage('/communities')">
+                <div class="mini-button">Go</div>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </div>
       <!-- token -->
       <div class="post-type" >
@@ -184,73 +201,21 @@
             <div class="intro">This post will be minted as an NFT on NEAR protocol and cannot be edited after minting.</div>
           </div>
         </el-popover>
-        <div class="pop-nft-mask" v-if="showNftBox" @click.self="showNftBox=false">
-          <div class="pop-box pop-intro pop-nft-info">
-            <div class="title-box">
-              <div class="title">Post as NFT</div>
-              <!--
-              <a class="more" target="_blank" href="">Find out more</a>
-              -->
-            </div>
-            <div class="intro">This post will be minted as an NFT on NEAR protocol and cannot be edited after minting.</div>
-            <div class="title-box mt40">
-              <div class="title">Choose your cover</div>
-              <div class="cover-type">
-                <div :class="['auto-generated', !postForm.nft.cover ? 'active' : '']" @click="postForm.nft.isAutoGenerated=true;postForm.nft.cover = '';">Auto-generated</div>
-                <div class="upload-cover" @click="uploadCover">Upload</div>
-                <el-upload
-                  :id="'upload-cover'+location"
-                  class="upload-cover-input"
-                  action=""
-                  accept="image/png, image/jpeg, image/jpg, image/gif"
-                  multiple
-                  :show-file-list="false"
-                  list-type="picture-card"
-                  :http-request="uploadCov"
-                  :before-upload="beforeUpload"
-                  >
-                </el-upload>
-              </div>
-            </div>
-            <div class="cover-preview">
-              <img v-if="postForm.nft.cover" :src="postForm.nft.cover"/>
-              <img v-else :src="postForm.nft.defalutCover"/>
-            </div>
-            <div class="title mt40">Public offering</div>
-            <div class="intro" v-if="postForm.nft.isPublicSale">Public offering gives you the option to set the 
-quantity and price of your NFTs, which can then be sold on the market.</div>
-            <div class="intro" v-else>Non-public offering means this post will be minted as an NFT and stored in your wallet.</div>
-            <div :class="['btn-sale',postForm.nft.isPublicSale ? 'open' : '']" @click="postForm.nft.isPublicSale = !postForm.nft.isPublicSale"></div>
-            <div class="sale-info" v-if="postForm.nft.isPublicSale">
-              <div class="sale-item">
-                <div>copies</div>
-                <el-input min=1 step=1 :controls="false" type="number" v-model="postForm.nft.copies" />
-              </div>
-              <div class="sale-item sale-price">
-                <div>mint price</div>
-                <el-input :min="0" :controls="false" type="number" v-model="postForm.nft.mintPrice" />
-              </div>
-            </div>
-            <div class="button-border button-post-nft">
-              <div class="button" @click="postNft()">Mint</div>
-            </div>
-
-          </div>
-          <!-- Canvas -->
-          <Canvas :text="postForm.text" @setDefalutCover="setDefalutCover"/>
-        </div>
       </div>
 
       <!-- post button -->
       <div :id="'pop-notice'+location" :class="['mini-button-border','button-post',!postForm.text.trim() && postForm.imgs.length<=0 ?'disabled' : '']">
-        <div :id="'pop-button'+location" class="mini-button" @click="post()">Post</div>
+        <div :id="'pop-button'+location" class="mini-button" @click="post()">
+          <img v-if="isPosting" class="white-loading" src="@/assets/images/common/loading.png"/>
+          <template v-else>Post</template>
+        </div>
         <!-- post notice -->
         <div class="pop-box pop-intro pop-notice" v-if="showNotice">
           <div class="title">Notice</div>
-          <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on [Recent activity (<a href="https://wallet.testnet.near.org/" target="_blank">https://wallet.testnet.near.org/ </a>) ]</div>
+          <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on <a href="https://wallet.testnet.near.org/" target="_blank">Recent activity</a></div>
           <div class="button-box">
-            <div class="mini-button-border button-cancle" @click="showNotice=false">
-              <div class="mini-button">Cancle</div>
+            <div class="mini-button-border button-cancel" @click="showNotice=false">
+              <div class="mini-button">Cancel</div>
             </div>
             <div class="mini-button-border" @click="confirmPost()">
               <div class="mini-button">Confirm</div>
@@ -261,9 +226,70 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
     </div>
   </div>
 
+  <div class="pop-nft-mask" v-if="showNftBox" @click.self="showNftBox=false">
+    <div class="pop-box pop-intro pop-nft-info">
+      <div class="title-box">
+        <div class="title">Post as NFT</div>
+        <!--
+        <a class="more" target="_blank" href="">Find out more</a>
+        -->
+      </div>
+      <div class="intro">This post will be minted as an NFT on NEAR protocol and cannot be edited after minting.</div>
+      <div class="title-box mt40">
+        <div class="title">Choose your cover</div>
+        <div class="cover-type">
+          <div :class="['auto-generated', !postForm.nft.cover ? 'active' : '']" @click="postForm.nft.isAutoGenerated=true;postForm.nft.cover = '';">Auto-generated</div>
+          <div class="upload-cover" @click="uploadCover">Upload</div>
+          <el-upload
+            :id="'upload-cover'+location"
+            class="upload-cover-input"
+            action=""
+            accept="image/png, image/jpeg, image/jpg, image/gif"
+            multiple
+            :show-file-list="false"
+            list-type="picture-card"
+            :http-request="uploadCov"
+            :before-upload="beforeUpload"
+            >
+          </el-upload>
+        </div>
+      </div>
+      <div class="cover-preview">
+        <!-- <img v-if="postForm.nft.cover" :src="$store.getters.getAwsImg(postForm.nft.cover)" @error.once="$event.target.src=postForm.nft.cover" />
+        <img v-else :src="postForm.nft.defaultCover"/> -->
+        <img v-if="nftCover" :src="nftCover" />
+        <img v-else :src="nftDefaultCover"/>
+      </div>
+      <div class="title mt40">Public offering</div>
+      <div class="intro" v-if="postForm.nft.isPublicSale">Public offering gives you the option to set the 
+quantity and price of your NFTs, which can then be sold on the market.</div>
+      <div class="intro" v-else>Non-public offering means this post will be minted as an NFT and stored in your wallet.</div>
+      <div :class="['btn-sale',postForm.nft.isPublicSale ? 'open' : '']" @click="postForm.nft.isPublicSale = !postForm.nft.isPublicSale"></div>
+      <div class="sale-info" v-if="postForm.nft.isPublicSale">
+        <div class="sale-item">
+          <div>copies</div>
+          <el-input min=1 step=1 :controls="false" type="number" v-model="postForm.nft.copies" />
+        </div>
+        <div class="sale-item sale-price">
+          <div>mint price</div>
+          <el-input :min="0" :controls="false" type="number" v-model="postForm.nft.mintPrice" />
+        </div>
+      </div>
+      <div class="button-border button-post-nft">
+        <div class="button" @click="postNft()">
+          <img v-if="isPosting" class="white-loading" src="@/assets/images/common/loading.png"/>
+          <template v-else>Mint</template>
+        </div>
+      </div>
+
+    </div>
+    <!-- Canvas -->
+    <Canvas :text="postForm.text" @setDefaultCover="setDefaultCover"/>
+  </div>
+
   <!-- Image Preview -->
   <template v-if="showPreview">
-    <ImagePreview :imgs="postForm.imgs" :index="index"  @closePreview = "closePreview" ></ImagePreview>
+    <ImagePreview :imgs="images" :index="index"  @closePreview = "closePreview" ></ImagePreview>
   </template>
 
   <!-- login-mask -->
@@ -277,7 +303,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
   import MainContract from "@/contract/MainContract";
   import NftContract from "@/contract/NftContract";
   import CommunityContract from "@/contract/CommunityContract";
-  import EncryptionContract from "@/contract/EncryptionContract";
   import { getMetadata } from "@/contract/TokenContract.js";
   import { executeMultipleTransactions, generateAccessKey } from '../utils/transaction';
   import { parseAmount,getParam,generatePhrase } from '@/utils/util';
@@ -291,6 +316,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
   import Canvas from '@/component/canvas.vue';
   import * as nearAPI from 'near-api-js';
   import js_sha256 from 'js-sha256';
+  import axios from 'axios';
+  import { compress, compressAccurately } from 'image-conversion'
   export default {
     components: {
       LoginMask,
@@ -315,14 +342,13 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       const { proxy } = getCurrentInstance();
       const mainContract = new MainContract(store.state.account);
       const nftContract = new NftContract(store.state.account);
-      const encryptionContract = new EncryptionContract(store.state.account);
 
       //state
       const state = reactive({
         postForm: {
           text: "",
           imgs: [],
-          blur_imgs:[],
+          // blur_imgs:[],
           community:{
             communityId:"",
             name:"",
@@ -333,8 +359,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           isNft:false,
           nft:{
             isAutoGenerated:true,
-            defalutCover:"",
-            defalutCoverFile:null,
+            defaultCover:"",
+            defaultCoverFile:null,
             cover:"",
             coverBase64:"",
             isPublicSale:false,
@@ -342,6 +368,10 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             copies:1000,
           }
         },
+        images:[],
+        nftCover:'',
+        nftDefaultCover:'',
+
         defaultCommunity:{},
         focusNode:null,
         focusOffset:null,
@@ -353,6 +383,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //community
         joinedCommunities:[],
         showCommunity:false,
+        isLoadingCommunity:false,
         //token
         showTokenBox:false,
         searchValue:'',
@@ -367,6 +398,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //other
         showLogin:false,
         showNotice:false,
+        isPosting:false
       })
 
       const init = async () => {
@@ -382,6 +414,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         //community
         if(props.community){
           state.postForm.community = props.community
+          state.defaultCommunity = props.community
         }else{
           const res = await proxy.$axios.community.get_community_detail({
             accountId:"",
@@ -402,13 +435,57 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.postForm.nft.copies = nftInfo.copies;
           state.postForm.nft.mintPrice = nftInfo.mint_price;
         }
+        
+
+        //usedCommunity update
+        const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
+        const updateCommunities =  [];
+        for(let i = 0;i<usedCommunities.length;i++){
+          const community = usedCommunities[i];
+          const res = await proxy.$axios.community.get_community_detail({
+            accountId:"",
+            communityId: community.communityId,
+          });
+          if(res.success) {
+            const comm = {
+              avatar:res.data.avatar,
+              communityId:res.data.communityId,
+              name:res.data.name
+            }
+            updateCommunities.push(comm);
+          }
+        }
+        localStorage.setItem("usedCommunities",JSON.stringify(updateCommunities));
       }
 
       //@
       const onCheck = (e) => {
-        if(postInput.value.textContent.length>=1000){
+        if(postInput.value.textContent.length>=1000 && e.key != 'Backspace'){
           e.preventDefault();
         }
+      }
+      const onPaste = (e) => {
+        let text = '';
+        let event = e.originalEvent || e ;
+        if (event.clipboardData && event.clipboardData.getData) {
+            text = event.clipboardData.getData('text/plain');
+        } else if (window.clipboardData && window.clipboardData.getData) {
+            text = window.clipboardData.getData('Text');
+        }
+        if(postInput.value.textContent.length + text.length >=1000 ){
+          if (document.queryCommandSupported('insertText')) {
+              document.execCommand('insertText', false, text.slice(0,1000-postInput.value.textContent.length));
+          } else {
+              document.execCommand('paste', false, text.slice(0,1000-postInput.value.textContent.length));
+          }
+          e.preventDefault();
+        }
+      }
+      const onClick = () => {
+        const selection = window.getSelection()
+        state.focusNode = selection.focusNode;
+        state.focusOffset = selection.focusOffset;
+        state.start_index = selection.focusOffset;
       }
       const onChange = async (e) => {
         const selection = window.getSelection()
@@ -418,22 +495,23 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.focusOffset = selection.focusOffset;
         let start = Math.max(selection.focusOffset-21,0);
         let start_index = null;
-        let str = "";
 
-        for(let i = selection.focusOffset;i>=start;i--){
+        for(let i = selection.focusOffset-1;i>=start;i--){
           if(text.substring(i,i+1)=="@"){
             start_index = i;
             break;
           }
-          if(i>0 && !(text.substring(i-1,i).trim())){
+          if(i!=selection.focusOffset-1 && !(text[i].trim())){
             break;
           }
         }
+        
 
         if(start_index!==null){
           let end = Math.min(start_index+21,text.length);
           let end_index = end;
-          for(let j = selection.focusOffset;j<end;j++){
+          const start = Math.max(selection.focusOffset-1,0)
+          for(let j = start;j<end;j++){
             if(text[j]==" " || text[j]=="@"){
               end_index = j;
               break;
@@ -449,37 +527,32 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             state.showUserList = false;
           }
         }else{
+          state.start_index = selection.focusOffset;
           state.showUserList = false;
         }
       }
 
       // const popUser = ref(null);
+      let CancelToken = axios.CancelToken;
       const searchUser = async (str) => {
+        if(state.cancel){
+            state.cancel();
+            state.cancel = null;
+        }
+        const cancelToken = new CancelToken((c) => {
+          state.cancel = c;
+        })
         state.showUserList = true;
         state.isLoaingUserList = true;
+
         const res = await proxy.$axios.post.at({
           accountId:str,
-        });
+        },cancelToken);
         if(res.success){
-          const list = [];
-          const len = Math.min(res.data.length,5)
-          for(let i =0;i<len;i++){
-            const user = await proxy.$axios.profile.get_user_info({
-              accountId:res.data[i]['account_id'],
-              currentAccountId: store.getters.accountId || ''
-            });
-            if(user.success){
-              list.push(user.data);
-              // state.joinedCommunities = state.user.data.joinedCommunities.slice(0,3)
-            }else{
-              list.push({account_id:res.data[i]['account_id'],outer:true});
-            }
-          }
-          state.userList = list;
+          state.userList = res.data;
           state.isLoaingUserList = false;
         }
       }
-
       const debounce = (fn, delay) => {
         let timeout;
         return function(){
@@ -490,7 +563,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         }
       }
       const debounceInput = debounce(searchUser, 300)
-
       const onSelectSubmit = (item) => {
         let selection = window.getSelection();
         let range = window.getSelection().getRangeAt(0);
@@ -503,7 +575,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         var spanNode1= document.createElement('span');
         var spanNode2 = document.createElement('span');
         spanNode1.className = 'atFont';
-        spanNode1.style="color:#FED23C;";
         spanNode1.innerHTML = '@' + item.account_id;
         spanNode1.contentEditable = false;
         spanNode2.innerHTML = '&nbsp;';
@@ -517,13 +588,12 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         range.insertNode(frag);
         selection.extend(lastNode, 1);
         selection.collapseToEnd();
+        //reset
+        const sel = window.getSelection();
+        state.focusNode = sel.focusNode;
+        state.focusOffset = sel.focusOffset;
         state.showUserList = false;
       }
-
-
-
-
-
 
       //checkLogin
       const postInput = ref();
@@ -550,14 +620,23 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
       const beforeUpload = (file,fileList) => {
         stateData.count++;
-        if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
-            proxy.$Message({
-              message: "The maximum size is 10M",
-              type: "error",
-            });
-            return false
-        }
-        return file
+        // if (file.size > 1024 * 1024 * 10) {// maxSize = 10M
+        //     proxy.$Message({
+        //       message: "The maximum size is 10M",
+        //       type: "error",
+        //     });
+        //     return false
+        // }
+        // return file
+        return new Promise((resolve, reject) => {
+          if (file.size / 1024 > 1024 * 5) { //1024 * 10
+            compressAccurately(file, 1024 * 5).then(res => {
+              resolve(res)
+            })
+          } else {
+            resolve(file)
+          } 
+        })
       }
       const uploadImg = ({ file }) => {
         //count check
@@ -577,11 +656,28 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         upload(file).then(data=>{
           stateData.count--;
           state.postForm.imgs[inx] = data;
+          blobToBase64(inx,file);
         })
+      }
+
+      const blobToBase64 = (inx,blob) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', ()=> {
+          console.log(inx,reader.result);
+          if(inx>=0){
+            state.images[inx] = reader.result;
+          }else if(inx==-1){
+            state.nftCover = reader.result;
+          }else if(inx==-2){
+            state.nftDefaultCover = reader.result;
+          }
+        });
+        reader.readAsDataURL(blob);
       }
       const handleRemove = (index) => {
         stateData.imgList.splice(index,1);
         state.postForm.imgs.splice(index,1);
+        state.images.splice(index,1);
       }
 
       //image preview
@@ -596,66 +692,53 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //emoji
       const setEmoji = (emoji) => {
         if(checkLogin()){
-          // const selection = postInput.value;
-          // const text = selection.extentNode.nodeValue;
-          // console.log(selection,'00000');
-          // const left = text.substring(0,selection);
-          // const right = text.substring(selection);
-          // state.postForm.text = left + emoji + " " + right;
+          if(postInput.value.textContent && state.focusNode && state.focusNode.insertData){
+            let selection = window.getSelection();
+            let range = selection.getRangeAt(0);
+            const container = state.focusNode; 
+            const pos = state.focusOffset;
+            //insert
+            range = document.createRange(); 
+            var cons = window.document.createTextNode(emoji); 
+            container.insertData(pos, cons.nodeValue); 
+            range.setEnd(container, pos + cons.nodeValue.length); 
+            range.setStart(container, pos + cons.nodeValue.length); 
+            state.focusOffset = pos + cons.nodeValue.length;
 
-          // state.postForm.text = postInput.value.textContent;
-
-          postInput.value.innerHTML = postInput.value.innerHTML + emoji + "&nbsp;";
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }else{
+            postInput.value.innerHTML = postInput.value.innerHTML + emoji;
+          }
           state.postForm.text = postInput.value.textContent;
-          // const selection = window.getSelection();
-          // const focusOffset = state.focusOffset;
-          // let node = state.focusNode;
-          // let range = window.getSelection().getRangeAt(0);
-          // range.setStart(state.focusNode, focusOffset);
-          // range.setEnd(state.focusNode, focusOffset+1);
-          // if (node === dom) {
-            // var textNode = document.createTextNode(emoji);
-            // range.setStart(state.focusNode, 1)
-            // range.setEnd(state.focusNode, 1);
-            // range.insertNode(textNode);
-            
-          // } else {
-          //     var text = node.textContent;
-          //     node.textContent = text.substr(0, focusOffset) +  emoji + text.substr(focusOffset);
-          //     var offset = (text.substr(0, focusOffset) + emoji).length;
-          //     if (node.nodeType != 3) {
-          //         node = node.childNodes[0];
-          //     }
-          //     range.setStart(node, offset);
-          //     range.setEnd(node, offset);
-          // }
-          
 
-          // const selection = postInput.value.$el.getElementsByTagName('textarea')[0].selectionStart;
-          // const left = state.postForm.text.substring(0,selection);
-          // const right = state.postForm.text.substring(selection);
-          // state.postForm.text = left + emoji + " " + right;
-          // state.postForm.text = state.postForm.text + emoji + " ";
+          // selection.addRange(range); 
+          // selection.collapseToEnd();
         }
       }
       const setGif = (gif) => {
-        state.postForm.text = state.postForm.text + emoji;
+        state.postForm.text = state.postForm.text + gif;
       }
 
       //showCommunityBox
       const showCommunityBox = async () => {
         if(checkLogin()){
-          const res = await proxy.$axios.community.get_joined_community_list({
-            accountId:store.getters.accountId,
-            page:0,
-            limit:10000
-          });
-          if(res.success) {
-            //usedTokenList
-            const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
-            state.joinedCommunities =  deduplication(usedCommunities.concat(res.data),'community');
-          }
           state.showCommunity = !state.showCommunity;
+          if(state.showCommunity){
+            state.isLoadingCommunity = true;
+            const res = await proxy.$axios.community.get_joined_community_list({
+              accountId:store.getters.accountId,
+              page:0,
+              limit:10000
+            });
+            if(res.success) {
+              //usedTokenList
+              const usedCommunities = JSON.parse(localStorage.getItem("usedCommunities")) || [];
+              state.joinedCommunities =  deduplication(usedCommunities.concat(res.data),'community');
+            }
+            state.isLoadingCommunity = false;
+          }
         }
       }
       const selectCommunity = (item) => {
@@ -671,13 +754,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           usedCommunities.unshift(item);
           usedCommunities = deduplication(usedCommunities,'community');
           localStorage.setItem("usedCommunities",JSON.stringify(usedCommunities))
-        }else{
-          state.postForm.community= {
-            communityId:"",
-            avatar:"",
-            name:""
-          }
-          state.showCommunity = false;
         }
       }
 
@@ -704,7 +780,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           }else{//name|symbol search
             const list = []
             state.searchTokenList.forEach(item=>{
-              if(item.symbol.indexOf(str)>-1 || item.name.indexOf(str)>-1 || item.tokenId == str){
+              if(item.symbol.toLowerCase().indexOf(str.toLowerCase())>-1 || item.name.toLowerCase().indexOf(str.toLowerCase())>-1 || item.tokenId == str){
                 list.push(item);
               }
             });
@@ -748,7 +824,11 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             }
         });
         if(!has_selected){
-          state.postForm.access.push(item);
+          state.postForm.access.push({
+            icon: item.icon,
+            symbol: item.symbol,
+            tokenId: item.tokenId,
+          });
           state.searchValue = "";
           //usedTokenList
           let usedTokenList = JSON.parse(localStorage.getItem("usedTokenList")) || [];
@@ -802,6 +882,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         fileByBase64(file)
         upload(file).then(data=>{
           state.postForm.nft.cover = data;
+          blobToBase64(-1,file);
         })
       }
       const fileByBase64 = (file) => {
@@ -811,10 +892,11 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.postForm.nft.coverBase64 = e.target.result
         };
       }
-      const setDefalutCover = (obj) => {
+      const setDefaultCover = (obj) => {
         // fileByBase64(obj.file)
-        state.postForm.nft.defalutCover = obj.url;
-        state.postForm.nft.defalutCoverFile = obj.file;
+        state.postForm.nft.defaultCover = obj.url;
+        state.postForm.nft.defaultCoverFile = obj.file;
+        blobToBase64(-2,obj.file);
       }
 
 
@@ -872,7 +954,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
 
       //post
       const post = async () => {
-        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin()){
+        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin() || state.isPosting){
           return;
         }
         if(state.postForm.isNft){
@@ -892,16 +974,9 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           state.showNotice = true;
           return;
         }
-        proxy.$Loading.showLoading({title: "Loading"});
-        if(state.postForm.access.length>0){
-          await handleBlur();
-          await encryptPost();
-        }else{
-          await publicPost();
-        }
-      }
-
-      const publicPost = async () => {
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isPosting = true;
+        //options
         const options = [];
         if(postInput.value.innerHTML){
           const reg = RegExp(/<span[^>]*>([\s\S]*?)<\/span>/,"g");
@@ -910,35 +985,50 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             options.push({At:r[1].trim().substring(1)});
           }
         }
-        const params = {   
-          args:JSON.stringify({
-            text:postInput.value.innerHTML,
-            imgs:state.postForm.imgs,
-            options
-          }), 
-        }
-        let result = {}
-        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
-          result = await mainContract.addPost(params,store.state.account);
-        }else{
-          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
-          result = await communityContract.addPost(params, state.postForm.community.communityId);
+        //submit
+        let result;
+        try{
+          if(state.postForm.access.length>0){
+            // await handleBlur();
+            result = await encryptPost(options);
+          }else{
+            result = await publicPost(options);
+          }
+        }catch(e){
+          console.log("post error:"+e);
+          proxy.$Message({
+            message: "Post Failed",
+            type: "error",
+          });
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
+          return;
         }
         handleSuccess(result);
       }
 
-      const encryptPost = async (param) => {
-        //encrypt
-        // const conditions = [{
-        //   FTCondition:{
-        //     token_id:'33.token.bhc8521.testnet',
-        //     amount_to_access:parseAmount(1,24)
-        //   }
-        // }]
+      const publicPost = async (options) => {
+        const params = {   
+          args:JSON.stringify({text:postInput.value.innerHTML,imgs:state.postForm.imgs}),
+          hierarchies:[],
+          options
+        }
+        let result = {}
+        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
+          result = await mainContract.addContent(params,store.state.account);
+        }else{
+          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
+          result = await communityContract.addContent(params, state.postForm.community.communityId);
+        }
+        return result;
+      }
+
+      const encryptPost = async (options) => {
         const access = {
           relationship: "Or",
           conditions:[]
         }
+        //access
         for(let i=0;i<state.postForm.access.length;i++){
           const item = state.postForm.access[i];
           let decimals = item.decimals || 24;
@@ -953,32 +1043,40 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             }
           })
         }
-        //encrypt
-        const param1 = {
-          plain_text:{
+        const res = await proxy.$axios.post.add_encrypt_content_sign({
+          content:{
             text:postInput.value.innerHTML,
-            imgs:JSON.stringify({...state.postForm.imgs}),
+            imgs:state.postForm.imgs,
           },
-          contract_id:state.postForm.community.communityId,
-        }
-        const res = await encryptionContract.encrypt(param1);
-        // addEncryptPost
-        const param2 = {
-          encrypt_args:JSON.stringify(res.cipher_text),
-          access,
-          text_sign:res.text_sign,
-          contract_id_sign:res.contract_id_sign,
-          blur_imgs:state.postForm.blur_imgs
-        }
-        let result = {}
-        if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
-          result = await mainContract.addEncryptPost(param2,store.state.account);
+          accountId:store.getters.accountId || ''
+        });
+
+        if(res.success){
+          // addEncryptPost
+          const param2 = {
+            access,
+            options,
+            hierarchies:[],
+            encrypt_args:res.data.encode,//JSON.stringify(res.data.encode),
+            nonce:res.data.nonce.toString(),
+            sign:res.data.sign,
+            // blur_imgs:[...state.postForm.blur_imgs],
+            // encrypt_args:JSON.stringify(res.cipher_text), 
+            // text_sign:res.text_sign,
+            // contract_id_sign:res.contract_id_sign,
+          }
+          let result = {}
+          if(state.postForm.community.communityId == store.state.nearConfig.MAIN_CONTRACT){
+            result = await mainContract.addEncryptContent(param2,store.state.account);
+          }else{
+            const communityContract = await CommunityContract.new(state.postForm.community.communityId);
+            // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
+            result = await communityContract.addEncryptContent(param2,store.state.account,state.postForm.community.communityId);
+          }
+          return result;
         }else{
-          const communityContract = await CommunityContract.new(state.postForm.community.communityId);
-          // const communityContract = new CommunityContract(store.state.account,state.postForm.community.communityId);
-          result = await communityContract.addEncryptPost(param2,store.state.account,state.postForm.community.communityId);
+          throw new Error("Encrypt Failed: " + res.message);
         }
-        handleSuccess(result);
       }
 
       const checkAccess = () => {
@@ -1007,7 +1105,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       //postNft
       const postNft = async () => {
         //check 
-        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin()){
+        if((!state.postForm.text && state.postForm.imgs.length<=0) || !checkLogin() || state.isPosting){
           return;
         }
         //check Nft Info
@@ -1026,44 +1124,53 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           return;
         }
 
-        proxy.$Loading.showLoading({title: "Loading"});
+        // proxy.$Loading.showLoading({title: "Loading"});
+        state.isPosting = true;
 
-
-        //cover
-        let cover = state.postForm.nft.isAutoGenerated ? "" : state.postForm.nft.cover;
-        let coverBase64 = state.postForm.nft.isAutoGenerated ?  state.postForm.nft.defalutCover : state.postForm.nft.coverBase64;
-        if(state.postForm.nft.isAutoGenerated){
-          const data = await upload(state.postForm.nft.defalutCoverFile);
-          cover = data;
+        try{
+          //cover
+          let cover = state.postForm.nft.isAutoGenerated ? "" : state.postForm.nft.cover;
+          let coverBase64 = state.postForm.nft.isAutoGenerated ?  state.postForm.nft.defaultCover : state.postForm.nft.coverBase64;
+          if(state.postForm.nft.isAutoGenerated){
+            const data = await upload(state.postForm.nft.defaultCoverFile);
+            cover = data;
+          }
+          //record param
+          if(state.postForm.nft.isPublicSale){
+            localStorage.setItem('nftSetting',JSON.stringify({
+              mint_price:state.postForm.nft.mintPrice,
+              copies:Number(state.postForm.nft.copies)
+            }))
+          }
+          //create
+          const params = {
+            creator_id: store.getters.accountId,
+            token_metadata: {
+              title: "popula",
+              description: postInput.value.textContent,
+              media: cover,
+              media_hash: js_sha256.sha256(coverBase64),
+              copies:state.postForm.nft.isPublicSale ? Number(state.postForm.nft.copies) : 1,
+              extra:JSON.stringify({...state.postForm.imgs})
+            },
+            mint_price: state.postForm.nft.isPublicSale ? parseAmount(state.postForm.nft.mintPrice,24) : null, 
+            ft_token_id: "near", 
+            notify_contract_id: state.postForm.community.communityId
+          }
+          let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
+          const result = await nftContract.nftCreateSeries(params,deposit);
+        }catch(e){
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
+          proxy.$Message({
+            message: "Post NFT Failed",
+            type: "error",
+          });
+          console.log("post nft error:"+e);
+          return;
         }
-
-        //record param
-        if(state.postForm.nft.isPublicSale){
-          localStorage.setItem('nftSetting',JSON.stringify({
-            mint_price:state.postForm.nft.mintPrice,
-            copies:Number(state.postForm.nft.copies)
-          }))
-        }
-
-
-        //create
-        const params = {
-          creator_id: store.getters.accountId,
-          token_metadata: {
-            title: "popula",
-            description: postInput.value.innerHTML,
-            media: cover,
-            media_hash: js_sha256.sha256(coverBase64),
-            copies:state.postForm.nft.isPublicSale ? Number(state.postForm.nft.copies) : 1,
-            extra:JSON.stringify({...state.postForm.imgs})
-          },
-          mint_price: state.postForm.nft.isPublicSale ? parseAmount(state.postForm.nft.mintPrice,24) : null, 
-          ft_token_id: "near", 
-          notify_contract_id: store.state.nearConfig.MAIN_CONTRACT
-        }
-
-        let deposit = state.postForm.nft.isPublicSale ? '20000000000000000000000' : '40000000000000000000000';
-        const result = await nftContract.nftCreateSeries(params,deposit);
+        state.showNftBox = false;
+        handleSuccess(result);
       }
 
 
@@ -1072,36 +1179,43 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         state.postForm = {
           text: "",
           imgs: [],
-          blur_imgs:[],
+          // blur_imgs:[],
           community:state.defaultCommunity,
           isPrivate:false,
           access:[],
           nft:{
             isAutoGenerated:true,
-            defalutCover:"",
+            defaultCover:"",
             cover:"",
             coverBase64:"",
             isPublicSale:false,
             mintPrice:10,
             copies:1000,
-            
           }
         };
+        state.images = [];
+        stateData.imgList = [];
+        stateData.count = 0;
         postInput.value.innerHTML = "";
-        proxy.$Loading.hideLoading();
-        if (res) {
+        
+        if (res == true) {
           proxy.$Message({
             message: "Post Success",
             type: "success",
           });
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
           setTimeout(()=>{
             emit("postSuccess");
           },500)
-        } else {
+        } else  if (res == false) {
           proxy.$Message({
             message: "Oops,something went wrong. Please try again or submit a report.",
             type: "error",
           });
+          // proxy.$Loading.hideLoading();
+          state.isPosting = false;
+        } else {
         }
       }
       
@@ -1127,7 +1241,9 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // popUser,
         init,
         onCheck,
+        onClick,
         onChange,
+        onPaste,
         onSelectSubmit,
         postInput,
         checkLogin,
@@ -1148,7 +1264,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         chooseNft,
         uploadCover,
         uploadCov,
-        setDefalutCover,
+        setDefaultCover,
         post,
         postNft,
         confirmPost,
@@ -1179,7 +1295,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         // const pop_nft = document.getElementById('pop-nft'+this.location);
         // // const pop_btn = document.getElementById('pop-button'+this.location);
         // if(this.showNftBox && ((pop_nft &&　!pop_nft.contains(e.target)) || (pop_notice &&　!pop_notice.contains(e.target)))) {
-        //     console.log("hhhhhhhh");
         //     this.showNftBox = false;
         // }
 
@@ -1204,21 +1319,33 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
     :deep(.el-upload) {
       display:none;
     }
-    &#postsuspend{
-      width:696px;
-      .postForm{
-        max-height:50vh;
-        overflow-y:scroll;
+    &#postsuspend,&#postdetail-suspend{
+      .post-form-box{
+        padding:20px 0 20px 20px;
+        .post-form{
+          max-height: 50vh;
+          overflow-y: scroll;
+        }
+        .div-input{
+          padding-right:14px;
+          padding-bottom:20px;
+        }
+        .image-item{
+          margin-top:15px;
+          margin-bottom: 20px;
+        }
+        :deep(.el-textarea){
+          height:39px;
+          padding:15px 20px 0 0;
+        }
       }
     }
-    .postForm{
+    .post-form-box{
       border-radius: 10px;
       background: #36363C;
       padding:20px 20px 20px 20px;
       position:relative;
       .div-input{
-        max-height:30vh;
-        overflow-y:scroll;
         position:relative;
         z-index:3;
         padding-left:36px;
@@ -1230,8 +1357,8 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         letter-spacing: 0;
         font-weight: 400;
         border:0;
-        text-align:justify;
-        
+        -webkit-user-modify: read-write-plaintext-only;
+        padding-bottom:35px;
       }
       .atFont{
         font-family: D-DINExp;
@@ -1258,7 +1385,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       :deep(.el-textarea){
         position:static!important;
         height:24px;
-        margin-top:34px;
+        overflow: hidden;
         textarea{
           background: transparent;
           padding:0;
@@ -1294,71 +1421,73 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       }
       .pop-user-box{
         position:relative;
-        .user-list{
+        .user-list-box{
           position:absolute;
           top:0;
           left:0;
           z-index:20;
-          background: #000000;
-          border: 1px solid rgba(255,255,255,0.2);
-          box-shadow: 0px 2px 30px 0px rgba(0,0,0,0.5);
-          border-radius: 10px;
-          width:200px;
-          .loading-box{
-            height:50px;
-            display:flex;
-            align-items: center;
-            justify-content:center;
-          }
-          .nobody{
-            height:50px;
-            display:flex;
-            align-items: center;
-            justify-content:center;
-            opacity: 0.5;
-            font-family: D-DINExp;
-            font-size: 14px;
-            color: #FFFFFF;
-            letter-spacing: 0;
-            text-align: center;
-            line-height: 14px;
-            font-weight: 400;
-          }
-          .user-item{
-            height:50px;
-            display:flex;
-            align-items: center;
-            padding:0 20px;
-            cursor:pointer;
-            &:hover{
-              background: rgba(40,40,45,0.5);
+          .user-list{
+            background: #000000;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0px 2px 30px 0px rgba(0,0,0,0.5);
+            border-radius: 10px;
+            width:200px;
+            .loading-box{
+              height:50px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
             }
-            .user-avatar{
-              width:30px;
-              height:30px;
-              border-radius:50%;
+            .nobody{
+              height:50px;
+              display:flex;
+              align-items: center;
+              justify-content:center;
+              opacity: 0.5;
+              font-family: D-DINExp;
+              font-size: 14px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              text-align: center;
+              line-height: 14px;
+              font-weight: 400;
             }
-            .user-info{
-              margin-left:10px;
-              .user-name{
-                font-family: D-DINExp-Bold;
-                font-size: 14px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                line-height: 14px;
-                font-weight: 700;
-                width:90px;
+            .user-item{
+              height:50px;
+              display:flex;
+              align-items: center;
+              padding:0 20px;
+              cursor:pointer;
+              &:hover{
+                background: rgba(40,40,45,0.5);
               }
-              .user-account{
-                margin-top:2px;
-                opacity: 0.5;
-                font-family: D-DINExp;
-                font-size: 14px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                line-height: 14px;
-                font-weight: 400;
-                width:90px;
+              .user-avatar{
+                width:30px;
+                height:30px;
+                border-radius:50%;
+              }
+              .user-info{
+                margin-left:10px;
+                .user-name{
+                  font-family: D-DINExp-Bold;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  line-height: 14px;
+                  font-weight: 700;
+                  width:90px;
+                }
+                .user-account{
+                  margin-top:2px;
+                  opacity: 0.5;
+                  font-family: D-DINExp;
+                  font-size: 14px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  line-height: 14px;
+                  font-weight: 400;
+                  width:90px;
+                }
               }
             }
           }
@@ -1381,7 +1510,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           height: 180px;
           position:relative;
           margin-right:35px;
-          margin-top:35px;
+          margin-bottom:35px;
           &.mr0{
             margin-right:0;
           }
@@ -1447,6 +1576,9 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         border-radius: 6px;
         border: 1px solid rgba(255,255,255,0.2);
         cursor: pointer;
+        &#pop-communitydetail,&#pop-communitydetail-suspend{
+          cursor:default;
+        }
         .community-selected{
           width: 124px;
           height: 34px;
@@ -1487,6 +1619,12 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           z-index:99;
           width:400px;
           padding:30px;
+          .loading{
+            height:100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
           .joined-list{
             margin-top:4px;
             display:flex;
@@ -1714,135 +1852,6 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
             background-size:cover;
           }
         }
-        .pop-nft-mask{
-          position: fixed;
-          top:0;
-          left:0;
-          right:0;
-          bottom:0;
-          background:rgba(0,0,0,0.3);
-          z-index:99;
-          .pop-nft-info{
-            // position: absolute;
-            // top:48px;
-            // left:0;
-            position: absolute;
-            top:50%;
-            left:50%;
-            transform: translate(-50%,-50%);
-            z-index:99;
-            width:460px;
-            padding:30px;
-            .mt40{
-              margin-top:40px;
-            }
-            .title-box{
-              display: flex;
-              justify-content:space-between;
-              align-items:center;
-              .more{
-                padding-right:18px;
-                background:url("@/assets/images/common/icon-arrow-right.png") no-repeat right center;
-                background-size:14px 14px;
-                font-family: D-DINExp;
-                font-size: 14px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                text-align: right;
-                font-weight: 400;
-                line-height:17px;
-              }
-              .cover-type{
-                display:flex;
-                .auto-generated{
-                  cursor:pointer;
-                  padding-left:24px;
-                  background:url("@/assets/images/post/icon-check.png") no-repeat left center;
-                  background-size:16px 16px;
-                  &.active{
-                    background:url("@/assets/images/post/icon-checked.png") no-repeat left center;
-                    background-size:16px 16px;
-                  }
-                }
-                .upload-cover{
-                  cursor:pointer;
-                  margin-left:30px;
-                  padding-left:24px;
-                  background:url("@/assets/images/post/icon-upload.png") no-repeat left center;
-                  background-size:16px 16px;
-                }
-              }
-            }
-            .cover-preview{
-              margin-top:20px;
-              width:400px;
-              height:230px;
-              background: #0B0B0B;
-              border: 1px solid rgba(40,40,40,1);
-              border-radius: 10px;
-              overflow: hidden;
-              img{
-                width:400px;
-                height:230px;
-                object-fit: cover;
-              }
-            }
-            .btn-sale{
-              margin-top:16px;
-              width:56px;
-              height:30px;
-              background:url("@/assets/images/post/btn-sale-close.png") no-repeat left center;
-              background-size:56px 30px;
-              cursor:pointer;
-              &.open{
-                background:url("@/assets/images/post/btn-sale-open.png") no-repeat left center;
-                background-size:56px 30px;
-              }
-            }
-            .sale-info{
-              margin-top:20px;
-              display:flex;
-              justify-content:space-between;
-              .sale-item{
-                width:192px;
-                height:64px;
-                padding:0 12px;
-                border: 1px solid rgba(255,255,255,0.2);
-                border-radius: 10px;
-                display:flex;
-                justify-content:space-between;
-                align-items: center;
-                &.sale-price{
-                  :deep(.el-input){
-                    .el-input__inner{
-                      padding:0 18px 0 0;
-                      background:transparent url("@/assets/images/common/icon-gas.png") no-repeat 78px center;
-                      background-size:12px;
-                    }
-                  }
-                }
-                :deep(.el-input){
-                  width:90px;
-                  height:40px;
-                  border-radius: 10px;
-                  .el-input__inner{
-                    background: transparent;
-                    border:0;
-                    font-family: D-DINExp;
-                    font-size: 16px;
-                    color: #FFFFFF;
-                    letter-spacing: 0;
-                    text-align: right;
-                    font-weight: 400;
-                  }
-                }
-              }
-            }
-            .button-post-nft{
-              margin:30px auto 0;
-            }
-          }
-        }
       }
       .button-post{
         cursor:pointer;
@@ -1853,6 +1862,138 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           top:46px;
           left:0;
         }
+      }
+    }
+  }
+  .pop-nft-mask{
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background:rgba(0,0,0,0.3);
+    z-index:99;
+    :deep(.el-upload) {
+      display:none;
+    }
+    .pop-nft-info{
+      // position: absolute;
+      // top:48px;
+      // left:0;
+      position: absolute;
+      top:50%;
+      left:50%;
+      transform: translate(-50%,-50%);
+      z-index:99;
+      width:460px;
+      padding:30px;
+      .mt40{
+        margin-top:40px;
+      }
+      .title-box{
+        display: flex;
+        justify-content:space-between;
+        align-items:center;
+        .more{
+          padding-right:18px;
+          background:url("@/assets/images/common/icon-arrow-right.png") no-repeat right center;
+          background-size:14px 14px;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          text-align: right;
+          font-weight: 400;
+          line-height:17px;
+        }
+        .cover-type{
+          display:flex;
+          .auto-generated{
+            cursor:pointer;
+            padding-left:24px;
+            background:url("@/assets/images/post/icon-check.png") no-repeat left center;
+            background-size:16px 16px;
+            &.active{
+              background:url("@/assets/images/post/icon-checked.png") no-repeat left center;
+              background-size:16px 16px;
+            }
+          }
+          .upload-cover{
+            cursor:pointer;
+            margin-left:30px;
+            padding-left:24px;
+            background:url("@/assets/images/post/icon-upload.png") no-repeat left center;
+            background-size:16px 16px;
+          }
+        }
+      }
+      .cover-preview{
+        margin-top:20px;
+        width:400px;
+        height:230px;
+        background: #0B0B0B;
+        border: 1px solid rgba(40,40,40,1);
+        border-radius: 10px;
+        overflow: hidden;
+        img{
+          width:400px;
+          height:230px;
+          object-fit: cover;
+        }
+      }
+      .btn-sale{
+        margin-top:16px;
+        width:56px;
+        height:30px;
+        background:url("@/assets/images/post/btn-sale-close.png") no-repeat left center;
+        background-size:56px 30px;
+        cursor:pointer;
+        &.open{
+          background:url("@/assets/images/post/btn-sale-open.png") no-repeat left center;
+          background-size:56px 30px;
+        }
+      }
+      .sale-info{
+        margin-top:20px;
+        display:flex;
+        justify-content:space-between;
+        .sale-item{
+          width:192px;
+          height:64px;
+          padding:0 12px;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 10px;
+          display:flex;
+          justify-content:space-between;
+          align-items: center;
+          &.sale-price{
+            :deep(.el-input){
+              .el-input__inner{
+                padding:0 18px 0 0;
+                background:transparent url("@/assets/images/common/icon-gas.png") no-repeat 78px center;
+                background-size:12px;
+              }
+            }
+          }
+          :deep(.el-input){
+            width:90px;
+            height:40px;
+            border-radius: 10px;
+            .el-input__inner{
+              background: transparent;
+              border:0;
+              font-family: D-DINExp;
+              font-size: 16px;
+              color: #FFFFFF;
+              letter-spacing: 0;
+              text-align: right;
+              font-weight: 400;
+            }
+          }
+        }
+      }
+      .button-post-nft{
+        margin:30px auto 0;
       }
     }
   }

@@ -1,16 +1,43 @@
 <template>
   <div class="user-item" v-if="item" @click="redirectPage('/user-profile/'+detail.account_id,false)">
     <div class="user-info">
-      <img v-if="detail.avatar" class="avatar" :src="detail.avatar"/>
+      <img v-if="detail.avatar" class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar"/>
       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
       <div class="info">
-        <div class="name txt-wrap" v-if="name" v-html="name"></div>
-        <div class="name txt-wrap" v-else v-html="accountId"></div>
+        <div :class="['name','name-'+item.data.type]">
+          <div v-if="name" class="name-txt txt-wrap" v-html="name"></div>
+          <div v-else class="name-txt txt-wrap" v-html="accountId"></div>
+          <!-- CO -->
+          <template v-if="detail.data.type=='creator'">
+            <el-popover
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <div class="user-flag co"></div>
+              </template>
+              <div class="pop-box pop-tip pop-user-flag">Community Originator</div>
+            </el-popover>
+          </template>
+
+          <!-- MOD -->
+          <template v-else-if="detail.data.type=='mod'">
+            <el-popover
+              placement="bottom-start"
+              trigger="hover"
+              >
+              <template #reference>
+                <div class="user-flag mod"></div>
+              </template>
+              <div class="pop-box pop-tip pop-user-flag">Moderator</div>
+            </el-popover>
+          </template>
+        </div>
         <div class="account txt-wrap" v-html="accountId"></div>
         <div class="total">
-          <div class="total-item"><span>{{detail.data.follows}}</span> Followers</div>
-          <div class="total-item"><span>{{detail.data.following}}</span> Following</div>
-          <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+          <div class="total-item"><span>{{detail.data.follows}}</span>Followers</div>
+          <div class="total-item"><span>{{detail.data.following}}</span>Following</div>
+          <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
         </div>
       </div>
       <!-- follow -->
@@ -113,10 +140,12 @@
 
 <style lang="scss" scoped>
   .user-item{
-    margin-top:20px;
-    padding: 20px;
+    padding: 20px 0;
     background: #28282D;
-    border-radius: 24px;
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
     cursor: pointer;
     .user-info{
       display:flex;
@@ -132,12 +161,43 @@
         margin-left:20px;
         width:300px;
         .name{
-          line-height: 22px;
-          font-family: D-DINExp-Bold;
-          font-size: 20px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
+          height:20px;
+          display:flex;
+          align-items: center;
+          &.name-creator{
+            .name-txt{
+              max-width:276px;
+            }
+          }
+          &.name-mod{
+            .name-txt{
+              max-width:268px;
+            }
+          }
+          .name-txt{
+            display:inline-block;
+            max-width:300px;
+            line-height: 22px;
+            font-family: D-DINExp-Bold;
+            font-size: 20px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+          }
+          .user-flag{
+            margin-left:4px;
+            width: 20px;
+            height: 14px;
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              width: 28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
+            }
+          }
         }
         .account{
           margin-top:8px;
@@ -158,11 +218,13 @@
             color: rgba(255,255,255,0.5);
             letter-spacing: 0;
             font-weight: 400;
+            line-height:18px;
             span{
               font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
+              margin-right:4px;
             }
           }
         }

@@ -9,20 +9,24 @@ export default class MainContract{
     contract
     methods = {
         viewMethods: [
+            'check_viewed',
+            'check_shared'
         ],
         changeMethods: [
-            'add_post',
-            'add_comment',
+            'add_content',
+            'add_encrypt_content',
             'follow',
             'unfollow',
             'like',
-            'unlike'
+            'unlike',
+            'share',
+            'report',
+            'del_content'
         ]  // mint
     }
 
     async _signAndSendTransaction(transaction) {
-        const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas)]
-        const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
+        const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, transaction)
         if (!checkReceiptsSuccess(result)) {
             return false
         }
@@ -34,9 +38,9 @@ export default class MainContract{
     }
 
 
-    async addPost(param,account) {
+    async addContent(param,account) {
         const transaction = {
-            methodName: "add_post",
+            methodName: "add_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
@@ -44,9 +48,9 @@ export default class MainContract{
         return await this._signAndSendTransaction(transaction)
     }
 
-    async addComment(param,account) {
+    async addEncryptContent(param) {
         const transaction = {
-            methodName: "add_comment",
+            methodName: "add_encrypt_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
@@ -54,19 +58,19 @@ export default class MainContract{
         return await this._signAndSendTransaction(transaction)
     }
 
-    async addEncryptPost(param) {
+    async report(param){
         const transaction = {
-            methodName: "add_encrypt_post",
+            methodName: "report",
             args: param,
-            deposit: "0",
+            deposit: "5000000000000000000000000",
             gas: "100000000000000"
         }
         return await this._signAndSendTransaction(transaction)
     }
 
-    async addEncryptComment(param) {
+    async delContent(param){
         const transaction = {
-            methodName: "add_encrypt_comment",
+            methodName: "del_content",
             args: param,
             deposit: "0",
             gas: "100000000000000"
@@ -75,19 +79,53 @@ export default class MainContract{
     }
 
     async follow(param){
-        return await this.contract.follow(param)
+        const transaction = {
+            methodName: "follow",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async unfollow(param){
-        return await this.contract.unfollow(param)
+        const transaction = {
+            methodName: "unfollow",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async like(param){
-        return await this.contract.like(param)
+        const transaction = {
+            methodName: "like",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     async unlike(param){
-        return await this.contract.unlike(param)
+        const transaction = {
+            methodName: "unlike",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
+    }
+
+    async share(param){
+        const transaction = {
+            methodName: "share",
+            args: param,
+            deposit: "0",
+            gas: "100000000000000"
+        }
+        return await this._signAndSendTransaction(transaction)
     }
 
     constructor(account){

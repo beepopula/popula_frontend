@@ -13,18 +13,20 @@
         <div :class="['right-nav-item','nav-hover',$route.path == '/explore' ? 'action' : '']" @click="redirectPage('/explore')"><span>Explore</span></div>
         <div v-if="false" :class="['right-nav-item','nav-hover',$route.path.indexOf('/create')>-1 ? 'action' : '']" @click="redirectPage('/create-list')"><span>Tools</span></div>
         <a v-if="false" class="right-nav-item nav-hover" target="_blank" href="https://www.notion.so/bepopula/FAQs-81506fb8e8ab4a68b837aee0decfb888"><span>Learn</span></a>
+        
+        <div :class="['notice',hasNotice && $route.path.indexOf('/notice') == -1 ?'has-notice':'']" v-if="store.getters.isLogin" @click="redirectPage('/notice')"></div>
         <div v-if="!store.getters.isLogin" class="user-login mini-button-border">
           <div class="mini-button" @click="showLoginMask">Sign in</div>
         </div>
         <div v-else class="right-nav-item user-photo">
           <el-popover
             popper-class="user-menu-box"
-            placement="bottom-end"
+            placement="bottom"
             :width="200"
             trigger="hover"
             >
             <template #reference>
-              <img v-if="store.state.profile.avatar" class="user-photo-img" :src="store.state.profile.avatar"/>
+              <img v-if="store.state.profile.avatar" class="user-photo-img" :src="$store.getters.getAwsImg($store.state.profile.avatar)" @error.once="$event.target.src=$store.state.profile.avatar"/>
               <img v-else class="user-photo-img" src="@/assets/images/common/user-default.png"/>
             </template>
             <div class="user-menu-list">
@@ -67,7 +69,17 @@ export default {
       oldSearchWord:"",
       searchWord:"",
       showLogin:false,
+      hasNotice:false,
     })
+
+    const init = async () => {
+      if(route.path.indexOf('/notice') == -1){
+        const res = await initNotice();
+        if(res.success && res.data.count>0){
+          state.hasNotice  = true;
+        }
+      }
+    }
 
     watch(
 			() => route.path,
@@ -77,8 +89,23 @@ export default {
           state.oldSearchWord = ""
           store.commit("setSearchWord", state.searchWord);
         }
+        if(route.path.indexOf('/notice') == -1){
+          state.hasNotice  = false;
+          initNotice().then(res=>{
+            if(res.success && res.data.count>0){
+              state.hasNotice  = true;
+            }
+          })
+        }
 			}
 		);
+
+    const initNotice = async () => {
+      return await proxy.$axios.profile.get_user_new_notifications({
+        accountId:store.getters.accountId,
+        lastTime:localStorage.getItem("notice_last_time_"+store.getters.accountId) || '',
+      })
+    }
 
     const search = () => {
       if(state.oldSearchWord == state.searchWord || !state.searchWord ){return}
@@ -136,6 +163,7 @@ export default {
 
     return {
       ...toRefs(state),
+      init,
       search,
       switchModel,
       store,
@@ -149,6 +177,9 @@ export default {
       closeLoginMask
     };
   },
+  mounted(){
+    this.init();
+  }
 };
 </script>
 
@@ -207,7 +238,7 @@ export default {
         }
         &.nav-hover {
           &::before{
-            display:block;
+            display:none;
             content:"";
             position:absolute;
             top:0;
@@ -220,7 +251,10 @@ export default {
             z-index:1;
           }
           &:hover{
+            font-family: D-DINExp-Bold;
+            font-weight: 700;
             &::before{
+              display:none;
               transition: opacity 0.5s linear;
               opacity: 1;
             }
@@ -228,8 +262,8 @@ export default {
         }
 
         &.action{
-          background:url('@/assets/images/header/action_bg.png') no-repeat center center;
-          background-size:contain;
+          // background:url('@/assets/images/header/action_bg.png') no-repeat center center;
+          // background-size:contain;
           font-family: D-DINExp-Bold;
           font-weight: 700;
           &::before{
@@ -244,7 +278,7 @@ export default {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            margin:0 0 0 112px;
+            margin:0 0 0 30px;
           }
         }
 
@@ -263,6 +297,18 @@ export default {
             width: 12px;
             transition: .5s;
           }
+        }
+      }
+
+      .notice{
+        width:24px;
+        height:24px;
+        background:url('@/assets/images/notice/icon-notice.png') no-repeat center center;
+        background-size:cover;
+        margin-left:20px;
+        cursor: pointer;
+        &.has-notice{
+          background-image:url('@/assets/images/notice/icon-notice-msg.png');
         }
       }
 

@@ -1,11 +1,11 @@
 <template>
   <div v-if="detail" :class="['community-item','community-item-'+from]" @click="redirectPage('/community-detail/'+detail.communityId,false,true)">
-    <img v-if="detail.cover" class="cover" :src="detail.cover">
-    <img v-else class="cover" src="@/assets/images/test/bg.png">
+    <img v-if="detail.cover" class="cover" :src="$store.getters.getAwsImg(detail.cover)" @error.once="$event.target.src=detail.cover">
+    <img v-else class="cover" src="@/assets/images/community/bg-small.png">
     <div class="info">
       <div class="avatar-border">
-        <img v-if="detail.avatar"  class="avatar" :src="detail.avatar">
-        <img v-else  class="avatar" src="@/assets/images/test/community.png">
+        <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
+        <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
       </div>
       <div class="item-token item-token-multiple3">
         <!--
@@ -18,7 +18,7 @@
       <!--createUser-->
       <div class="creator txt-wrap" v-if="from=='popup' && detail.data.createUser">@{{detail.data.createUser.name || detail.data.createUser.account_id}}</div>
       <div class="creator txt-wrap" v-else-if="from=='popup'">@{{detail.accountId}}</div>
-      <el-popover v-else placement="bottom-start"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
+      <el-popover v-else placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
         <template #reference>
           <div class="creator txt-wrap" @click.stop="redirectPage('/user-profile/'+detail.accountId,false)">@{{detail.accountId}}</div>
         </template>
@@ -28,8 +28,8 @@
       </el-popover>
 
       <div class="total">
-        <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
-        <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+        <div class="total-item"><span>{{detail.data.membersCount}}</span>Members</div>
+        <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
       </div>
       <div class="bio txt-wrap2">{{detail.info}}</div>
     </div>
@@ -137,7 +137,8 @@
     margin-top:20px;
     margin-right:20px;
     width: 335px;
-    height: 394px;
+    max-width:100%;
+    height: 392px;
     background: #28282D;
     border-radius: 24px;
     overflow: hidden;
@@ -147,10 +148,13 @@
       margin-top:0;
       background: #000000;
       transform:translateX(-1px);
+      .avatar-border{
+        background: #000000;
+      }
     }
     .cover{
-      width: 335px;
-      height: 150px;
+      width: 100%;
+      height: 160px;
       object-fit: cover;
     }
     .avatar-border{
@@ -159,8 +163,8 @@
       background:#28282D;
       border-radius: 20px;
       position:absolute;
-      top:132px;
-      left:20px;
+      top:126px;
+      left:16px;
       display:flex;
       align-items: center;
       justify-content:center;
@@ -172,7 +176,7 @@
       }
     }
     .info{
-      padding:16px 20px 20px;
+      padding:20px;
       .item-token{
         height:30px;
         display:flex;
@@ -217,7 +221,7 @@
         color: #FFFFFF;
         letter-spacing: 0;
         font-weight: 700;
-        margin-top:36px;
+        margin-top:16px;
         line-height: 20px;
       }
       .creator{
@@ -243,11 +247,13 @@
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 400;
+          line-height:18px;
           span{
             font-size: 16px;
             color: #FFFFFF;
             letter-spacing: 0;
             font-weight: 700;
+            margin-right:4px;
           }
         }
       }

@@ -9,8 +9,8 @@
           <div class="joined-list">
             <template v-for="item in joinedList">
               <div v-if="item.name" class="joined-item" @click="redirectPage('/community-detail/'+item.communityId)">
-                <img v-if="item.avatar"  class="avatar" :src="item.avatar">
-                <img v-else  class="avatar" src="@/assets/images/test/community.png">
+                <img v-if="item.avatar"  class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
+                <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
                 <div class="name txt-wrap">{{item.name}}</div>
                 <div class="message" v-if="item.unRead">{{item.unRead}}</div>
               </div>
@@ -32,7 +32,10 @@
         </div>
 
         <div class="no-more" v-if="isEnd">
-          <template v-if="communities[currentTab]['length'] == 0">No communities</template>
+          <div v-if="communities[currentTab]['length'] == 0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No communities
+          </div>
           <template v-else>No more communities</template>
         </div>
       </div>

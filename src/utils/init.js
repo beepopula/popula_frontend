@@ -3,10 +3,22 @@ import * as nearAPI from 'near-api-js';
 import getConfig from "../config";
 import api from '@/axios/index.js';
 import { getMetadata } from "../contract/TokenContract";
-import { getQueryString, parseAmount } from "./util";
+import { getQueryString, parseAmount, setShareInfo } from "./util";
 import { getTxData, storeAccessKey } from "./transaction";
+import { Ceramic } from "./ceramic";
+import * as bs58 from 'bs58';
+import secret from "./secret.js"
 
-
+function initS3() {
+  const data = secret  //process.env.NODE_ENV === 'production' ? json.mainnet : json.testnet); 
+  AWS.config.update({accessKeyId: data.s3.access_key_id, secretAccessKey: data.s3.secret_access_key});
+  AWS.config.apiVersions = {
+    s3: '2006-03-01',
+  };
+  window.s3 = new AWS.S3({
+    endpoint: new AWS.Endpoint('s3-accelerate.amazonaws.com')
+  });
+}
 
 async function initViewAccount() {
   const keyStore = new nearAPI.keyStores.InMemoryKeyStore();
@@ -51,10 +63,12 @@ async function initSignIn() {
   // }
   store.commit("setAccount", account)
   store.commit("setSignedIn", true)
+  //Ceramic.new()
   let res = await api.profile.get_user_info({accountId:store.getters.accountId})
   if (res.success) {
-    store.commit("setProfile", res.data)
+    store.commit("setProfile", res.data);
   }
+  await setShareInfo();
 }
 
 async function initSenderWallet(keyStore, walletConnection) {
@@ -96,6 +110,7 @@ async function initSenderWallet(keyStore, walletConnection) {
 
 export async function init() {
   store.commit("setNearConfig", getConfig()) //process.env.NODE_ENV === 'production' ? "mainnet" : "development"); 
+  initS3()
   const providers = new nearAPI.providers.JsonRpcProvider(store.state.nearConfig.nodeUrl)
   store.commit("setProvider", providers)
   await initViewAccount()
@@ -105,7 +120,7 @@ export async function init() {
     ...store.state.nearConfig,
   });
   // 
-  //store.commit("setNear", near);
+  store.commit("setNear", near);
   const walletConnection = new nearAPI.WalletConnection(near, "popula")
   store.commit("setWalletConnection", walletConnection);
   await initSenderWallet(keyStore, walletConnection)

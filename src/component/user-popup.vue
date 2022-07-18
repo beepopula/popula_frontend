@@ -1,11 +1,11 @@
 <template>
-  <div class="pop-box pop-user" @click="redirectPage('/user-profile/'+user.account_id,false)">
+  <div class="pop-box pop-user" @click.stop="redirectPage('/user-profile/'+user.account_id,false)">
     <div class="loading-box" v-if="isLoading">
       <img class="white-loading" src="@/assets/images/common/loading.png"/>
     </div>
     <template v-else-if="user.data">
       <!-- follow -->
-      <div class="follow-button" v-if="user.account_id !== $store.getters.accountId">
+      <div class="follow-button" v-if="user.account_id !== $store.getters.accountId && !hideBtn">
         <FollowButton 
           :isFollow="user.data.isFollow" 
           :accountId="user.account_id" 
@@ -15,20 +15,20 @@
           @login = "login"
         />
       </div>
-      <img v-if="user.avatar" class="avatar" :src="user.avatar"/>
+      <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
       <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
       <div class="name  txt-wrap">{{user.name || user.account_id}}</div>
       <div class="account  txt-wrap">{{user.account_id}}</div>
       <div class="total">
-        <div class="total-item"><span>{{user.data.follows}}</span> Followers</div>
-        <div class="total-item"><span>{{user.data.following}}</span> Following</div>
-        <div class="total-item"><span>{{user.data.postCount}}</span> Posts</div>
+        <div class="total-item"><span>{{user.data.follows}}</span>Followers</div>
+        <div class="total-item"><span>{{user.data.following}}</span>Following</div>
+        <div class="total-item"><span>{{user.data.postCount}}</span>Posts</div>
       </div>
       <div class="bio txt-wrap2">{{user.bio}}</div>
       <div class="comunity-joined" v-if="joinedCommunities && joinedCommunities.length>0">
         <div class="community-item" v-for="item in joinedCommunities" @click.stop="redirectPage('/community-detail/'+item.communityId,false)">
-          <img v-if="item.avatar"  class="avatar" :src="item.avatar">
-          <img v-else  class="avatar" src="@/assets/images/test/community.png">
+          <img v-if="item.avatar"  class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
+          <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
           <div class="name txt-wrap">{{item.name}}</div>
         </div>
       </div>
@@ -51,6 +51,10 @@
       account:{
         type:String,
         value:""
+      },
+      hideBtn:{
+        type:Boolean,
+        value:false
       },
     },
     setup(props,{ emit }) {
@@ -171,11 +175,13 @@
         color: rgba(255,255,255,0.5);
         letter-spacing: 0;
         font-weight: 400;
+        line-height:18px;
         span{
           font-size: 16px;
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 700;
+          margin-right:4px;
         }
       }
     }

@@ -23,8 +23,7 @@ export default class CommunityGenesisContract{
     }
 
     async _signAndSendTransaction(transaction) {
-        const actions = [functionCall(transaction.methodName, transaction.args, transaction.gas)]
-        const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, actions)
+        const result = await signAndSendTransaction(this.contract.contractId, this.contract.account, transaction)
         if (!checkReceiptsSuccess(result)) {
             return false
         }

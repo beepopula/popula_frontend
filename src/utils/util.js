@@ -78,6 +78,12 @@ export function generatePhrase(entrophy) {
 }
 
 export function checkReceiptsSuccess(result) {
+  if (result == 'redirect') {
+    return 'redirect'
+  }
+  if (result && !result.receipts_outcome) {
+    return false
+  }
   let index = result.receipts_outcome.findIndex(item => item.outcome.status.Failure)
   return index == -1
 }
@@ -288,4 +294,39 @@ export function getTimer(timestamp){
     showTime:result,
     hoverTime:utcArr.slice(1,2) + ' ' + utcArr.slice(2,3) + ' ' + utcArr.slice(3,4)//d + " at " + t
   };
+}
+
+export async function setShareInfo(shareInfoCode) {
+  if (!shareInfoCode) {
+    shareInfoCode = localStorage.getItem("shareInfo")
+    if (!shareInfoCode) {
+      return
+    }
+  }
+  const shareInfo = JSON.parse(bs58.decode(shareInfoCode).toString())
+  const args = shareInfo['args'];
+  if(args && args.inviter_id && args.inviter_id != store.getters.accountId){
+    if (store.getters.accountId){
+      const check_params = {
+        ...args,
+        account_id:store.getters.accountId
+      }
+      const recorded = await store.state.viewAccount.viewFunction(args.contract_id, "check_viewed", check_params); 
+      if(!recorded){
+        localStorage.setItem("shareInfo", shareInfoCode);
+      } else {
+        localStorage.removeItem("shareInfo")
+      }
+    }else{
+      localStorage.setItem("shareInfo", shareInfoCode);
+    }
+  }
+  return shareInfo
+}
+
+export function getShareInfo() {
+  const shareInfoCode = localStorage.getItem("shareInfo")
+  if (shareInfoCode) {
+    return JSON.parse(bs58.decode(shareInfoCode).toString())
+  }
 }

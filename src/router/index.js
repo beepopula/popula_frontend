@@ -56,24 +56,20 @@ const routes = [
         name: "UserProfile",
         component: () => import("../views/user-profile.vue"),
       },
-      // {
-      //   path: "/notice",
-      //   name: "notice",
-      //   component: () => import("../views/notice.vue"),
-      //   meta:{
-      //     requireAuth:true,
-      //     redirectPage:'home',
-      //   }
-      // },
-      // {
-      //   path: "/user-profile-edit",
-      //   name: "UserProfileEdit",
-      //   component: () => import("../views/user-profile-edit.vue"),
-      //   meta:{
-      //     requireAuth:true,
-      //     redirectPage:'home',
-      //   }
-      // },
+      {
+        path: "/notice",
+        name: "Notice",
+        component: () => import("../views/notice.vue"),
+        meta:{
+          requireAuth:true,
+          redirectPage:'home',
+        }
+      },
+      {
+        path: "/share/:id",
+        name: "Share",
+        component: () => import("../views/share.vue"),
+      },
     ],
   },
 ];

@@ -1,19 +1,18 @@
 <template>
-  <div class="main-box" v-if="detail.data">
-    <div v-if="detail.cover" class="bg-box" :style="'background-image:url('+detail.cover+');'">
-      <div class="bg-mask"></div>
-    </div>
-    <div v-else class="bg-box">
+  <div class="main-box">
+    <div class="bg-box">
+      <img v-if="detail.cover" :src="$store.getters.getAwsImg(detail.cover)" @error.once="$event.target.src=detail.cover">
+      <img v-else src="@/assets/images/community/bg.png">
       <div class="bg-mask"></div>
     </div>
     <!-- Community info  -->
     <div class="community-info" v-if="detail.data">
       <div class="info-box">
         <div class="info-left">
-          <img v-if="detail.avatar"  class="avatar" :src="detail.avatar">
-          <img v-else  class="avatar" src="@/assets/images/test/community.png">
+          <img v-if="detail.avatar"  class="avatar" :src="$store.getters.getAwsImg(detail.avatar)" @error.once="$event.target.src=detail.avatar">
+          <img v-else  class="avatar" src="@/assets/images/community/default-avatar.png">
           <div class="info">
-            <div class="name">{{detail.name}}</div>
+            <div class="name" ><span class="txt-wrap">{{detail.name}}</span><div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBasicinfoLayer"></div></div>
             <div class="creator">Created by 
               <el-popover placement="bottom-start"  trigger="hover" @show="showCreateUser=true" @hide="showCreateUser=false">
                 <template #reference>
@@ -25,22 +24,25 @@
               </el-popover>
             </div>
             <div class="total">
-              <div class="total-item"><span>{{detail.data.membersCount}}</span> Members</div>
-              <div class="total-item"><span>{{detail.data.postCount}}</span> Posts</div>
+              <div class="total-item"><span>{{detail.data.membersCount}}</span>Members</div>
+              <div class="total-item"><span>{{detail.data.postCount}}</span>Posts</div>
             </div>
           </div>
         </div>
         <div class="info-right">
+          <!--
           <div class="token-list" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && false">
             <img class="token-icon" src="@/assets/images/test/token_icon1.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon2.png"/>
             <img class="token-icon" src="@/assets/images/test/token_icon3.png"/>
           </div>
-          <div class="button-border join-button" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT">
+          -->
+          <div class="button-border join-button" v-if="$route.params.id != $store.state.nearConfig.MAIN_CONTRACT && detail.data.createUser.account_id != $store.getters.accountId">
             <div class="button" @click="changeJoinCommunity()">
               <template v-if="detail.data.isJoin">  Joined </template>
               <template v-else>  Join </template>
             </div>
+            <!--
             <div class="fail-tip" v-if="showJoinFailReason">
               <div class="title">Failed</div>
               <div class="reason">reason reason reason</div>
@@ -60,10 +62,11 @@
                 <div class="mini-button">confirm</div>
               </div>
             </div>
+            -->
           </div>
         </div>
       </div>
-      <div class="bio txt-wrap2">{{detail.info}}</div>
+      <div class="bio txt-wrap2" v-if="detail.info">{{detail.info}}</div>
     </div>
     <!-- Tab  -->
     <div class="page">
@@ -74,7 +77,7 @@
     <div class="main main-post" v-if="currentPage == 'post'">
       <!-- left -->
       <div class="left">
-        <Post v-if="detail.data" :community="detail" @postSuccess="postSuccess()"/>
+        <Post v-if="detail.data" :community="detail" :location="'detail'" @postSuccess="postSuccess()"/>
         <div class="filter-menu">
           <div :class="['filter-menu-item',currentTab == 'hot' ? 'active' : '']" @click="changeTab('hot')">Hot</div>
           <div :class="['filter-menu-item',currentTab == 'new' ? 'active' : '']" @click="changeTab('new')">
@@ -82,14 +85,20 @@
             <div class="unread-count" v-if="postCount.new">{{postCount.new}}</div>
           </div>
         </div>
-        <template v-for="item in postList[currentTab]">
-          <PostItem :item="item" :from="'communityDetail'"/>
-        </template>
+        <div class="post-list">
+          <template v-for="item in postList[currentTab]">
+            <PostItem :item="item" :from="'community'" @changePostListStatus="changePostListStatus(item,$event)"/>
+          </template>
+        </div>
 
         <div class="no-more" v-if="isEnd">
-          <template v-if="postList[currentTab]['length'] == 0">No posts</template>
+          <div v-if="postList[currentTab]['length'] == 0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No posts
+          </div>
           <template v-else>No more posts</template>
         </div>
+
       </div>
       <!-- right -->
       <div class="right">
@@ -105,11 +114,37 @@
           <div class="members-list">
             <template v-for="item in members">
               <div class="members-item" v-if="item" @click="redirectPage('/user-profile/'+item.account_id,false)">
-                <img v-if="item.avatar" class="avatar" :src="item.avatar">
+                <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
-                <div class="creator-flag" v-if="item.data.type=='creator'">creator</div>
                 <div class="info">
-                  <div class="name txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</div>
+                  <div :class="['name','name-'+item.data.type]">
+                    <span class="name-txt txt-wrap">{{item.name || item.account_id.split(".testnet")[0]}}</span>
+                    <!-- CO -->
+                    <template v-if="item.data.type=='creator' || item.account_id==detail.data.createUser.account_id">
+                      <el-popover
+                        placement="bottom-start"
+                        trigger="hover"
+                        >
+                        <template #reference>
+                          <div class="user-flag co"></div>
+                        </template>
+                        <div class="pop-box pop-tip pop-user-flag">Community Originator</div>
+                      </el-popover>
+                    </template>
+                    <!-- MOD -->
+                    <template v-else-if="item.data.type=='mod'">
+                      <el-popover
+                        placement="bottom-start"
+                        trigger="hover"
+                        >
+                        <template #reference>
+                          <div class="user-flag mod"></div>
+                        </template>
+                        <div class="pop-box pop-tip pop-user-flag">Moderator</div>
+                      </el-popover>
+                    </template>
+
+                  </div>
                   <div class="account txt-wrap">{{item.account_id}}</div>
                 </div>
                 <!-- follow -->
@@ -125,8 +160,6 @@
             </template>
           </div>
         </div>
-        <!-- About -->
-        <About/>
       </div>
     </div>
 
@@ -134,14 +167,46 @@
       <!-- left -->
       <div class="left">
         <!-- Community Information-->
-        <div class="title">Community Information</div>
+        <div class="title" style="justify-content:flex-start;">
+          Community Information
+          <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditContributorLayer"></div>
+        </div>
         <div class="community-information">
-          <div class="intro">{{detail.information}}</div>       
+          <div class="intro" v-if="detail.information">{{detail.information}}</div>       
           <div class="media">
-            <a class="media-item website" :href="detail.website" target="_blank">Website</a>
-            <a class="media-item governance" :href="detail.governance" target="_blank">Blog</a>
-            <a class="media-item twitter" :href="detail.twitter" target="_blank">Twitter</a>
-            <a class="media-item discord" :href="detail.discord" target="_blank">Discord</a>
+            <!-- Website -->
+            <a v-if="media.website && media.website.url" class="media-item" :href="checkUrl(media.website.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
+              Website
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/> 
+              Website
+            </div>
+
+
+            <!-- twitter -->
+            <a v-if="media.twitter && media.twitter.url" class="media-item" :href="checkUrl(media.twitter.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-twitter-hover.png"/>
+              Twitter
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-twitter-grey.png"/> 
+              Twitter
+            </div>
+
+            <!-- Discord -->
+            <a v-if="media.discord && media.discord.url" class="media-item" :href="checkUrl(media.discord.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-discord.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-discord-hover.png"/>
+              Discord
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-discord-grey1.png"/> 
+              Discord
+            </div>
           </div>
 
           <!-- creator -->
@@ -151,7 +216,7 @@
             <el-popover placement="bottom-start"  trigger="hover" @show="showCreateUser2=true" @hide="showCreateUser2=false">
               <template #reference>
                 <div class="user" @click="redirectPage('/user-profile/'+detail.data.createUser.account_id,false)">
-                  <img v-if="detail.data.createUser.avatar" class="avatar" :src="detail.data.createUser.avatar">
+                  <img v-if="detail.data.createUser.avatar" class="avatar" :src="$store.getters.getAwsImg(detail.data.createUser.avatar)" @error.once="$event.target.src=detail.data.createUser.avatar">
                   <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                   <div class="user-info">
                     <div class="name">{{detail.data.createUser.name || detail.data.createUser.account_id}}</div>
@@ -167,7 +232,6 @@
           -->
 
           <!-- creator -->
-          <!--
           <div class="contributor-box" v-if="contributors.length>0">
             <div class="mini-title">Contributor</div>
             <div class="contributor">
@@ -175,11 +239,11 @@
                 <el-popover placement="bottom-start"  trigger="hover" @show="item.showUser=true" @hide="item.showUser=false">
                   <template #reference>
                     <div :class="['user','contributor-item',index%4 == 3 ? 'mr0' : '']">
-                      <img v-if="item.avatar" class="avatar" :src="item.avatar">
+                      <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
                       <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                       <div class="user-info">
-                        <div class="name txt-wrap">{{item.name || item.account_id}}</div>
-                        <div class="account txt-wrap">{{item.account_id}}</div>
+                        <div class="name txt-wrap">{{item.name || item.accountId}}</div>
+                        <div class="account txt-wrap">{{item.accountId}}</div>
                       </div>
                     </div>
                   </template>
@@ -190,69 +254,76 @@
               </template>
             </div>
           </div>
-          -->
           
         </div>
         <!-- Benefits -->
-        <!--
-        <div class="title">Benefits</div>
-        <div class="benefits">
-          <template v-for="i in 4">
-            <div :class="['benefit-item',i%2==0 ? 'mr0' : '']">
-              <div class="mini-title">This is a tittle</div>
-              <div class="benefit-intro">
-                Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more…
+        <template v-if="benefits.length>0 || detail.data.createUser.account_id == $store.getters.accountId">
+          <div class="title" style="justify-content:flex-start;">
+            Benefits
+            <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditBenefitsLayer"></div>
+          </div>
+          <div class="benefits">
+            <template v-for="(benefit,index) in benefits">
+              <div :class="['benefit-item',index%2==1 ? 'mr0' : '']">
+                <div class="mini-title txt-wrap">{{benefit.title}}</div>
+                <div class="benefit-intro">
+                  {{benefit.introduction}}
+                </div>
+                <div class="benefit-bottom">
+                  <div class="benefit-type">{{benefit.type}}</div>
+                  <!--<div class="benefit-points">100 points</div>-->
+                </div>
               </div>
-              <div class="benefit-bottom">
-                <div class="benefit-access">Access</div>
-                <div class="benefit-points">100 points</div>
-              </div>
-            </div>
-          </template>
-        </div>
-        -->
+            </template>
+          </div>
+        </template>
         <!-- News -->
-        <!--
-        <div class="title">News</div>
-        <div class="news">
-          <div class="news-item">
-            <div class="news-right">
-              <div class="mini-title">This is a tittle</div>
-              <div class="news-intro">
-                Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more
-              </div>
-              <div class="news-bottom">
-                <div class="news-from">Mirror</div>
-                <div class="news-time">Jan 4 , 2022</div>
-              </div>
-            </div>
+        <template v-if="news.length>0 || detail.data.createUser.account_id == $store.getters.accountId">
+          <div class="title" style="justify-content:flex-start;">
+            News
+            <div class="edit-btn" v-if="detail.data.createUser.account_id == $store.getters.accountId" @click="showEditNewsLayer"></div>
           </div>
-          <div class="news-item">
-            <img class="news-left-cover" src="https://popula-frontend.s3.amazonaws.com/user/i41wnDgEdlbS1cIzmGAB0QT1t0fGbaUP.png"/>
-            <div class="news-right">
-              <div class="mini-title">This is a tittle</div>
-              <div class="news-intro news-right-intro">
-                Post Text more more more or more more more post Text more more more or more more more Post Text more more more or more more more post post Text more
+          <div class="news">
+            <template  v-for="(item,index) in news">
+              <div v-if="item.picture" class="news-item news-item-cover">
+                <img class="news-left-cover" :src="$store.getters.getAwsImg(item.picture)" @error.once="$event.target.src=item.picture"/>
+                <div class="news-right">
+                  <div class="mini-title txt-wrap">{{item.title}}</div>
+                  <div class="news-intro news-right-intro">{{item.introduction}}</div>
+                  <!--
+                  <div class="news-bottom">
+                    <div class="news-from">Mirror</div>
+                    <div class="news-time">Jan 4 , 2022</div>
+                  </div>
+                  -->
+                </div>
               </div>
-              <div class="news-bottom">
-                <div class="news-from">Mirror</div>
-                <div class="news-time">Jan 4 , 2022</div>
+              <div v-else class="news-item">
+                <div class="news-right">
+                  <div class="mini-title txt-wrap">{{item.title}}</div>
+                  <div class="news-intro">{{item.introduction}}</div>
+                  <!--
+                  <div class="news-bottom">
+                    <div class="news-from">Mirror</div>
+                    <div class="news-time">Jan 4 , 2022</div>
+                  </div>
+                  -->
+                </div>
               </div>
-            </div>
+            </template>
           </div>
-        </div>
-        -->
+        </template>
 
       </div>
       <!-- right -->
       <div class="right">
         <!-- Points Amount-->
-        <template v-if="$route.params.id == 't3.community-genesis2.bhc8521.testnet'">
+        <!-- <template>
           <div class="title">Points Amount</div>
           <div class="points-amount">
             <img style="width:100%" src="@/assets/images/community/coming-soon.png"/>
           </div>
-        </template>
+        </template> -->
         
         
         <!--
@@ -304,7 +375,7 @@
           <template v-for="item in 7">
             <div class="members-rank-item">
               <div class="members-rank-item-left">
-                <img v-if="item.avatar" class="avatar" :src="item.avatar">
+                <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar">
                 <img v-else class="avatar" src="@/assets/images/common/user-default.png">
                 <div class="name txt-wrap">VValkerVValkerVValkerVValker</div>
               </div>
@@ -316,8 +387,15 @@
           </template>
         </div>
         -->
-        <!-- About -->
-        <About/>
+
+        <div class="title">Token Contract</div>
+        <div class="token-contract">
+          <div class="token-contract-type">
+            NEAR Chain(NEP-141)
+            <a class="jump-contract" :href="$store.state.nearConfig.explorerUrl+'/accounts/'+$route.params.id" target="_blank"></a>
+          </div>
+          <div class="token-contract-address">{{$route.params.id}}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -336,7 +414,7 @@
         <div class="pop-box pop-tip">All Communities</div>
       </el-popover>
     </div>
-    <div class="joined-communities" v-if="joinedList.length>0">
+    <div :class="['joined-communities',joinedList.length<=4?'joined-communities-noscroll':'']" v-if="joinedList.length>0">
       <draggable 
         v-model="joinedList" 
         group="people" 
@@ -351,8 +429,8 @@
               trigger="hover"
               >
               <template #reference>
-                <img v-if="element.avatar" :src="element.avatar" @click="redirectPage('/community-detail/'+element.communityId)">
-                <img v-else src="@/assets/images/test/community.png" @click="redirectPage('/community-detail/'+element.communityId)">
+                <img v-if="element.avatar" :src="$store.getters.getAwsImg(element.avatar)" @error.once="$event.target.src=element.avatar" @click="redirectPage('/community-detail/'+element.communityId)">
+                <img v-else src="@/assets/images/community/default-avatar.png" @click="redirectPage('/community-detail/'+element.communityId)">
               </template>
               <div class="pop-box pop-tip" v-if="!drag">{{element.name}}</div>
             </el-popover>
@@ -391,9 +469,7 @@
     </div>
     <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
       <div class="edit-button close" @click="closeSuspendLayer()"></div>
-      <div class="elastic-layer-content">
-        <Post v-if="detail.data" :community="detail" :location="'suspend'" @postSuccess="postSuccess()"/>
-      </div>
+      <Post v-if="detail.data" :community="detail" :location="'detail-suspend'" @postSuccess="postSuccess()"/>
     </div>
   </div>
 
@@ -401,7 +477,23 @@
   <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 
   <!-- suspend -->
-  <suspend @postSuccess="postSuccess()" />
+  <!-- <suspend @postSuccess="postSuccess()" /> -->
+
+  <!-- CommunityEditBasicinfo -->
+  <template v-if="showEditBasicinfo">
+    <CommunityEditBasicinfo :communityId="$route.params.id" :editInfo="editBasicinfo" @updateInfo="updateBasicinfo" @closeEditLayer="showEditBasicinfo=false"/>
+  </template>
+  <template v-if="showEditContributor">
+    <CommunityEditContributor :communityId="$route.params.id" :editInfo="editContributor" @updateInfo="updateContributor" @closeEditLayer="showEditContributor=false"/>
+  </template>
+  <template v-if="showEditBenefits">
+    <CommunityEditBenefits :communityId="$route.params.id" :editInfo="benefits" @updateInfo="updateBenefits" @closeEditLayer="showEditBenefits=false"/>
+  </template>
+  <template v-if="showEditNews">
+    <CommunityEditNews :communityId="$route.params.id" :editInfo="news" @updateInfo="updateNews" @closeEditLayer="showEditNews=false"/>
+  </template>
+
+
 </template>
 
 <script>
@@ -409,7 +501,7 @@
   import { useRoute,useRouter } from "vue-router";
   import { useStore } from 'vuex';
   import CommunityContract from "@/contract/CommunityContract";
-  import { getGas} from '../utils/util';
+  import { checkReceiptsSuccess, getGas} from '../utils/util';
   import { executeMultipleTransactions, generateAccessKey } from '@/utils/transaction';
   import Post from '@/component/post.vue';
   import PostItem from '@/component/post-item.vue';
@@ -419,6 +511,10 @@
   import FollowButton from "@/component/follow-button.vue";
   import UserPopup from '@/component/user-popup.vue';
   import suspend from "@/component/suspend.vue";
+  import CommunityEditBasicinfo from "@/component/community-edit-basicinfo.vue";
+  import CommunityEditContributor from "@/component/community-edit-contributor.vue";
+  import CommunityEditBenefits from "@/component/community-edit-benefits.vue";
+  import CommunityEditNews from "@/component/community-edit-news.vue";
   import draggable from 'vuedraggable'
   export default {
     components: {
@@ -430,6 +526,10 @@
       FollowButton,
       UserPopup,
       suspend,
+      CommunityEditBasicinfo,
+      CommunityEditContributor,
+      CommunityEditBenefits,
+      CommunityEditNews,
       draggable,
     },
     setup(){
@@ -472,10 +572,24 @@
         showLogin:false,
         showLayer:false,
         drag: false,
-        //other
         showCreateUser:false,
         showCreateUser2:false,
-        contributors:[]
+        //
+        media:{
+          // website:state.detail.website || {url:'',verified:false},
+          // twitter:state.detail.twitter || {url:'',verified:false},
+          // discord:state.detail.discord || {url:'',verified:false},
+        },
+        contributors:[],
+        benefits:[],
+        news:[],
+        //edit
+        showEditBasicinfo:false,
+        editBasicinfo:{},
+        showEditContributor:false,
+        editContributor:{},
+        showEditBenefits:false,
+        showEditNews:false,
       })
 
       const init = async () => {
@@ -485,6 +599,12 @@
         });
         if(res.success) {
           state.detail = res.data;
+          state.contributors = state.detail.contributor ||  [];
+          state.media = {
+            website:state.detail.website || {url:'',verified:false},
+            twitter:state.detail.twitter || {url:'',verified:false},
+            discord:state.detail.discord || {url:'',verified:false},
+          }
         }
         //posts
         changeTab('hot');
@@ -503,23 +623,28 @@
         state.members = (await getMembers()).slice(0,3);
         //postCommunity
         initUnreadCount();
-        //contributors
-        initContributor();
+        //initBenefitAndNews
+        initBenefits();
+        initNews();
       };
 
-      //initContributor
-      const initContributor = async () => {
-        const list = state.detail.contributor ||  [];
-        const contributors = [];
-        for(let i = 0;i<list.length;i++){
-          const res = await proxy.$axios.profile.get_user_info({
-            accountId:list[i],
-          });
-          if(res.success){
-            contributors.push(res.data);
-          }
+      const initBenefits = async () => {
+        const res = await proxy.$axios.community.get_benefit_list({
+          communityId:route.params.id,
+          accountId:store.getters.accountId || '',
+        });
+        if(res.success) {
+          state.benefits = res.data;
         }
-        state.contributors = contributors;
+      }
+      const initNews = async () => {
+        const res = await proxy.$axios.community.get_news_list({
+          communityId:route.params.id,
+          accountId:store.getters.accountId || '',
+        });
+        if(res.success) {
+          state.news = res.data;
+        }
       }
 
       //unread post count
@@ -555,28 +680,46 @@
         if(!store.getters.isLogin){
           state.showLogin = true
         }else{
-          const method = state.detail.data.isJoin ? 'quit' : 'join';
-          const taskTransaction = {
-            receiverId: route.params.id,
-            actions: [{
-              kind: "functionCall",
-              methodName: method,
-              args: {},
-              deposit: "20000000000000000000000",
-              gas: getGas().toString()
-            }]
+          try{
+            const method = state.detail.data.isJoin ? 'quit' : 'join';
+            const taskTransaction = {
+              receiverId: route.params.id,
+              actions: [{
+                kind: "functionCall",
+                methodName: method,
+                args: {},
+                deposit: "20000000000000000000000",
+                gas: getGas().toString()
+              }]
+            }
+            const accessKey = await generateAccessKey(store.getters.accountId, route.params.id)
+            const accessKeyTransaction = {
+              receiverId: store.getters.accountId,
+              actions: [{
+                kind: "addKey",
+                publicKey: accessKey.publicKey,
+                accessKey: accessKey.accessKey
+              }]
+            }
+            const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+            // if (!checkReceiptsSuccess(result)) {
+            //   return false
+            // }
+            // state.detail.data.isJoin = !state.detail.data.isJoin;
+            if (result == true) {
+              state.detail.data.isJoin = !state.detail.data.isJoin;
+            } else  if (res == false) {
+              throw new Error('error')
+            } else {}
+            
+          }catch(e){
+            const message = state.detail.data.isJoin ? 'Quit Failed' : 'Join Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log(message+" error:"+e);
           }
-          const accessKey = await generateAccessKey(store.getters.accountId, route.params.id)
-          const accessKeyTransaction = {
-            receiverId: store.getters.accountId,
-            actions: [{
-              kind: "addKey",
-              publicKey: accessKey.publicKey,
-              accessKey: accessKey.accessKey
-            }]
-          }
-          await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-          // state.detail.data.isJoin = !state.detail.data.isJoin;
         }
       }
 
@@ -635,7 +778,7 @@
 
       //handleScroll
       const handleScroll = async () => {
-        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd){
+        if(((document.documentElement.scrollTop + window.innerHeight) >= document.body.scrollHeight-200) && !state.isLoading && !state.isEnd && state.currentTab){
           const res = await getPosts();
           state.postList[state.currentTab] = state.postList[state.currentTab].concat(res.data);
         }
@@ -698,6 +841,71 @@
         }
       }
 
+      //edit Basicinfo
+      const showEditBasicinfoLayer = () => {
+        state.editBasicinfo = {
+          name:state.detail.name,
+          info:state.detail.info,
+          avatar:state.detail.avatar,
+          cover:state.detail.cover
+        }
+        state.showEditBasicinfo = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateBasicinfo = (info) => {
+        state.detail.name = info.name;
+        state.detail.info = info.info;
+        state.detail.avatar = info.avatar;
+        state.detail.cover = info.cover;
+        
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditBasicinfo = false;
+      }
+
+
+      //edit Contributor
+      const showEditContributorLayer = () => {
+        state.editContributor = {
+          information:state.detail.information,
+          contributor:state.contributors || [],
+          media:state.media
+        }
+        state.showEditContributor = true;
+
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateContributor = (info) => {
+        state.detail.information = info.information;
+        state.contributors = [...info.contributor];
+        state.media = {...info.media}
+
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditContributor = false;
+      }
+
+      //edit Benefits
+      const showEditBenefitsLayer = () => {
+        state.showEditBenefits = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateBenefits = (info) => {
+        state.benefits = info;
+        state.showEditBenefits = false;
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+      }
+
+      //edit News
+      const showEditNewsLayer = () => {
+        state.showEditNews = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+      const updateNews = (info) => {
+        state.news = info;
+        
+        document.getElementsByTagName('body')[0].classList.remove("fixed");
+        state.showEditNews = false;
+      }
+
       //drag
       const dragEnd = async (event) => {
         state.drag = false;
@@ -709,6 +917,26 @@
           accountId:store.getters.accountId,
         });
 
+      }
+
+      //changePostListStatus 
+      const changePostListStatus = (item,close=false) => {
+        state.postList[state.currentTab].forEach(i=>{
+          if(i==item && !close){
+            i.isComment = true;
+          }else{
+            i.isComment = false;
+          }
+        })
+      }
+
+      //checkUrl
+      const checkUrl = (url) => {
+        if(url.indexOf('http://')<0 && url.indexOf('https://')<0){
+          return `http://${url}`
+        }else{
+          return url;
+        }
       }
       
       //redirectPage
@@ -758,8 +986,18 @@
         closeMemberList,
         memberLayer,
         membersScroll,
+        showEditBasicinfoLayer,
+        updateBasicinfo,
+        showEditContributorLayer,
+        updateContributor,
+        showEditBenefitsLayer,
+        updateBenefits,
+        showEditNewsLayer,
+        updateNews,
         dragEnd,
+        checkUrl,
         redirectPage,
+        changePostListStatus,
         backTop,
         popUp,
         closeSuspendLayer,
@@ -776,19 +1014,26 @@
 
 <style lang="scss" scoped>
   .main-box{
-    padding-top:150px;
-    position:relative;
+    padding-top:220px;
+    position:static;
     .bg-box{
-      position: fixed;
-      top:0;
+      position: absolute;
+      top:80px;
       left:0;
-      width:100%;
+      width:100vw;
       height:300px;
-      background:url('@/assets/images/community/bg.png') no-repeat center center;
-      background-size:cover;
+      img{
+        width:100vw;
+        height:100%;
+        object-fit: cover;
+      }
       .bg-mask{
+        position:absolute;
+        top:0;
+        left:0;
         width:100%;
         height:100%;
+        z-index: 2;
         background:url('@/assets/images/community/bg-mask.png') no-repeat center bottom;
         background-size:cover;
       }
@@ -804,7 +1049,9 @@
         display:flex;
         justify-content:space-between;
         align-items:center;
+        height: 90px;
         .info-left{
+          height: 90px;
           display:flex;
           .avatar{
             width: 90px;
@@ -813,16 +1060,24 @@
             object-fit: cover;
           }
           .info{
+            height: 90px;
             display:flex;
             flex-direction: column;
             justify-content: center;
             margin-left:30px;
             .name{
               font-family: D-DINExp-Bold;
-              font-size: 18px;
+              font-size: 20px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
+              display:flex;
+              align-items: center;
+              line-height:22px;
+              height:22px;
+              span{
+                max-width: 300px;
+              }
             }
             .creator{
               margin-top:8px;
@@ -831,6 +1086,7 @@
               color: rgba(255,255,255,0.5);
               letter-spacing: 0;
               font-weight: 400;
+              line-height:16px;
               span{
                 color: #FFFFFF;
                 cursor: pointer;
@@ -846,11 +1102,13 @@
                 color: rgba(255,255,255,0.5);
                 letter-spacing: 0;
                 font-weight: 400;
+                line-height:18px;
                 span{
                   font-size: 16px;
                   color: #FFFFFF;
                   letter-spacing: 0;
                   font-weight: 700;
+                  margin-right:4px;
                 }
               }
             }
@@ -1010,6 +1268,14 @@
   }
 
   .main-post{
+    .left{
+      .post-list{
+        background: #28282D;
+        border-radius: 24px;
+        padding:0 20px;
+        margin-top:20px;
+      }
+    }
     .right{
       .members{
         width: 320px;
@@ -1043,6 +1309,7 @@
             margin-top:30px;
             display:flex;
             position:relative;
+            align-items: center;
             cursor:pointer;
             .avatar{
               width: 40px;
@@ -1050,39 +1317,46 @@
               border-radius:50%;
               object-fit: cover;
             }
-            .creator-flag{
-              position:absolute;
-              bottom:-12px;
-              left:0;
-              display:flex;
-              justify-content: center;
-              align-items: center;
-              width: 80px;
-              height: 32px;
-              font-family: D-DINExp;
-              font-size: 20px;
-              line-height:20px;
-              color: #FFFFFF;
-              letter-spacing: 0;
-              background: #ED1F5A;
-              border: 2px solid rgba(0,0,0,1);
-              border-radius: 8px;
-              transform-origin:left bottom;
-              transform:scale(0.5);
-            }
             .info{
               margin-left:12px;
-              display:flex;
-              flex-direction: column;
-              justify-content: center;
               .name{
-                width:100px;
-                line-height: 19px;
-                font-family: D-DINExp-Bold;
-                font-size: 18px;
-                color: #FFFFFF;
-                letter-spacing: 0;
-                font-weight: 700;
+                height:20px;
+                display: flex;
+                align-items: center;
+                &.name-creator{
+                  .name-txt{
+                    max-width:76px;
+                  }
+                }
+                &.name-mod{
+                  .name-txt{
+                    max-width:68px;
+                  }
+                }
+                .name-txt{
+                  display:inline-block;
+                  max-width:100px;
+                  line-height: 20px;
+                  font-family: D-DINExp-Bold;
+                  font-size: 18px;
+                  color: #FFFFFF;
+                  letter-spacing: 0;
+                  font-weight: 700;
+                }
+                .user-flag{
+                  margin-left:4px;
+                  width: 20px;
+                  height: 14px;
+                  &.co{
+                    background:url("@/assets/images/common/co.png") no-repeat right center;
+                    background-size:20px 14px;
+                  }
+                  &.mod{
+                    width: 28px;
+                    background:url("@/assets/images/common/mod.png") no-repeat right center;
+                    background-size:28px 14px;
+                  }
+                }
               }
               .account{
                 width:100px;
@@ -1146,6 +1420,14 @@
         border-radius: 24px;
         padding:20px;
         margin-bottom:60px;
+        .media:first-child{
+          margin-top:10px;
+        }
+        .media:first-child:last-child{
+          margin-top:0px;
+          height:36px;
+        }
+          
         .intro{
           font-family: D-DINExp;
           font-size: 16px;
@@ -1160,7 +1442,9 @@
           display:flex;
           align-items: center;
           .media-item{
-            padding-left:27px;
+            display:flex;
+            height:20px;
+            align-items: center;
             margin-right:40px;
             font-family: D-DINExp;
             font-size: 14px;
@@ -1169,22 +1453,19 @@
             text-align: justify;
             font-weight: 400;
             cursor: pointer;
-            &:hover{
-              color: rgba(255,255,255,1);
+            img{
+              margin-right:11px;
+              height:16px;
             }
+            img.hover{
+              display:none;
+            }
+            /*
             &.website{
               background:url('@/assets/images/common/logo-link-hover.png') no-repeat left center;
               background-size:auto 16px;
               &:hover{
                 background:url('@/assets/images/common/logo-link.png') no-repeat left center;
-                background-size:auto 16px;
-              }
-            }
-            &.governance{
-              background:url('@/assets/images/common/logo-governance-hover.png') no-repeat left center;
-              background-size:auto 16px;
-              &:hover{
-                background:url('@/assets/images/common/logo-governance.png') no-repeat left center;
                 background-size:auto 16px;
               }
             }
@@ -1202,6 +1483,17 @@
               &:hover{
                 background:url('@/assets/images/common/logo-discord.png') no-repeat left center;
                 background-size:auto 16px;
+              }
+            }
+            */
+          }
+          a.media-item{
+            &:hover{
+              img{
+                display:none;
+              }
+              img.hover{
+                display:block;
               }
             }
           }
@@ -1258,6 +1550,7 @@
             .contributor-item{
               margin-right:40px;
               margin-top:20px;
+              margin-bottom:0;
               &.mr0{
                 margin-right:0;
               }
@@ -1274,7 +1567,7 @@
         margin-bottom:40px;
         .benefit-item{
           width:335px;
-          height:233px;
+          height:161px;
           padding:20px;
           background: #28282D;
           border-radius: 24px;
@@ -1284,19 +1577,19 @@
             margin-right:0;
           }
           .benefit-intro{
+            height:48px;
             margin-top:10px;
             opacity: 0.7;
             font-family: D-DINExp;
             font-size: 16px;
             color: #FFFFFF;
             letter-spacing: 0;
-            text-align: justify;
             line-height: 24px;
             font-weight: 400;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 5;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             word-wrap:break-word;
           }
@@ -1305,16 +1598,17 @@
             height:24px;
             display:flex;
             align-items: center;
-            .benefit-access{
-              width:61px;
+            .benefit-type{
+              padding:0 10px;
               height:24px;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 4px;
+              background: #36363C;
+              border-radius: 12px;    
               display:flex;
               align-items: center;
               justify-content:center;
               font-family: D-DINExp;
               font-size: 12px;
+              line-height:24px;
               color: #FFFFFF;
               letter-spacing: 0;
               text-align: center;
@@ -1342,15 +1636,24 @@
           background: #28282D;
           border-radius: 24px;
           display:flex;
+          &.news-item-cover{
+            .news-right{
+              width:350px;
+            }
+          }
           .news-left-cover{
             width:180px;
             height:180px;
             border-radius: 10px;
             margin-right:20px;
+            object-fit: cover;
           }
           .news-right{
             width:650px;
             flex:1;
+            .mini-title{
+              width:100%;
+            }
             .news-intro{
               margin-top:10px;
               opacity: 0.7;
@@ -1358,7 +1661,6 @@
               font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
-              text-align: justify;
               line-height: 24px;
               font-weight: 400;
               overflow: hidden;
@@ -1577,6 +1879,44 @@
           }
         }
       }
+      .token-contract{
+        margin-bottom:20px;
+        width:320px;
+        padding:20px;
+        background: #000000;
+        border-radius: 20px;
+        .token-contract-type{
+          display:flex;
+          align-items: center;
+          font-family: D-DINExp;
+          font-size: 14px;
+          letter-spacing: 0;
+          font-weight: 400;
+          line-height:16px;
+          color: rgba(255,255,255,0.7);
+          .jump-contract{
+            display:block;
+            width:20px;
+            height:20px;
+            background: url(/src/assets/images/post-item/icon-jump.png) no-repeat center;
+            background-size: 12px 12px;
+            cursor: pointer;
+          }
+        }
+        .token-contract-address{
+          font-family: D-DINExp-Bold;
+          font-size: 14px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          font-weight: 700;
+          line-height:20px;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 10px;
+          margin-top:16px;
+          padding:14px 16px;
+          word-break: break-all;
+        }
+      }
     }
   }
 
@@ -1608,7 +1948,7 @@
     }
     .joined-communities{
       margin-top:30px;
-      max-height:400px;
+      max-height:290px;
       overflow-y:auto;
       .joined-item{
         position:relative;
@@ -1643,6 +1983,11 @@
           object-fit: cover;
         }
       }
+      &.joined-communities-noscroll{
+        .joined-item{
+          left:0;
+        }
+      }
     }
   }
 
@@ -1657,7 +2002,23 @@
       letter-spacing: 0;
       font-weight: 700;
     }
+    .all-members-list{
+      background: #28282D;
+      border-radius: 24px;
+      padding:0 20px;
+      margin-top:20px;
+    }
   }
+
+  .edit-btn{
+    width:16px;
+    height:16px;
+    cursor:pointer;
+    background:url("@/assets/images/common/icon-edit.png") no-repeat center center;
+    background-size:16px 16px;
+    margin-left:12px;
+  }
+
 </style>
 
 <style lang="scss">

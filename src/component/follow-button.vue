@@ -26,10 +26,10 @@
     <!-- follow notice -->
     <div :class="['pop-box','pop-intro','pop-notice',$props.position]" v-if="showNotice">
       <div class="title">Notice</div>
-      <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on [Recent activity (<a href="https://wallet.testnet.near.org/" target="_blank">https://wallet.testnet.near.org/ </a>) ]</div>
+      <div class="intro">This action will be recorded as a transaction on Near Protocol, details can be verify on <a href="https://wallet.testnet.near.org/" target="_blank">Recent activity</a></div>
       <div class="button-box">
-        <div class="mini-button-border button-cancle" @click.stop="showNotice=false">
-          <div class="mini-button">Cancle</div>
+        <div class="mini-button-border button-cancel" @click.stop="showNotice=false">
+          <div class="mini-button">Cancel</div>
         </div>
         <div class="mini-button-border" @click.stop="confirmFollow()">
           <div class="mini-button">Confirm</div>
@@ -114,13 +114,28 @@
             return;
           }
           state.isFollowing = true;
-          const res = state.isFollowed ? await mainContract.unfollow({account_id:props.accountId}) : await mainContract.follow({account_id:props.accountId})
-          state.isFollowed  = !state.isFollowed;
-          state.isFollowing = false;
-          emit('follow',{
-            isFollow:state.isFollowed,
-            accountId:props.accountId
-          });
+          try{
+            const res = state.isFollowed ? await mainContract.unfollow({account_id:props.accountId}) : await mainContract.follow({account_id:props.accountId})
+            if (res == true) {
+              state.isFollowed  = !state.isFollowed;
+              state.isFollowing = false;
+              emit('follow',{
+                isFollow:state.isFollowed,
+                accountId:props.accountId
+              });
+            } else  if (res == false) {
+              throw new Error('error')
+            } else {}
+          }catch(e){
+            state.isFollowing = false;
+            const message = state.isFollowed ? 'Unfollow Failed' : 'Follow Failed';
+            proxy.$Message({
+              message,
+              type: "error",
+            });
+            console.log("follow error:"+e);
+            return;
+          }
         }else{
           if(props.from=='popup'){
             emit("login");
@@ -148,7 +163,7 @@
   .pop-notice{
     position:absolute;
     top:46px;
-    left:0;
+    right:0;
     .title{
       text-align: left;
     }

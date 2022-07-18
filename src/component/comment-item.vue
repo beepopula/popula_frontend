@@ -1,14 +1,16 @@
 <template>
-  <div v-if="!isBlocked && !hasDelete">
-    <div :class="['comment-item',from=='elastic-layer' ? 'layer-comment-item' : '']" @click.self="showCommentLayer()">
+  <div class="comment-item-box" v-if="!isBlocked && !hasDelete">
+    <div :class="['comment-item',from=='elastic-layer' ? 'layer-comment-item' : '']" @click="showCommentLayer()">
       <!-- user -->
       <div class="user" v-if="$props.item.data">
         <!-- avatar -->
-        <el-popover placement="bottom-start"  trigger="hover" @show="showUser=true" @hide="showUser=false">
+        <el-popover placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="showUser=true" @hide="showUser=false">
           <template #reference>
-            <img v-if="user.avatar" class="avatar" :src="user.avatar" @click="redirectPage('/user-profile/'+item.accountId,false)"/>
-            <img v-else  class="avatar" src="@/assets/images/common/user-default.png" @click="redirectPage('/user-profile/'+item.accountId,false)"/>
-          </template>
+            <div @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
+              <img v-if="user.avatar" class="avatar" :src="$store.getters.getAwsImg(user.avatar)" @error.once="$event.target.src=user.avatar"/>
+              <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
+            </div>
+         </template>
           <template v-if="showUser">
             <UserPopup :account="item.accountId" @login="showLogin=true"/>
           </template>
@@ -16,11 +18,32 @@
 
         <!-- userinfo -->
         <div class="user-info">
-          <div class="name" @click="redirectPage('/user-profile/'+item.accountId,false)">
-            {{item.accountId}}
-            <!--
-            <div class="landlord-flag" v-if="post.accountId == item.accountId">landlord</div>
-            -->
+          <div class="name" @click.stop="redirectPage('/user-profile/'+item.accountId,false)">
+            <div class="name-txt txt-wrap">{{item.accountId}}</div>
+            <!-- CO -->
+            <template v-if="$props.community.accountId == item.accountId">
+              <el-popover
+                placement="bottom-start"
+                trigger="hover"
+                >
+                <template #reference>
+                  <div class="user-flag co"></div>
+                </template>
+                <div class="pop-box pop-tip pop-user-flag">Community Originator</div>
+              </el-popover>
+            </template>
+            <!-- PO -->
+            <template v-if="$props.post.accountId == item.accountId">
+              <el-popover
+                placement="bottom-start"
+                trigger="hover"
+                >
+                <template #reference>
+                  <div class="user-flag op"></div>
+                </template>
+                <div class="pop-box pop-tip pop-user-flag">Original Poster</div>
+              </el-popover>
+            </template>
           </div>
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>
@@ -31,25 +54,25 @@
         </div>
 
         <!-- edit -->
-        <el-popover placement="bottom-end"  trigger="hover">
+        <el-popover placement="bottom"  trigger="hover" popper-class="edit-popper">
           <template #reference>
             <img class="icon icon-edit" src="@/assets/images/post-item/icon-more.png"/>
           </template>
           <div class="pop-box pop-edit">
             <!-- self -->
             <template v-if="user.account_id == $store.getters.accountId">
-              <div class="pop-edit-item" @click="del()">
+              <div class="pop-edit-item" @click.stop="del()">
                 <img class="icon16" src="@/assets/images/post-item/icon-delete.png"/>
                 Delete
               </div>
             </template>
             <!-- other people -->
             <template v-else>
-              <div class="pop-edit-item" @click="report()">
+              <div class="pop-edit-item" @click.stop="report()">
                 <img class="icon16" src="@/assets/images/post-item/icon-report.png"/>
                 Report
               </div>
-              <div class="pop-edit-item" @click="block()">
+              <div class="pop-edit-item" @click.stop="block()">
                 <img class="icon16" src="@/assets/images/post-item/icon-block.png"/>
                 Block
               </div>
@@ -63,7 +86,7 @@
         Replying to 
         <el-popover placement="bottom-start"  trigger="hover" @show="showReplyUser=true" @hide="showReplyUser=false">
           <template #reference>
-            <span>@{{item.data.replay}}</span>
+            <span @click.stop="redirectPage('/user-profile/'+item.data.replay,false)">@{{item.data.replay}}</span>
           </template>
           <template v-if="showReplyUser">
             <UserPopup :account="item.data.replay" @login="showLogin=true"/>
@@ -73,11 +96,11 @@
       
 
       <!-- text -->
-      <div class="text text-ellipsis-wrapper" @click="showCommentLayer()">
+      <div class="text text-ellipsis-wrapper" @click.stop="showCommentLayer()">
         <div ref="textBox" :class="['txt','txt-wrap5',needWrap ? '' : 'hidebtn', showall? 'showall' : '']" :style="textStyleObject">
           <!--<pre>{{text}}</pre>-->
           <label class="btn" @click.stop="showall = !showall"></label>
-          <pre ref="textDom"><div v-html="text"></div></pre>
+          <pre ref="textDom"><div v-html="text" @click.stop="textJump"></div></pre>
         </div>
       </div>
       
@@ -104,7 +127,7 @@
             <div class="pop-box pop-intro pop-hash">
               <div class="hash-txt">
                 <a class="txt-wrap" :href="$store.state.nearConfig.explorerUrl+'/transactions/'+item.transaction_hash" target="_blank">{{item.transaction_hash}}</a>
-                <img class="icon-copy" @click="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
+                <img class="icon-copy" @click.stop="triggerCopy(item.transaction_hash)" src="@/assets/images/common/icon-copy.png">
               </div>
             </div>
           </el-popover>
@@ -116,36 +139,39 @@
               <div class="share">{{shareCount}}</div>
             </template>
             <div class="pop-box pop-edit">
-              <div class="pop-edit-item" @click="shareTwitter()">
+              <div class="pop-edit-item" @click.stop="shareTwitter()">
                 <img class="icon16" src="@/assets/images/post-item/icon-twitter-mini.png"/>
                 Twitter
               </div>
-              <div class="pop-edit-item" @click="triggerCopy(post.target_hash,true)">
+              <div class="pop-edit-item" @click.stop="triggerCopy(post.target_hash,true)">
                 <img class="icon16" src="@/assets/images/post-item/icon-link.png"/>
-                Cory link
+                Copy link
               </div>
             </div>
           </el-popover>
           <!-- reply -->
-          <div :class="['comment',addCount ? 'add-count' : '']" @click="reply()">
+          <div :class="['comment',addCount ? 'add-count' : '']" @click.stop="reply()">
             <template v-if="commentCount>0">{{commentCount}}</template>
             <template v-else>Reply</template>
           </div>
           <!-- like -->
-          <Like :item="like"/>
+          <Like :item="like" :type="'comment'" @changeLike="changeLike"/>
         </div>
       </div>
 
       <!-- comment -->
-      <div class="comment-box" v-if="from!='elastic-layer-parent' && showCommentBox">
+      <div class="comment-box" v-if="from!='elastic-layer-parent' && $props.item.isComment">
         <Comment 
           :targetHash="item.target_hash" 
+          :parentAccount="item.accountId"
+          :hierarchies="item.hierarchies"
           :communityId="item.receiverId" 
-          :methodName="post.methodName" 
+          :postType="post.type" 
           :from="'list'"
           :focus="focusComment"
           @comment="comment"
         />
+        ...
       </div>
     </div>
 
@@ -153,20 +179,24 @@
     <div class="elastic-layer" v-if="showCommentList" @click.self="closeLayer()">
       <div class="edit-button back" v-if="hasBack"  @click="showCommentList=false">{{hasBack}}</div>
       <div class="edit-button close" @click="closeLayer()"></div>
-      <div class="layer-content" ref="commentLayer" @scroll="commentsScroll()">
+      <div class="layer-content" ref="commentLayer" @scroll="commentsScroll()" @click.self="closeLayer()">
         <div class="child-comments-box">
           <div class="parent-comment">
             <CommentItem 
+              :community="$props.community"
               :post="post" 
-              :item="item" 
+              :item="detail" 
               :commentC="commentCount" 
               :from="'elastic-layer-parent'"
+              :level="$props.level+1"
             />
           </div>
           <Comment 
             :targetHash="item.target_hash" 
+            :parentAccount="item.accountId"
+            :hierarchies="item.hierarchies"
             :communityId="item.receiverId" 
-            :methodName="post.methodName" 
+            :postType="post.type" 
             @comment="commentRefresh"
           />
           <div class="all-comments-title">
@@ -178,11 +208,22 @@
           </div>
           <div class="child-comments">
             <template v-for="item in commentList[currentTab]">
-              <CommentItem :post="post" :item="item" from="elastic-layer" :hasBack="true" @closeLayer="closeLayer" />
+              <CommentItem 
+              :community="$props.community" 
+              :level="$props.level+1" 
+              :post="post" 
+              :item="item" 
+              from="elastic-layer" 
+              :hasBack="true" 
+              @closeLayer="closeLayer"
+              @changeCommentListStatus="changeCommentListStatus(item,$event)" />
             </template>
           </div>
           <div class="no-more" v-if="isEnd">
-            <template v-if="commentCount == 0">No comments</template>
+            <div v-if="commentCount == 0" class="no-result">
+              <img src="@/assets/images/common/emoji-null.png"/>
+              No comments
+            </div>
             <template v-else>No more comments</template>
           </div>
         </div>
@@ -195,6 +236,17 @@
     <!-- login-mask -->
     <login-mask :showLogin="showLogin"  @closeloginmask = "closeLoginMask"></login-mask>
 
+
+    <!-- ConfirmModal -->
+    <template v-if="showReportModal">
+      <ConfirmModal :title="'Report'" :intro="'I think this comments has offended me.'" @cancel="showReportModal=false" @confirm="reportConfirm"/>
+    </template>
+    <template v-if="showDeleteModal">
+      <ConfirmModal :title="'Delete'" :intro="'This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results.'" @cancel="showDeleteModal=false" @confirm="deleteConfirm"/>
+    </template>
+    <template v-if="showBlockModal">
+      <ConfirmModal :title="'Block'" :intro="'This will hide this comments from your posts as well as hide them from your view on your explore and other threads.'" @cancel="showBlockModal=false" @confirm="blockConfirm"/>
+    </template>
   </div>
 </template>
 
@@ -202,24 +254,32 @@
 import { ref, reactive, toRefs , watch, nextTick, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex';
-import EncryptionContract from "@/contract/EncryptionContract";
+import MainContract from "@/contract/MainContract";
+import CommunityContract from "@/contract/CommunityContract";
 import { formatAmount, checkCondition, getTimer} from "@/utils/util.js";
 import Clipboard from 'clipboard';
 import Comment from '@/component/comment.vue';
 import UserPopup from '@/component/user-popup.vue';
 import Like from "@/component/like.vue";
 import LoginMask from "@/component/login-mask.vue";
+import ConfirmModal from '@/component/confirm-modal.vue';
+import * as bs58 from 'bs58';
 export default {
   components: {
     Comment,
     UserPopup,
     Like,
-    LoginMask
+    LoginMask,
+    ConfirmModal
   },
   props:{
     from:{
       type:String,
       value:""
+    },
+    community:{
+      type:Object,
+      value:{}
     },
     post:{
       type:Object,
@@ -240,13 +300,17 @@ export default {
     hasBack:{
       type:Boolean,
       value:false
-    }
+    },
+    level:{
+      type:Number,
+      value:1
+    },
   },
   setup(props,{ emit }) {
     const store = useStore();
     const router = useRouter();
     const { proxy } = getCurrentInstance();
-    const encryptionContract = new EncryptionContract(store.state.account);
+    const mainContract = new MainContract(store.state.account);
 
     const state = reactive({
       //user
@@ -263,16 +327,19 @@ export default {
       //gas
       gasUsed:formatAmount(props.item.gas_used,24,4),
       //share & like & comment
+      detail:{},
       shareCount:props.item.data.shareCount,
       like:{
+        hierarchies:props.item.hierarchies,
+        accountId:props.item.accountId,
         likeCount:props.item.data.likeCount,
-        isLiked:props.item.data.isLike,
+        isLiked:props.item.data.isLiked,
         targetHash:props.item.target_hash,
         communityId:(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT) ? "" : props.item.receiverId
       },
-      //child comment
       commentCount:props.commentC || props.item.data.commentCount,
-      showCommentBox:false,
+      //child comment
+      // showCommentBox:false,
       showCommentList:false,
       currentTab:'',
       commentList:{
@@ -283,6 +350,10 @@ export default {
       limit:10,
       isEnd:false,
       isLoading:false,
+      //report | delete | block
+      showReportModal:false,
+      showDeleteModal:false,
+      showBlockModal:false,
       //other
       showall:false,
       copyText:"",
@@ -311,12 +382,14 @@ export default {
     watch(
       () => textDom.value,
       (newVal) => {
-        const textBoxHeight = textBox.value.getBoundingClientRect().height;
-        const textDomHeight = textDom.value.getBoundingClientRect().height;
-        if(textBoxHeight>textDomHeight){
-          state.needWrap = false;
-        }else{
-          state.needWrap = true;
+        if(newVal){
+          const textBoxHeight = textBox.value.getBoundingClientRect().height;
+          const textDomHeight = textDom.value.getBoundingClientRect().height;
+          if(textBoxHeight>=textDomHeight){
+            state.needWrap = false;
+          }else{
+            state.needWrap = true;
+          }
         }
       }
     )
@@ -330,29 +403,20 @@ export default {
       state.time = getTimer(props.item.createAt)
       //text
       let text = "";
-      if(props.post.methodName != 'add_encrypt_post'){
+      if(props.item.type != 'encrypt'){
         text = props.item.text
       }else{
         //decrypt
-        const result = await proxy.$axios.post.get_sign({
-          postId:props.post.target_hash,
-          commentId :props.item.target_hash,
+        const res = await proxy.$axios.post.get_decode_content({
+          postId:props.item.target_hash,   //postId=>commentId
           accountId:store.getters.accountId
         });
-        const param = {
-          cipher_text: JSON.parse(props.item.encrypt_args), 
-          contract_id: props.item.receiverId, 
-          sign: result.data.text_sign
+        if(res.success){
+          text = res.data.text;
         }
-        const res = await encryptionContract.decrypt(param);
-        text = res.text;
       }
       state.text = text;
 
-      // const reg = RegExp(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/,"g");
-      // state.text = text.replace(reg,(match)=>{
-      //   return `<span class='emoji'>${match}</span>`
-      // })
 
       if(props.defaultComment == props.item.target_hash){
         showCommentLayer();
@@ -374,12 +438,19 @@ export default {
     //comment
     const reply = () => {
       if(checkLogin()){
+        // if(props.level>=5){return}
         state.focusComment=true;
-        state.showCommentBox=!state.showCommentBox;
+        // state.showCommentBox=!state.showCommentBox;
+        if(props.item.isComment){
+          emit("changeCommentListStatus",true);
+        }else{
+          emit("changeCommentListStatus");
+        }
       }
     }
     const comment = (res) => {
-      state.showCommentBox = false;
+      // state.showCommentBox = false;
+      emit("changeCommentListStatus",true);
       state.addCount = true;
       emit('comment');
       setTimeout(()=>{
@@ -397,7 +468,13 @@ export default {
 
     //showCommentLayer
     const showCommentLayer = () => {
-      if(props.from=='elastic-layer-parent'){return;}
+      if(props.from=='elastic-layer-parent'){return;} // || props.level>=5
+      state.detail = {
+        ...props.item,
+      }
+      state.detail.data.likeCount = state.like.likeCount;
+      state.detail.data.isLiked = state.like.isLiked;
+      state.detail.data.shareCount = state.shareCount;
       document.getElementsByTagName('body')[0].classList.add("fixed");
       state.showCommentList = true;
       changeTab('hot');
@@ -441,7 +518,7 @@ export default {
       return [];
     }
 
-    //membersScroll
+    //commentsScroll
     const commentLayer = ref();
     const commentsScroll = async () => {
       const commentBox = commentLayer.value;
@@ -451,19 +528,79 @@ export default {
       }
     }
 
+    //changeCommentListStatus
+    const changeCommentListStatus = (item,close=false) => {
+      state.commentList[state.currentTab].forEach(i=>{
+        if(i==item && !close){
+          i.isComment = true;
+        }else{
+          i.isComment = false;
+        }
+      })
+    }
+
+    //shareLink
+    const getShareLink = () => {
+      const parmsJson = JSON.stringify({
+        type:'content',
+        args:{
+          hierarchies:[
+            ...props.item.hierarchies,
+            {target_hash:props.item.target_hash,account_id : props.item.accountId},
+          ],
+          inviter_id:store.getters.accountId || '',
+          contract_id: props.item.receiverId
+        }
+      })
+      const signature = bs58.encode(Buffer.from(parmsJson));
+      return `${window.location.protocol}//${window.location.host}/share/${signature}`;
+    }
+
+    const shareRecord = () => {
+      if(checkLogin()){
+        const params = {
+          hierarchies:[
+            ...props.item.hierarchies,
+            {target_hash:props.item.target_hash,account_id : props.item.accountId},
+          ]
+        };
+        const check_params = {
+          ...params,
+          account_id: store.getters.accountId,
+        }
+        if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+          store.state.viewAccount.viewFunction(store.state.nearConfig.MAIN_CONTRACT, "check_shared", check_params).then(check_res => {
+            if(!check_res){
+              mainContract.share(params).then(()=>{
+                state.shareCount++;
+              })
+            }
+          })
+        }else{
+          store.state.viewAccount.viewFunction(props.item.receiverId, "check_shared", check_params).then(check_res => {
+            if(!check_res){
+              CommunityContract.new(props.item.receiverId).then(communityContract=>{
+                communityContract.share(params).then(()=>{
+                  state.shareCount++;
+                })
+              })
+            }
+          })
+        }
+      }
+    }
+
     //share -> handleCopy
     const copy_text = ref()
     const triggerCopy = async (str,isShare) => {
-      state.copyText = isShare ? `${window.location.protocol}//${window.location.host}/detail/${props.post.target_hash}?comment=${props.item.target_hash}` : str;
+      state.copyText = isShare ? getShareLink() : str;
       nextTick(() => {
         copy_text.value.click();
       });
-      if(isShare){
-        await shareRecord();
-      }
     }
     const handleCopyFun = () => {
       const clipboard = new Clipboard('#copy_text'+props.item.target_hash)
+      shareRecord();
       clipboard.on('success', e => {
         proxy.$Message({
           message: "copy success",
@@ -479,6 +616,13 @@ export default {
         clipboard.destroy()
       })
     }
+
+    //changeLike
+    const changeLike = (res) => {
+      state.like.likeCount = res.likeCount;
+      state.like.isLiked = res.isLiked;
+    }
+
 
     //checkLogin
     const checkLogin = () => {
@@ -511,37 +655,115 @@ export default {
       }
     };
 
+    const textJump = (e) => {
+      if(e.target.className=='atFont'){
+        redirectPage(`/user-profile/${e.target.textContent.trim().slice(1)}`,false)
+      }else{
+        showCommentLayer()
+      }
+    }
+
     //edit
     const del = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.comment.delete({
-          commentId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
+        state.showDeleteModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const deleteConfirm = async () => {
+      if(checkLogin()){
+        const params = {
+          hierarchies : [
+            ...props.item.hierarchies,
+            {
+              target_hash : props.item.target_hash,
+              account_id : props.item.accountId,
+            }
+          ]
+        }
+        try{
+          let res = ''
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            res = await mainContract.delContent(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            res = await communityContract.delContent(params);
+          }
+          if (res == true) {
+            state.showDeleteModal = false;
+            state.hasDelete = true;
+            proxy.$Message({
+              message: "delete success",
+              type: "success",
+            });
+          } else  if (res == false) {
+            state.showDeleteModal = false;
+            throw new Error('error')
+          } else {}
+        }catch(e){
+          state.showDeleteModal = false;
+          console.log("delete error:"+e);
           proxy.$Message({
-            message: "delete success",
-            type: "success",
+            message: "Delete Failed",
+            type: "error",
           });
-          state.hasDelete = true;
+          return;
         }
       }
     }
     const report = async () => {
       if(checkLogin()){
-        const res = await proxy.$axios.post.report({
-          commentId:props.item.target_hash,
-          accountId:store.getters.accountId || ''
-        });
-        if(res.success){
+        state.showReportModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const reportConfirm = async () => {
+      if(checkLogin()){
+        const params = {
+          hierarchies : [
+            ...props.item.hierarchies,
+            {
+              target_hash : props.item.target_hash,
+              account_id : props.item.accountId,
+            }
+          ]
+        }
+        try{
+          let res = ''
+          if(props.item.receiverId == store.state.nearConfig.MAIN_CONTRACT || props.item.receiverId == store.state.nearConfig.NFT_CONTRACT){
+            res = await mainContract.report(params); 
+          }else{
+            const communityContract = await CommunityContract.new(props.item.receiverId);
+            res = await communityContract.report(params);
+          }
+          if (res == true) {
+            state.showReportModal = false;
+            proxy.$Message({
+              message: "report success",
+              type: "success",
+            });
+          } else  if (res == false) {
+            state.showReportModal = false;
+            throw new Error('error')
+          } else {}
+        }catch(e){
+          state.showReportModal = false;
+          console.log("report error:"+e);
           proxy.$Message({
-            message: "report success",
-            type: "success",
+            message: "Report Failed",
+            type: "error",
           });
+          return;
         }
       }
     }
     const block = async () => {
+      if(checkLogin()){
+        state.showBlockModal = true;
+        document.getElementsByTagName('body')[0].classList.add("fixed");
+      }
+    }
+    const blockConfirm = async () => {
       if(checkLogin()){
         const commentBlockList = JSON.parse(localStorage.getItem("commentBlockList")) || [];
         let isBlocked = false;
@@ -552,26 +774,15 @@ export default {
           commentBlockList.push(props.item.target_hash);
           localStorage.setItem("commentBlockList",JSON.stringify(commentBlockList));
         }
+        state.showBlockModal = false;
         proxy.$Message({type: "success",message: "block success"});
         state.isBlocked = true;
       }
     }
 
-    //shareRecord
-    const shareRecord = async () => {
-      const res = await proxy.$axios.post.share_record({
-        target_hash:props.item.target_hash,
-        accountId:store.getters.accountId
-      });
-      if(res.success){
-        state.shareCount = parseInt(state.shareCount) + 1;
-      }
-    }
-
     const shareTwitter = async () => {
-      await shareRecord();
-      const text = `${window.location.protocol}//${window.location.host}/detail/${props.post.target_hash}?comment=${props.item.target_hash}`;
-      window.open('https://twitter.com/intent/tweet?text='+text);
+      shareRecord();
+      window.open('https://twitter.com/intent/tweet?text='+getShareLink());
     }
 
 
@@ -588,15 +799,21 @@ export default {
       changeTab,
       commentLayer,
       commentsScroll,
+      changeCommentListStatus,
       copy_text,
       triggerCopy,
       handleCopyFun,
+      changeLike,
       showLoginMask,
       closeLoginMask,
       redirectPage,
+      textJump,
       del,
+      deleteConfirm,
       report,
+      reportConfirm,
       block,
+      blockConfirm,
       shareTwitter
     };
   },
@@ -606,10 +823,17 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  .comment-item-box{
+    border-top:1px solid rgba(255,255,255,0.1);
+    &:first-child{
+      border:0;
+    }
+  }
   .comment-item{
     background: #28282D;
     border-radius: 24px;
-    padding:30px 0;
+    padding:20px 0;
+    cursor: pointer;
     &.layer-comment-item{
       padding:20px 0;
     }
@@ -628,34 +852,37 @@ export default {
       .user-info{
         margin-left:12px;
         .name{
-          font-family: D-DINExp-Bold;
           height: 18px;
-          line-height:18px;
-          font-size: 18px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
-          position: relative;
-          cursor: pointer;
-          .landlord-flag{
-            position:absolute;
-            top:1px;
-            right:-107px;
-            display:flex;
-            justify-content: center;
-            align-items: center;
-            width: 100px;
-            height: 32px;
-            font-family: D-DINExp;
-            font-size: 20px;
-            line-height:20px;
+          display:flex;
+          align-items: center;
+          .name-txt{
+            max-width: 300px;
+            font-family: D-DINExp-Bold;
+            height: 18px;
+            line-height:18px;
+            font-size: 18px;
             color: #FFFFFF;
             letter-spacing: 0;
-            background: #ED1F5A;
-            border: 2px solid rgba(0,0,0,1);
-            border-radius: 8px;
-            transform-origin:left top;
-            transform:scale(0.5);
+            font-weight: 700;
+            cursor: pointer;
+          }
+          .user-flag{
+            margin-left:4px;
+            width: 20px;
+            height: 14px;
+            &.op{
+              background:url("@/assets/images/common/op.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.co{
+              background:url("@/assets/images/common/co.png") no-repeat right center;
+              background-size:20px 14px;
+            }
+            &.mod{
+              width:28px;
+              background:url("@/assets/images/common/mod.png") no-repeat right center;
+              background-size:28px 14px;
+            }
           }
         }
         .createtime{
@@ -685,7 +912,7 @@ export default {
       line-height: 17px;
       font-weight: 400;
       span{
-        color: #0084FF;
+        color: #FED23C;
         cursor: pointer;
       }
     }

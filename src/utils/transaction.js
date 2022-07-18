@@ -6,6 +6,7 @@ import { PublicKey } from 'near-api-js/lib/utils';
 import { baseDecode, serialize } from 'borsh';
 import store from "@/store/index.js";
 import BN from 'bn.js';
+import { getShareInfo, setShareInfo } from "./util";
 
 
 async function createTransaction({receiverId,actions,nonceOffset = 1}) {
@@ -21,22 +22,23 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
           deposit: fc.deposit
         }
       } else if (fc.kind == "addKey") {
-        return {
-          kind: fc.kind,
-          args: {
-            publicKey: fc.publicKey.toString(),
-            accessKey: {
-              nonce: fc.accessKey.nonce,
-              permission: {
-                FunctionCall: {
-                  allowance: fc.accessKey.permission.functionCall.allowance,
-                  receiverId: fc.accessKey.permission.functionCall.receiverId,
-                  methodNames: fc.accessKey.permission.functionCall.methodNames
-                }
-              }
-            }
-          },
-        }
+
+        // return {
+        //   kind: fc.kind,
+        //   args: {
+        //     publicKey: fc.publicKey.toString(),
+        //     accessKey: {
+        //       nonce: fc.accessKey.nonce,
+        //       permission: {
+        //         FunctionCall: {
+        //           allowance: fc.accessKey.permission.functionCall.allowance,
+        //           receiverId: fc.accessKey.permission.functionCall.receiverId,
+        //           methodNames: fc.accessKey.permission.functionCall.methodNames
+        //         }
+        //       }
+        //     }
+        //   },
+        // }
       }
     })
     return {
@@ -60,7 +62,6 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
       )
     }
   })
-
   
 
   const localKey = await store.state.account.connection.signer.getPublicKey(
@@ -96,8 +97,21 @@ async function createTransaction({receiverId,actions,nonceOffset = 1}) {
   }
 }
 
-export async function signAndSendTransaction(contractId, account, actions) {
-  return await account.signAndSendTransaction({receiverId: contractId, actions: actions})
+export async function signAndSendTransaction(contractId, account, tx) {
+  const actions = [transaction.functionCall(tx.methodName, tx.args, tx.gas, tx.deposit)]
+  const res = await account.signAndSendTransaction({receiverId: contractId, actions: actions})
+  
+  const shareInfo = getShareInfo()
+  if (shareInfo && contractId == shareInfo.args.contract_id) {
+      const actions = [transaction.functionCall(
+      "share_view",
+      {hierarchies: shareInfo.args.hierarchies, inviter_id: shareInfo.args.inviter_id},
+      "100000000000000",
+      "0")]
+      await account.signAndSendTransaction({receiverId: contractId, actions: actions})  
+  }
+  
+  return res
 }
 
 export async function getTxData(hash) {
@@ -106,7 +120,6 @@ export async function getTxData(hash) {
 }
 
 export async function getReceiptState(receipt_id) {
-  console.log(receipt_id,'----receipt_id----');
   const result = await store.state.provider.sendJsonRpc("EXPERIMENTAL_receipt", { "receipt_id":receipt_id });
   return result
 }
@@ -129,6 +142,29 @@ export async function executeMultipleTransactions(
     transactions,
     callbackUrl
   ) {
+    if (store.getters.loginWallet == "sender") {
+      transactions = transactions.filter((tx) => {
+        for (let action of tx.actions) {
+          if (action.kind != "functionCall") {
+            return false
+          }
+        }
+        return true
+      })
+    }
+    const shareInfo = getShareInfo()
+    if (shareInfo) {
+      transactions.push({
+        receiverId: shareInfo.args.contract_id,
+        actions: [{
+            kind: "functionCall",
+            methodName: "share_view",
+            args: {hierarchies: shareInfo.args.hierarchies, inviter_id: shareInfo.args.inviter_id},
+            deposit: "0",
+            gas: "100000000000000"
+        }]
+      })
+    }
     const nearTransactions = await Promise.all(
       transactions.map((t, i) => {
         return createTransaction({
@@ -140,9 +176,11 @@ export async function executeMultipleTransactions(
       })
     );
     if (store.getters.loginWallet == "sender") {
-      return await window.near.requestSignTransactions({ transactions: nearTransactions });
+      const res = await window.near.requestSignTransactions({ transactions: nearTransactions });
+      return res.response[0]
     } 
-    return store.state.walletConnection.requestSignTransactions(nearTransactions, callbackUrl);
+    await store.state.walletConnection.requestSignTransactions(nearTransactions, callbackUrl);
+    return 'redirect'
   };
 
 export async function generateAccessKey(accountId, contractId) {

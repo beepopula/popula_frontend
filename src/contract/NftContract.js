@@ -29,8 +29,9 @@ export default class NftContract{
             }]
         }]
         const result = await executeMultipleTransactions(this.contract.account, txs)
-        console.log(result)
-        //TODO checkResult
+        if (!checkReceiptsSuccess(result)) {
+            return false
+        }
         return true
     }
 

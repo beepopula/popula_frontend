@@ -9,9 +9,7 @@
       @swiper="setListSwiper"
       >
       <swiper-slide  v-for="(item, index) in imgs"  :key="index" @click.self="close">
-      
-          <img :src="item" :style="'transform:scale('+(ratioList[ratioIndex]/100)+')'"/>
-
+          <img :src="$store.getters.getAwsImg(item)" @error.once="$event.target.src=item" :style="'transform:scale('+(ratioList[ratioIndex]/100)+')'"/>
       </swiper-slide>
     </swiper>
 
@@ -81,14 +79,16 @@
     right:30px;
     z-index:10;
     .larger{
-      background: rgba(255,255,255,0.12) url("@/assets/images/common/icon-larger.png") no-repeat center center;
+      background: rgba(0,0,0,0.30) url("@/assets/images/common/icon-larger.png") no-repeat center center;
       background-size:24px 24px;
+      border: 1px solid rgba(255,255,255,0.3);
       cursor: pointer;
     }
     .smaller{
       margin-top:20px;
-      background: rgba(255,255,255,0.12) url("@/assets/images/common/icon-smaller.png") no-repeat center center;
+      background: rgba(0,0,0,0.30) url("@/assets/images/common/icon-smaller.png") no-repeat center center;
       background-size:24px 24px;
+      border: 1px solid rgba(255,255,255,0.3);
       cursor: pointer;
     }
     .disabled{
@@ -108,8 +108,12 @@
       align-items: center;
       width:100vw!important;
       height:100vh;
+      overflow: hidden;
       img{
+        width:100%;
+        height:100%;
         border-radius: 24px;
+        object-fit:contain;
       }
     }
   }
@@ -120,6 +124,7 @@
       height:50px;
       border-radius: 50%;
       overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.3);
       &::after{
         display:none;
       }
@@ -128,7 +133,7 @@
         content:"";
         width:50px;
         height:50px;
-        background: rgba(255,255,255,0.12) url("@/assets/images/post-item/icon-prev.png") no-repeat center center;
+        background: rgba(0,0,0,0.30) url("@/assets/images/post-item/icon-prev.png") no-repeat center center;
         background-size:24px 24px;
       }
     }
@@ -138,9 +143,15 @@
     .swiper-button-next{
       right:30px;
       &::before{
-        background: rgba(255,255,255,0.12) url("@/assets/images/post-item/icon-next.png") no-repeat center center;
+        background: rgba(0,0,0,0.30) url("@/assets/images/post-item/icon-next.png") no-repeat center center;
         background-size:24px 24px;
       }
     }
+  }
+
+  .edit-button.close{
+    background: rgba(0,0,0,0.30) url("@/assets/images/common/icon-close.png") no-repeat center center;
+    background-size:24px 24px;
+    border: 1px solid rgba(255,255,255,0.3);
   }
 </style>

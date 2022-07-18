@@ -59,9 +59,12 @@ async function getSign(method, param) {
   };
 }
 
-export async function get(method, data) {
+export async function get(method, data, cancelToken = null) {
   // return axios.get("/api/" + method, { params: {data: data } });
-  return axios.get("/api/" + method, { params: data  });
+  return axios.get("/api/" + method, { 
+    params: data , 
+    cancelToken: cancelToken,
+  });
 }
 
 export async function post(method, data) {

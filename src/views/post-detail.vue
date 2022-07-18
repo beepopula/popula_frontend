@@ -3,45 +3,49 @@
     <div class="main">
       <!-- left -->
       <div class="left">
-        <!-- Community -->
-        <div class="Community-info" v-if="postCommunity.data">
-          <img v-if="postCommunity.avatar" @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" :src="postCommunity.avatar"/>
-          <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/test/community.png"/>
-          <div class="info">
-            <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
-            <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
-            <div class="total">
-              <div class="total-item"><span>{{postCommunity.data.membersCount}}</span> Members</div>
-              <div class="total-item"><span>{{postCommunity.data.postCount}}</span> Posts</div>
+        <div class="post-detail">
+          <!-- Community -->
+          <div class="Community-info" v-if="postCommunity.data">
+            <img v-if="postCommunity.avatar" @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" :src="$store.getters.getAwsImg(postCommunity.avatar)" @error.once="$event.target.src=postCommunity.avatar"/>
+            <img v-else @click="redirectPage('/community-detail/'+postCommunity.communityId)" class="avatar" src="@/assets/images/community/default-avatar.png"/>
+            <div class="info">
+              <div class="name" @click="redirectPage('/community-detail/'+postCommunity.communityId)">{{postCommunity.name}}</div>
+              <div class="creator" @click="redirectPage('/user-profile/'+postCommunity.accountId,false)">@{{postCommunity.accountId}}</div>
+              <div class="total">
+                <div class="total-item"><span>{{postCommunity.data.membersCount}}</span>Members</div>
+                <div class="total-item"><span>{{postCommunity.data.postCount}}</span>Posts</div>
+              </div>
+            </div>
+            <div v-if="postCommunity.communityId != $store.state.nearConfig.MAIN_CONTRACT && postCommunity.accountId != $store.getters.accountId" class="mini-button-border join-button" @click="changeJoinCommunity()">
+              <div class="mini-button" v-if="postCommunity.data.isJoin">  Joined  </div>
+              <div class="mini-button" v-else>  Join  </div>
             </div>
           </div>
-          <div class="mini-button-border join-button" @click="changeJoinCommunity()">
-            <div class="mini-button" v-if="postCommunity.data.isJoin">  Joined  </div>
-            <div class="mini-button" v-else>  Join  </div>
-          </div>
-        </div>
-        <!-- PostItem  -->
+          <!-- PostItem  -->
           <template v-if="postDetail.target_hash">
             <PostItem 
               :item="postDetail" 
               :commentC="commentCount" 
               :from="'detail'" 
-              @changeAccess="isAccess=true"
+              @changeAccess="isAccess=true;changeTab('hot');"
               @focus="focusComment=!focusComment"
             />
           </template>
+        </div>
         <!-- Comment  -->
-        <div style="margin-top:20px;"></div>
-        <Comment 
-          :targetHash="$route.params.id" 
-          :communityId="postDetail.receiverId" 
-          :methodName="postDetail.methodName"
-          :focus="focusComment"
-          @comment="comment"
-        />
+        <template v-if="postDetail.type!='encrypt' || isAccess || $store.getters.accountId==postDetail.accountId">
+          <div style="margin-top:20px;"></div>
+          <Comment 
+            :targetHash="$route.params.id" 
+            :parentAccount="postDetail.accountId"
+            :hierarchies="[]"
+            :communityId="postDetail.receiverId" 
+            :postType="postDetail.type"
+            :focus="focusComment"
+            @comment="comment"
+          />
 
-        <!-- All Comments -->
-        <template v-if="postDetail.methodName!='add_encrypt_post' || isAccess">
+          <!-- All Comments -->
           <div class="all-comments-title">
             <div class="font20">Comments({{commentCount}})</div>
             <div class="filter-menu">
@@ -51,12 +55,22 @@
           </div>
           <div class="all-comments">
             <template v-for="item in comments[currentTab]">
-              <CommentItem :post="postDetail" :item="item" :defaultComment="$route.query.comment" @comment="comment"/>
+              <CommentItem 
+              :level="1" 
+              :community="postCommunity" 
+              :post="postDetail" 
+              :item="item" 
+              :defaultComment="$route.query.comment" 
+              @comment="comment" 
+              @changeCommentListStatus="changeCommentListStatus(item,$event)"/>
             </template>
           </div>
 
           <div class="no-more" v-if="isEnd">
-            <template v-if="commentCount == 0">No comments</template>
+            <div v-if="commentCount == 0" class="no-result">
+              <img src="@/assets/images/common/emoji-null.png"/>
+              No comments
+            </div>
             <template v-else>No more comments</template>
           </div>
         </template>
@@ -68,7 +82,7 @@
           <!-- avatar-follow -->
           <div @click="redirectPage('/user-profile/'+userDetail.account_id,false)">
             <div class="avatar-follow">
-              <img v-if="userDetail.avatar" class="avatar" :src="userDetail.avatar"/>
+              <img v-if="userDetail.avatar" class="avatar" :src="$store.getters.getAwsImg(userDetail.avatar)" @error.once="$event.target.src=userDetail.avatar"/>
               <img v-else  class="avatar" src="@/assets/images/common/user-default.png"/>
               <!-- follow -->
               <div class="follow-button" v-if="userDetail.account_id !== $store.getters.accountId">
@@ -89,9 +103,9 @@
           
           <!-- account-total -->
           <div class="total">
-            <div class="total-item"><span>{{userDetail.data.follows}}</span> Followers</div>
-            <div class="total-item"><span>{{userDetail.data.following}}</span> Following</div>
-            <div class="total-item"><span>{{userDetail.data.postCount}}</span> Posts</div>
+            <div class="total-item"><span>{{userDetail.data.follows}}</span>Followers</div>
+            <div class="total-item"><span>{{userDetail.data.following}}</span>Following</div>
+            <div class="total-item"><span>{{userDetail.data.postCount}}</span>Posts</div>
           </div>
 
           <!-- bio -->
@@ -100,8 +114,8 @@
           <!-- communities -->
           <div class="communities" v-if="joinedCommunities.length>0">
             <div class="community-item" v-for="item in joinedCommunities" @click="redirectPage('/community-detail/'+item.communityId,false)">
-              <img v-if="item.avatar" class="avatar" :src="item.avatar">
-              <img v-else class="avatar" src="@/assets/images/test/community.png">
+              <img v-if="item.avatar" class="avatar" :src="$store.getters.getAwsImg(item.avatar)" @error.once="$event.target.src=item.avatar"/>
+              <img v-else class="avatar" src="@/assets/images/community/default-avatar.png">
               <div class="name txt-wrap">{{item.name}}</div>
             </div>
           </div>
@@ -114,21 +128,22 @@
     <!-- suspend -->
     <div class="suspend">
       <div id="backTop" class="back-top" @click="backTop()"></div>
-      <div class="button-box" @click="popUp()">
+      <div class="button-box" v-if="postDetail.type!='encrypt' || isAccess"  @click="popUp()">
         <div class="button">
-          <img src="@/assets/images/post-item/icon-comment.png"/>
+          <img src="@/assets/images/post/icon-comment-black.png"/>
         </div>
       </div>
       <div class="elastic-layer suspend-elastic-layer" v-if="showLayer" @click.self="closeSuspendLayer()">
         <div class="edit-button close" @click="closeSuspendLayer()"></div>
-        <div class="elastic-layer-content">
-          <Comment 
-            :targetHash="$route.params.id" 
-            :communityId="postDetail.receiverId" 
-            :methodName="postDetail.methodName"
-            @comment="comment()"
-          />
-        </div>
+        <Comment 
+          :targetHash="$route.params.id" 
+          :parentAccount="postDetail.accountId"
+          :hierarchies="[]"
+          :communityId="postDetail.receiverId" 
+          :postType="postDetail.type"
+          :from="'suspend'"
+          @comment="comment()"
+        />
       </div>
     </div>
   </div>
@@ -142,7 +157,7 @@ import { ref, reactive, toRefs, getCurrentInstance} from "vue";
 import { useRoute,useRouter } from "vue-router";
 import { useStore } from 'vuex';
 import { executeMultipleTransactions,generateAccessKey } from '@/utils/transaction';
-import { getGas} from '../utils/util';
+import { checkReceiptsSuccess, getGas} from '../utils/util';
 import Post from '@/component/post.vue';
 import PostItem from '@/component/post-item.vue';
 import Comment from '@/component/comment.vue';
@@ -203,7 +218,9 @@ export default {
         state.joinedCommunities = res.data.JoinedCommunities.slice(0,3);
       }
       //comment
-      changeTab('hot');
+      if(state.postDetail.type!='encrypt' || state.isAccess || store.getters.accountId==state.postDetail.accountId){
+        changeTab('hot');
+      }
     };
 
     //changeJoinCommunity
@@ -211,38 +228,47 @@ export default {
       if(!store.getters.isLogin){
         state.showLogin = true
       }else{
-        const method = state.postCommunity.data.isJoin ? 'quit' : 'join';
-        const taskTransaction = {
-          receiverId: state.postDetail.receiverId,
-          actions: [{
-            kind: "functionCall",
-            methodName: method,
-            args: {},
-            deposit: "20000000000000000000000",
-            gas: getGas().toString()
-          }]
+        try{
+          const method = state.postCommunity.data.isJoin ? 'quit' : 'join';
+          const taskTransaction = {
+            receiverId: state.postDetail.receiverId,
+            actions: [{
+              kind: "functionCall",
+              methodName: method,
+              args: {},
+              deposit: "20000000000000000000000",
+              gas: getGas().toString()
+            }]
+          }
+          const accessKey = await generateAccessKey(store.getters.accountId, state.postDetail.receiverId)
+          const accessKeyTransaction = {
+            receiverId: store.getters.accountId,
+            actions: [{
+              kind: "addKey",
+              publicKey: accessKey.publicKey,
+              accessKey: accessKey.accessKey
+            }]
+          }
+          const result = await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
+          // if (!checkReceiptsSuccess(result)) {
+          //   return false
+          // }
+          // state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+          if (result == true) {
+            state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
+          } else  if (res == false) {
+            throw new Error('error')
+          } else {}
+          
+          
+        }catch(e){
+          const message = state.postCommunity.data.isJoin ? 'Quit Failed' : 'Join Failed';
+          proxy.$Message({
+            message,
+            type: "error",
+          });
+          console.log(message+" error:"+e);
         }
-        const accessKey = await generateAccessKey(store.getters.accountId, state.postDetail.receiverId)
-        const accessKeyTransaction = {
-          receiverId: store.getters.accountId,
-          actions: [{
-            kind: "addKey",
-            publicKey: accessKey.publicKey,
-            accessKey: accessKey.accessKey
-          }]
-        }
-
-        // const task_transaction = {
-        //   receiverId: state.postDetail.receiverId,
-        //   actions: [{
-        //     methodName: "join",
-        //     args: {},
-        //     deposit: "20000000000000000000000",
-        //     gas: '300000000000000'
-        //   }]
-        // }
-        await executeMultipleTransactions(store.state.account, [taskTransaction, accessKeyTransaction]);
-        // state.postCommunity.data.isJoin = !state.postCommunity.data.isJoin;
       }
     }
 
@@ -260,7 +286,7 @@ export default {
       closeSuspendLayer();
       state.commentCount += 1;
       setTimeout(()=>{
-        changeTab(state.newTab);
+        changeTab('new');
       },1000);
     }
 
@@ -323,6 +349,16 @@ export default {
       }
     };
 
+    const changeCommentListStatus = (item,close=false) => {
+      state.comments[state.currentTab].forEach(i=>{
+        if(i==item && !close){
+          i.isComment = true;
+        }else{
+          i.isComment = false;
+        }
+      })
+    }
+
     //backTop
     const backTop = () => {
       document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -348,6 +384,7 @@ export default {
       changeTab,
       handleScroll,
       redirectPage,
+      changeCommentListStatus,
       backTop,
       popUp,
       closeSuspendLayer
@@ -371,64 +408,71 @@ export default {
 .main {
   .left{
     padding-right:20px;
-    .Community-info{
+    .post-detail{
       background: #28282D;
       border-radius: 24px;
-      padding:20px;
-      display:flex;
-      align-items: center;
-      position: relative;
-      .avatar{
-        width: 90px;
-        height: 90px;
-        border-radius: 16px;
-        cursor:pointer;
-        object-fit: cover;
-      }
-      .info{
-        margin-left:30px;
-        .name{
-          line-height: 22px;
-          font-family: D-DINExp-Bold;
-          font-size: 20px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
+      padding:0 20px;
+      .Community-info{
+        background: #28282D;
+        padding:20px 0;
+        display:flex;
+        align-items: center;
+        position: relative;
+        .avatar{
+          width: 90px;
+          height: 90px;
+          border-radius: 16px;
           cursor:pointer;
+          object-fit: cover;
         }
-        .creator{
-          margin-top:8px;
-          opacity: 0.5;
-          font-family: D-DINExp;
-          font-size: 14px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 400;
-          cursor:pointer;
-        }
-        .total{
-          margin-top:20px;
-          display:flex; 
-          .total-item{
-            margin-right:30px;
+        .info{
+          margin-left:30px;
+          .name{
+            line-height: 22px;
+            font-family: D-DINExp-Bold;
+            font-size: 20px;
+            color: #FFFFFF;
+            letter-spacing: 0;
+            font-weight: 700;
+            cursor:pointer;
+          }
+          .creator{
+            margin-top:8px;
+            opacity: 0.5;
             font-family: D-DINExp;
             font-size: 14px;
-            color: rgba(255,255,255,0.5);
+            color: #FFFFFF;
             letter-spacing: 0;
             font-weight: 400;
-            span{
-              font-size: 16px;
-              color: #FFFFFF;
+            cursor:pointer;
+            line-height: 16px;
+          }
+          .total{
+            margin-top:20px;
+            display:flex; 
+            .total-item{
+              margin-right:30px;
+              font-family: D-DINExp;
+              font-size: 14px;
+              color: rgba(255,255,255,0.5);
               letter-spacing: 0;
-              font-weight: 700;
+              font-weight: 400;
+              line-height:18px;
+              span{
+                font-size: 16px;
+                color: #FFFFFF;
+                letter-spacing: 0;
+                font-weight: 700;
+                margin-right:4px;
+              }
             }
           }
         }
-      }
-      .join-button{
-        position: absolute;
-        top:47px;
-        right:20px;
+        .join-button{
+          position: absolute;
+          top:47px;
+          right:20px;
+        }
       }
     }
 
@@ -455,6 +499,9 @@ export default {
           border-radius:50%;
           cursor:pointer;
           object-fit: cover;
+        }
+        .follow-button{
+          position: relative;
         }
       }
       .name{
@@ -487,6 +534,7 @@ export default {
           color: rgba(255,255,255,0.5);
           letter-spacing: 0;
           font-weight: 400;
+          line-height:18px;
           span{
             font-size: 16px;
             color: #FFFFFF;
@@ -494,6 +542,7 @@ export default {
             font-weight: 700;
             display:block;
             margin-bottom:4px;
+            line-height:18px;
           }
         }
       }

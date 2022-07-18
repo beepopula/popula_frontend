@@ -38,6 +38,7 @@ export default {
     overflow-y: hidden;
     overflow-x: hidden;
     padding-bottom:100px;
+    min-height: 100vh;
     &.page-index{
       background: #020202;
       padding-bottom:0;
@@ -123,7 +124,6 @@ export default {
 
   .no-more{
     margin-top:30px;
-    height: 17px;
     font-family: D-DINExp;
     font-size: 16px;
     color: rgba(255,255,255,0.5);
@@ -353,6 +353,9 @@ export default {
       display:none;
     }
   }
+  .edit-popper{
+    margin-left:-58px!important;
+  }
   .pop-box{
     background: #000000;
     border: 1px solid rgba(255,255,255,0.2);
@@ -369,6 +372,7 @@ export default {
       display:flex;
       justify-content: center;
       align-items: center;
+      color:rgba(255,255,255,0.5);
     }
     &.pop-intro{
       width: 320px;
@@ -376,6 +380,12 @@ export default {
       &.pop-notice{
         z-index:99;
         padding:30px;
+        .intro{
+          a{
+            display: inline;
+            color: rgba(255,255,255,1);
+          }
+        }
       }
       &.pop-hash{
         width:198px;
@@ -390,10 +400,9 @@ export default {
       }
       .intro{
         margin-top:8px;
-        opacity: 0.5;
         font-family: D-DINExp;
         font-size: 14px;
-        color: #FFFFFF;
+        color: rgba(255,255,255,0.5);
         letter-spacing: 0;
         text-align: left;
         line-height: 22px;
@@ -438,10 +447,11 @@ export default {
       background:rgba(0,0,0,1);
       overflow: hidden;
       .pop-edit-item{
+        padding:0 25px;
         height: 50px;
         border-radius: 1px;
         display:flex;
-        justify-content:center;
+        
         align-items:center;
         cursor:pointer;
         .icon16{
@@ -461,7 +471,7 @@ export default {
       .mini-button{
         background:#000;
       }
-      .button-cancle{
+      .button-cancel{
         background:rgba(255,255,255,0.2);
         &::after{
           display:none;
@@ -476,12 +486,14 @@ export default {
     left:0;
     right:0;
     bottom:0;
-    background: rgba(0,0,0,1);
+    background: rgba(0,0,0,0.9);
     z-index:99;
     .layer-content{
+      overflow-x:hidden;
       overflow-y:scroll;
       padding:60px 10px 60px 0;
-      max-height:100vh;
+      height:100vh;
+      width:100%;
     }
     .edit-button{
       width: 50px;
@@ -504,6 +516,9 @@ export default {
     z-index:10;
     .mt-4{
       margin-top:0!important;
+    }
+    .vue3-discord-emojipicker__gifbutton{
+      display:none!important;
     }
     header,.bg-grey-700{
       display:none!important;
@@ -587,8 +602,8 @@ export default {
     }
 
     .suspend-elastic-layer{
-      overflow-y:scroll;
-      .elastic-layer-content{
+      overflow-y: scroll;
+      .post,.comment{
         position:absolute;
         top:50%;
         left:50%;
@@ -601,6 +616,7 @@ export default {
     display: flex;
     overflow: hidden;
     .txt-wrap5 {
+      min-width:650px;
       font-size: 16px;
       color: #FFFFFF;
       letter-spacing: 0;
@@ -615,7 +631,7 @@ export default {
       transition: .3s max-height;
       &::before {
         content: '';
-        height: calc(100% - 26px);
+        height: calc(max(100%,130px) - 26px);
         float: right;
       }
       &::after {
@@ -670,6 +686,39 @@ export default {
         }
       }
     }
+  }
+
+  span.atFont{
+    font-family: D-DINExp;
+    font-size: 16px;
+    color: #FED23C;
+    letter-spacing: 0;
+    text-align: justify;
+    line-height: 24px;
+    font-weight: 400; 
+  }
+
+  .no-result{
+    padding:80px 0;
+    background: #28282D;
+    border-radius: 24px;
+    font-family: D-DINExp;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0;
+    text-align: center;
+    font-weight: 400;
+    line-height:16px;
+    img{
+      display:block;
+      width: 60px;
+      height: 60px;
+      margin:0 auto 12px;
+    }
+  }
+  
+  .text span.atFont{
+    cursor: pointer;
   }
 
   @keyframes addcount {

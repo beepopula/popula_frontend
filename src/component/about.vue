@@ -23,7 +23,7 @@
         trigger="hover"
         >
         <template #reference>
-          <a class="media-item" target="_blank" href="https://twitter.com/bepopula">
+          <a class="media-item" target="_blank" href="https://twitter.com/beepopula">
             <img src="@/assets/images/common/logo-twitter.png"/>
             <img class="hover" src="@/assets/images/common/logo-twitter-hover.png"/>
           </a>
@@ -37,7 +37,7 @@
         trigger="hover"
         >
         <template #reference>
-          <a class="media-item" target="_blank" href="https://medium.com/@bepopula">
+          <a class="media-item" target="_blank" href="https://medium.com/beepopula">
             <img src="@/assets/images/common/logo-medium.png"/>
             <img class="hover" src="@/assets/images/common/logo-medium-hover.png"/>
           </a>
@@ -114,7 +114,7 @@ export default {}
         }
         &:hover{
           img{
-            display:none;
+            display: none;
           }
           img.hover{
             display:block;
