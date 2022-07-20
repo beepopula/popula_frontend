@@ -62,6 +62,7 @@
               :item="item" 
               :defaultComment="$route.query.comment" 
               @comment="comment" 
+              @resetUrl="resetUrl"
               @changeCommentListStatus="changeCommentListStatus(item,$event)"/>
             </template>
           </div>
@@ -290,6 +291,10 @@ export default {
       },1000);
     }
 
+    const resetUrl = () => {
+      router.push({query: {}});
+    }
+
     //LoginMask
     const showLoginMask = () => {
       state.showLogin = true
@@ -379,6 +384,7 @@ export default {
       changeJoinCommunity,
       follow,
       comment,
+      resetUrl,
       showLoginMask,
       closeLoginMask,
       changeTab,
@@ -387,7 +393,7 @@ export default {
       changeCommentListStatus,
       backTop,
       popUp,
-      closeSuspendLayer
+      closeSuspendLayer,
     }
 
 

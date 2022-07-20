@@ -44,10 +44,12 @@
           <div class="account  txt-wrap">{{item.owner_id}}</div>
         </div>
         <!-- royalty -->
+        <!--
         <div class="royalty">
           <div class="mini-title">Royalties</div>
           <div class="text">None</div>
         </div>
+        -->
         <!-- Token Info -->
         <div class="token-info">
           <div class="mini-title">Token Info</div>
@@ -104,9 +106,8 @@
       })
 
       const init = async () => {
-        
-        const res = await store.state.viewAccount.viewFunction(props.item.contract_id, "nft_payout", {token_id: props.item.token_id,balance:"60000000000000000000000",max_len_payout:900}); 
-        console.log(props.item,res,'-----'); 
+        const res = await store.state.viewAccount.viewFunction(props.item.contract_id, "nft_payout", {token_id: props.item.token_id,balance:"50",max_len_payout:50}); 
+        console.log(props.item,res,'----res---');
       }
       init();
 

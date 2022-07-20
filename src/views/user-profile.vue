@@ -48,14 +48,6 @@
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list-box">
               <div class="media-list">
-                <!-- Website -->
-                <a v-if="user.website && user.website.url" class="media-item" :href="checkUrl(user.website.url)" target="_blank">
-                  <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
-                  <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
-                </a>
-                <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/>
-                </div>
 
                 <!-- Twitter -->
                 <a v-if="user.twitter && user.twitter.url" class="media-item" :href="checkUrl(user.twitter.url)" target="_blank">
@@ -75,6 +67,15 @@
                   <img class="plat-icon" src="@/assets/images/common/logo-instagram-grey.png"/>
                 </div>
 
+                <!-- YouTube -->
+                <a v-if="user.youtube && user.youtube.url" class="media-item" :href="checkUrl(user.youtube.url)" target="_blank">
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-youtube-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-grey.png"/>
+                </div>
+
                 <!-- TikTok -->
                 <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="checkUrl(user.tiktok.url)" target="_blank">
                   <img class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
@@ -84,13 +85,13 @@
                   <img class="plat-icon" src="@/assets/images/common/logo-tiktok-grey.png"/>
                 </div>
 
-                <!-- YouTube -->
-                <a v-if="user.youtube && user.youtube.url" class="media-item" :href="checkUrl(user.youtube.url)" target="_blank">
-                  <img class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
-                  <img class="plat-icon hover" src="@/assets/images/common/logo-youtube-hover.png"/>
+                <!-- Website -->
+                <a v-if="user.website && user.website.url" class="media-item" :href="checkUrl(user.website.url)" target="_blank">
+                  <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-grey.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/>
                 </div>
 
               </div>
@@ -689,7 +690,6 @@
       const nftDiv = ref();
       const nftScroll = async () => {
         const nftBox = nftDiv.value;
-        console.log((nftBox.scrollTop + window.innerHeight - 192) >= nftBox.scrollHeight-200);
         if(((nftBox.scrollTop + window.innerHeight - 192) >= nftBox.scrollHeight-200) && !state.isLoadingNft && !state.isEndNft){
           const res = await getNftList();
           state.nftList[state.nftCurrentTab] = state.nftList[state.nftCurrentTab].concat(res);

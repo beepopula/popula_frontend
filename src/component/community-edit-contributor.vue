@@ -56,19 +56,19 @@
             </div>
           </div>
 
-          <!-- Binding -->
+          <!-- Social Link -->
           <div class="form-item form-item-media">
-            <div class="form-item-label"> Binding</div>
+            <div class="form-item-label"> Social Link</div>
             <div class="form-item-content">
-              <div :class="[edit.media.website.url?'':'empty']">
-                <el-input class="website-input" placeholder="Paste link here  " v-model="edit.media.website.url" />
-              </div>
               <div :class="['verify-box',edit.media.twitter.url?'':'empty']">
                 <el-input class="twitter-input" placeholder="Paste link here  " v-model="edit.media.twitter.url" />
                 <div class="verify-button" @click="showVerify=true">Verify</div>
               </div>
               <div :class="[edit.media.discord.url?'':'empty']">
                 <el-input class="discord-input" placeholder="Paste link here  " v-model="edit.media.discord.url" />
+              </div>
+              <div :class="[edit.media.website.url?'':'empty']">
+                <el-input class="website-input" placeholder="Paste link here  " v-model="edit.media.website.url" />
               </div>
             </div>
           </div>
@@ -616,6 +616,7 @@
                   padding-left:44px;
                 }
                 &.website-input{
+                  padding-bottom:0;
                   input{
                     background:#36363C url('@/assets/images/common/logo-link.png') no-repeat 16px center;
                     background-size:16px;
@@ -628,7 +629,6 @@
                   }
                 }
                 &.discord-input{
-                  padding-bottom:0;
                   input{
                     background:#36363C url('@/assets/images/common/logo-discord.png') no-repeat 16px center;
                     background-size:16px;

@@ -100,13 +100,10 @@
               <el-input  placeholder="Tell others more about you!  " v-model="editProfile.bio" type="textarea" maxlength="160" show-word-limit />
             </div>
           </div>
-          <!-- Binding -->
+          <!-- Social Link -->
           <div class="form-item form-item-media">
-            <div class="form-item-label"> Binding</div>
+            <div class="form-item-label"> Social Link</div>
             <div class="form-item-content">
-              <div :class="[editProfile.website.url?'':'empty']">
-                <el-input class="website-input" placeholder="Paste link here  " v-model="editProfile.website.url" />
-              </div>
               <div :class="['verify-box',editProfile.twitter.url?'':'empty']">
                 <el-input class="twitter-input" placeholder="Paste link here  " v-model="editProfile.twitter.url" />
                 <div class="verify-button" @click="showVerify=true">Verify</div>
@@ -119,6 +116,9 @@
               </div>
               <div :class="[editProfile.tiktok.url?'':'empty']">
                 <el-input class="tiktok-input" placeholder="Paste link here  " v-model="editProfile.tiktok.url" />
+              </div>
+              <div :class="[editProfile.website.url?'':'empty']">
+                <el-input class="website-input" placeholder="Paste link here  " v-model="editProfile.website.url" />
               </div>
             </div>
           </div>
@@ -373,7 +373,7 @@
         .upload-avatar{
           position:absolute;
           left:16px;
-          top:140px;
+          top:210px;
           z-index: 2;
           :deep(.el-upload){
             width: 98px;
@@ -410,16 +410,16 @@
           margin-bottom: 68px;
           :deep(.el-upload){
             width: 690px;
-            height: 170px;
+            height: 240px;
             background: #111113;
             border:none;
             .background-box{
               width: 690px;
-              height: 170px;
+              height: 240px;
               position:relative;
               .background{
                 width: 690px;
-                height: 170px;
+                height: 240px;
                 object-fit: cover;
               }
               .upload-button{
@@ -438,7 +438,7 @@
         }
         .mian-form{
           padding:0 20px;
-          max-height: calc(100vh - 464px);
+          max-height: calc(100vh - 534px);
           overflow-y: scroll;
           .form-item{
             padding-top:40px;
