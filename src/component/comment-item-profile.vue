@@ -119,7 +119,7 @@
           <!-- share -->
           <el-popover placement="bottom-start"  trigger="hover">
             <template #reference>
-              <div class="share">35</div>
+              <div class="share">{{shareCount}}</div>
             </template>
             <div class="pop-box pop-edit">
               <div class="pop-edit-item" @click.stop="shareTwitter()">
@@ -294,6 +294,7 @@ export default {
       //gas
       gasUsed:formatAmount(props.item.gas_used,24,4),
       //share & like & comment
+      shareCount:props.item.data.shareCount,
       like:{
         hierarchies:props.item.hierarchies,
         accountId:props.item.accountId,

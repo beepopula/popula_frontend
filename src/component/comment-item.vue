@@ -484,6 +484,9 @@ export default {
       document.getElementsByTagName('body')[0].classList.remove("fixed");
       state.showCommentList = false;
       emit('closeLayer');
+      if(props.defaultComment == props.item.target_hash){
+        emit('resetUrl');
+      }
     }
     //changeTab
     const changeTab = async (tab) => {

@@ -174,18 +174,6 @@
         <div class="community-information">
           <div class="intro" v-if="detail.information">{{detail.information}}</div>       
           <div class="media">
-            <!-- Website -->
-            <a v-if="media.website && media.website.url" class="media-item" :href="checkUrl(media.website.url)" target="_blank">
-              <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
-              <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
-              Website
-            </a>
-            <div v-else class="media-item">
-              <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/> 
-              Website
-            </div>
-
-
             <!-- twitter -->
             <a v-if="media.twitter && media.twitter.url" class="media-item" :href="checkUrl(media.twitter.url)" target="_blank">
               <img class="plat-icon" src="@/assets/images/common/logo-twitter.png"/>
@@ -206,6 +194,17 @@
             <div v-else class="media-item">
               <img class="plat-icon" src="@/assets/images/common/logo-discord-grey1.png"/> 
               Discord
+            </div>
+
+            <!-- Website -->
+            <a v-if="media.website && media.website.url" class="media-item" :href="checkUrl(media.website.url)" target="_blank">
+              <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+              <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
+              Website
+            </a>
+            <div v-else class="media-item">
+              <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/> 
+              Website
             </div>
           </div>
 

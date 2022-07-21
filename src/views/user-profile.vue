@@ -48,14 +48,6 @@
             <div class="bio txt-wrap2">{{user.bio}}</div>
             <div class="media-list-box">
               <div class="media-list">
-                <!-- Website -->
-                <a v-if="user.website && user.website.url" class="media-item" :href="checkUrl(user.website.url)" target="_blank">
-                  <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
-                  <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
-                </a>
-                <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/>
-                </div>
 
                 <!-- Twitter -->
                 <a v-if="user.twitter && user.twitter.url" class="media-item" :href="checkUrl(user.twitter.url)" target="_blank">
@@ -75,6 +67,15 @@
                   <img class="plat-icon" src="@/assets/images/common/logo-instagram-grey.png"/>
                 </div>
 
+                <!-- YouTube -->
+                <a v-if="user.youtube && user.youtube.url" class="media-item" :href="checkUrl(user.youtube.url)" target="_blank">
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-youtube-hover.png"/>
+                </a>
+                <div v-else class="media-item">
+                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-grey.png"/>
+                </div>
+
                 <!-- TikTok -->
                 <a v-if="user.tiktok && user.tiktok.url" class="media-item" :href="checkUrl(user.tiktok.url)" target="_blank">
                   <img class="plat-icon" src="@/assets/images/common/logo-tiktok.png"/>
@@ -84,13 +85,13 @@
                   <img class="plat-icon" src="@/assets/images/common/logo-tiktok-grey.png"/>
                 </div>
 
-                <!-- YouTube -->
-                <a v-if="user.youtube && user.youtube.url" class="media-item" :href="checkUrl(user.youtube.url)" target="_blank">
-                  <img class="plat-icon" src="@/assets/images/common/logo-youtube.png"/>
-                  <img class="plat-icon hover" src="@/assets/images/common/logo-youtube-hover.png"/>
+                <!-- Website -->
+                <a v-if="user.website && user.website.url" class="media-item" :href="checkUrl(user.website.url)" target="_blank">
+                  <img class="plat-icon" src="@/assets/images/common/logo-link.png"/>
+                  <img class="plat-icon hover" src="@/assets/images/common/logo-link-hover.png"/>
                 </a>
                 <div v-else class="media-item">
-                  <img class="plat-icon" src="@/assets/images/common/logo-youtube-grey.png"/>
+                  <img class="plat-icon" src="@/assets/images/common/logo-link-grey.png"/>
                 </div>
 
               </div>
@@ -149,8 +150,8 @@
           </div>  
           <div class="nfts">
             <!-- @click="redirectPage('/detail/'+item.target_hash,false)" -->
-            <div :class="['nft',index%3==2 ? 'mr0' : '']" v-for="(item,index) in nfts" >
-              <img class="avatar" :src="$store.getters.getAwsImg(item.metadata.media)" @error.once="$event.target.src=item.metadata.media" />
+            <div :class="['nft',index%3==2 ? 'mr0' : '']" v-for="(item,index) in nfts" @click="showNftLayer(item)">
+              <img class="avatar" :src="checkNftMedia(item.metadata.media)" />
             </div>
           </div>
         </div>
@@ -167,7 +168,13 @@
           <div :class="['tab',followCurrentTab == 'followers' ? 'active' : '']" @click="changeFollowTab('followers')">Followers</div>
           <div :class="['tab',followCurrentTab == 'following' ? 'active' : '']" @click="changeFollowTab('following')">Following</div>
         </div>
-        <div v-if="followList[followCurrentTab]['length']>0" class="follow-list" ref="followDiv" @scroll="followScroll()">
+
+        <div v-if="isEndFollow && followList[followCurrentTab]['length']==0" class="no-result">
+          <img src="@/assets/images/common/emoji-null.png"/>
+          No data
+        </div>
+
+        <div v-else-if="followList[followCurrentTab]['length']>0" class="follow-list" ref="followDiv" @scroll="followScroll()">
           <div class="follow-item" v-for="user in followList[followCurrentTab]" :key="user.data.account_id" @click="redirectPage('/user-profile/'+user.data.account_id,false)">
             <el-popover placement="bottom" :fallback-placements="[ 'top']"  trigger="hover" @show="user.showUser=true" @hide="user.showUser=false">
               <template #reference>
@@ -193,17 +200,19 @@
           </div>
           <div class="no-more" v-if="isEndFollow">No more</div>
         </div>
-        <div v-else-if="isEndFollow" class="no-result">
-          <img src="@/assets/images/common/emoji-null.png"/>
-          No data
+
+        <!-- loading -->
+        <div class="loading-box" v-if="isLoadingFollow">
+          <img class="white-loading" src="@/assets/images/common/loading.png"/>
         </div>
+        
       </div>
     </div>
 
     <!-- communities layer -->
     <div class="elastic-layer" v-if="showCommunities" @click.self="closeCommunityList()">
       <div class="edit-button close" @click="closeCommunityList()"></div>
-      <div class="layer-content">
+      <div class="layer-content" @click.self="closeCommunityList()">
         <div class="elastic-content">
           <div class="title">Joined Communities</div>
           <div id="community-list" class="community-list" >
@@ -218,9 +227,9 @@
     </div>
 
     <!-- nfts layer -->
-    <div class="elastic-layer" v-if="showNfts" @click.self="closeNftList()">
+    <div class="elastic-layer" v-if="showNfts">
       <div class="edit-button close" @click="closeNftList()"></div>
-      <div class="layer-content">
+      <div class="layer-content" @click.self="closeNftList()" ref="nftDiv" @scroll="nftScroll()">
         <div class="elastic-content">
           <div class="title">
             NFTs
@@ -229,13 +238,28 @@
               <div :class="['filter-menu-item',nftCurrentTab == 'created' ? 'active' : '']" @click="changeNftTab('created')">Created {{nftCount['created']}}</div>
             </div>
           </div>
-          <div id="nft-list" class="nft-list" >
-            <div v-for="(item,index) in nftList[nftCurrentTab]" :class="['nft-item',index%4==3 ? 'mr0' : '']" @click="redirectPage('/detail/'+item.target_hash)">
-              <img class="media" :src="$store.getters.getAwsImg(item.metadata.media)" @error.once="$event.target.src=item.metadata.media"/>
-              <div class="name txt-wrap">{{item.metadata.title}}</div>
-              <div class="collection txt-wrap">{{item.contract_id}}</div>
-            </div>
+
+          <div v-if="isEndNft && nftList[nftCurrentTab]['length']==0" class="no-result">
+            <img src="@/assets/images/common/emoji-null.png"/>
+            No data
           </div>
+
+          <div v-else-if="nftList[nftCurrentTab]['length']>0" id="nft-list" class="nft-list" >
+            <div v-for="(item,index) in nftList[nftCurrentTab]" :class="['nft-item',index%3==2 ? 'mr0' : '']" @click="showNftLayer(item)">
+              <img class="media" :src="checkNftMedia(item.metadata.media)"/>
+              <div class="nft-info">
+                <div class="name txt-wrap">{{item.metadata.title}}</div>
+                <div class="sale">Sale</div>
+                <div class="see-details">See Details</div>
+              </div>
+            </div>
+            <div class="no-more" v-if="isEndNft">No more</div>
+          </div>
+          <!-- loading -->
+          <div class="loading-box" v-if="isLoadingNft">
+            <img class="white-loading" src="@/assets/images/common/loading.png"/>
+          </div>
+
         </div>
       </div>
     </div>
@@ -243,6 +267,11 @@
     <!-- ProfileEdit -->
     <template v-if="showEdit">
       <ProfileEdit :accountId="user.account_id" :editInfo="editInfo" @updateInfo="updateInfo" @closeEditLayer="showEdit=false"/>
+    </template>
+
+    <!-- ProfileEdit -->
+    <template v-if="showNftDetail">
+      <NftDetail :user="user" :item="currentNftItem" @close="showNftDetail=false"/>
     </template>
 
     <!-- suspend -->
@@ -271,7 +300,9 @@
   import loginMask from "@/component/login-mask.vue";
   import suspend from "@/component/suspend.vue";
   import ProfileEdit from "@/component/profile-edit.vue";
+  import NftDetail from "@/component/nft-detail.vue";
   import Clipboard from 'clipboard';
+  import * as bs58 from 'bs58';
 
   export default {
     components: {
@@ -282,7 +313,8 @@
       About,
       loginMask,
       suspend,
-      ProfileEdit
+      ProfileEdit,
+      NftDetail
     },
     setup() {
       const store = useStore();
@@ -315,6 +347,7 @@
         followCurrentTab:'',
         isLoadingFollow:false,
         isEndFollow:false,
+        followPage:0,
         followList:{
           followers:[],
           following:[]
@@ -327,6 +360,9 @@
         nfts:[],
         showNfts:false,
         nftCurrentTab:'',
+        isLoadingNft:false,
+        isEndNft:false,
+        nftPage:0,
         nftList:{
           collected:[],
           created:[],
@@ -335,16 +371,17 @@
           collected:0,
           created:0,
         },
+        showNftDetail:false,
+        currentNftItem:{},
         // pageNft:0,
         // limitNft:10,
-        // isEndNft:false,
-        // isLoadingNft:false,
         //edit
         showEdit:false,
         editInfo:{},
         //other
         shareLink:`${window.location.protocol}//${window.location.host}/user-profile/${route.params.id || store.getters.accountId}`,
         showLogin:false,
+        
       });
 
       //init
@@ -355,25 +392,19 @@
             currentAccountId: store.getters.accountId || ''
           });
           if(res.success){
-            //media
-            state.mediaList = res.data.media;
-            // if(res.data.media){
-            //   const media = [];
-            //   res.data.media.forEach(item=>{
-            //     media[item.name] = {
-            //       url:item.url,
-            //       verified:item.verified
-            //     }
-            //   })
-            //   state.mediaList.forEach(item=>{
-            //     item.url = media[item.name] ? media[item.name]['url'] : "";
-            //     item.verified = media[item.name] ? media[item.name]['verified'] : false;
-            //   })
-            // }
-
             state.user = res.data;
             state.joinedCommunityList = state.user.data.joinedCommunities || [];
             state.joinedCommunities = state.joinedCommunityList.slice(0,6);
+          }
+          if(route.query.nft){
+            try{
+              const params = JSON.parse(bs58.decode(route.query.nft).toString())
+              const nft_token = await store.state.viewAccount.viewFunction(params.contract_id, "nft_token", {token_id: params.token_id}); 
+              if(nft_token.owner_id == state.accountId){
+                state.currentNftItem = {...nft_token,contract_id:params.contract_id};
+                state.showNftDetail = true;
+              }
+            }catch(e){}
           }
 
           changeTab('post');
@@ -382,29 +413,27 @@
       }
 
       const initNfts = async () => {
-        const collected = await proxy.$axios.profile.get_user_nfts({
+
+        const collected_res = await proxy.$axios.profile.get_user_nfts({
           accountId:state.accountId,
-          type:'collected'
+          type:'collected',
+          page:0,
+          limit:10
         });
+        state.nftCount.collected = collected_res.count;
 
-        const collectedList = [];
-        for(let i = 0;i<collected.data.length;i++){
-          const item = collected.data[i];
-          const res = await store.state.viewAccount.viewFunction(item.contract_id, "nft_token", {token_id: item.token_id}); 
-          collectedList.push({...res,contract_id:item.contract_id});
-        }
-         // const token_series_id = item.token_id.split(':')[0];
-          // const nft_info = await nftContract.getSeries({token_series_id});
 
-        state.nftCount.collected = collected.data.length;
-        state.nftList.collected = collectedList;
-        
-        if(state.nftList.collected.length<4){
-          await getCreated();
-          state.nfts = state.nftList.collected.concat(state.nftList.created).slice(0,6)
-        }else{
-          state.nfts = state.nftList.collected;
-        }
+        const created_res = await proxy.$axios.profile.get_user_nfts({
+          accountId:state.accountId,
+          type:'created',
+          page:0,
+          limit:10
+        });
+        state.nftCount.created = created_res.count;
+
+        const nfts = collected_res.data.concat(created_res.data).slice(0,6)
+        //handle data
+        state.nfts = await handleNftData(nfts);
       }
 
       const initCount = async () => {
@@ -497,87 +526,6 @@
         }
       }
 
-      //redirectPage
-      const redirectPage = (path,need_login=true) => {
-        if(!store.getters.isLogin && need_login){
-          state.showLogin = true
-        }else{
-          router.push({
-            path
-          });
-        }
-      };
-
-      //postScroll
-      const profileList = ref()
-      const showPostList = () => {
-        changeTab('post');
-        document.documentElement.scrollTop = profileList.value.getBoundingClientRect().top - 100;
-      }
-
-      //follow list
-      const showFollowList = async (type) => {
-        document.getElementsByTagName('body')[0].classList.add("fixed");
-        state.followCurrentTab = type;
-        state.showFollows = true;
-        state.followPage = 0;
-        state.isEndFollow = false;
-        state.followList[state.followCurrentTab] =  await getFollowList();
-      }
-      const closeFollowList = () => {
-        document.getElementsByTagName('body')[0].classList.remove("fixed");
-        state.showFollows = false;
-      }
-      const changeFollowTab  = async (type) => {
-        if(state.followCurrentTab == type || state.isLoadingFollow){
-          return;
-        }
-        state.followCurrentTab = type;
-        state.followPage = 0;
-        state.isEndFollow = false;
-        state.followList[state.followCurrentTab] =  await getFollowList();
-      }
-      const getFollowList = async () => {
-        state.isLoadingFollow = true;
-        let result = [];
-        if(state.followCurrentTab=="followers"){
-          const res = await proxy.$axios.profile.get_user_followers({
-            accountId:state.accountId,
-            currentAccountId:store.getters.accountId || '',
-            page:state.followPage,
-            limit:10
-          });
-          if(res.success){
-            state.followPage++;
-            result = res.data;
-          }
-        }else{
-          const res = await proxy.$axios.profile.get_user_following({
-            accountId:state.accountId,
-            currentAccountId:store.getters.accountId || '',
-            page:state.followPage,
-            limit:10
-          });
-          if(res.success){
-            state.followPage++;
-            result = res.data;
-          }
-        }
-        if(result.length<10){
-          state.isEndFollow = true;
-        }
-        state.isLoadingFollow = false;
-        return result;
-      }
-      const followDiv = ref();
-      const followScroll = async () => {
-        const followBox = followDiv.value;
-        if(((followBox.scrollTop + window.innerHeight - 192) >= followBox.scrollHeight-200) && !state.isLoadingFollow && !state.isEndFollow){
-          const res = await getFollowList();
-          state.followList[state.followCurrentTab] = state.followList[state.followCurrentTab].concat(res);
-        }
-      }
-
       //edit
       const showEditLayer = () => {
         state.editInfo = {
@@ -609,27 +557,81 @@
 
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showEdit = false;
-      }
-      const showEditMediaLayer = () => {
-        state.editMedia = {
-          twitter:state.user.twitter || {url:'',verified:false},
-          instagram:state.user.instagram || {url:'',verified:false},
-          youtube:state.user.youtube || {url:'',verified:false},
-          tiktok:state.user.tiktok || {url:'',verified:false},
 
-          bio:state.user.bio,
-        };
+        const profile = store.state.profile;
+        profile.avatar = info.avatar;
+        store.commit("setProfile", profile);
+      }
+
+      //postScroll
+      const profileList = ref()
+      const showPostList = () => {
+        changeTab('post');
+        document.documentElement.scrollTop = profileList.value.getBoundingClientRect().top - 100;
+      }
+
+      //follow list
+      const showFollowList = async (type) => {
         document.getElementsByTagName('body')[0].classList.add("fixed");
-        state.showEditMedia = true;
+        state.followCurrentTab = type;
+        state.showFollows = true;
+        state.followPage = 0;
+        state.isEndFollow = false;
+        state.followList[state.followCurrentTab] =  await getFollowList();
       }
-      const updateMedia = (info) => {
-        state.user.twitter = info.twitter;
-        state.user.instagram = info.instagram;
-        state.user.youtube = info.youtube;
-        state.user.tiktok = info.tiktok;
-
+      const closeFollowList = () => {
         document.getElementsByTagName('body')[0].classList.remove("fixed");
-        state.showEditMedia = false;
+        state.showFollows = false;
+      }
+      const changeFollowTab  = async (type) => {
+        if(state.followCurrentTab == type || state.isLoadingFollow){
+          return;
+        }
+        state.followCurrentTab = type;
+        state.followPage = 0;
+        state.isEndFollow = false;
+        state.followList[state.followCurrentTab] = [];
+        state.followList[state.followCurrentTab] =  await getFollowList();
+      }
+      const getFollowList = async () => {
+        state.isLoadingFollow = true;
+        let result = [];
+        if(state.followCurrentTab=="followers"){
+          const res = await proxy.$axios.profile.get_user_followers({
+            accountId:state.accountId,
+            currentAccountId:store.getters.accountId || '',
+            page:state.followPage,
+            limit:10
+          });
+          if(res.success){
+            state.followPage++;
+            result = res.data;
+          }
+        }else{
+          const res = await proxy.$axios.profile.get_user_following({
+            accountId:state.accountId,
+            currentAccountId:store.getters.accountId || '',
+            page:state.followPage,
+            limit:10
+          });
+          if(res.success){
+            state.followPage++;
+            result = res.data;
+          }
+        }
+        if(result.length==0){
+          state.isEndFollow = true;
+        }
+        state.isLoadingFollow = false;
+        return result;
+      }
+      const followDiv = ref();
+      const followScroll = async () => {
+        const followBox = followDiv.value;
+        if(((followBox.scrollTop + window.innerHeight - 192) >= followBox.scrollHeight-200) && !state.isLoadingFollow && !state.isEndFollow){
+          const res = await getFollowList();
+          state.followList[state.followCurrentTab] = state.followList[state.followCurrentTab].concat(res);
+        }
       }
 
 
@@ -648,42 +650,73 @@
         document.getElementsByTagName('body')[0].classList.add("fixed");
         changeNftTab('collected');
         state.showNfts = true;
-
-        //getdata
-        if(state.nftList.collected.length>=4){
-          await getCreated();
-        }
       }
       const closeNftList = () => {
         document.getElementsByTagName('body')[0].classList.remove("fixed");
         state.showNfts = false;
       }
       const changeNftTab = async (tab) => {
-        if(state.nftCurrentTab == tab) return;
+        if(state.nftCurrentTab == tab || state.isLoadingNft) return;
         //reset data
         state.nftCurrentTab = tab;
+        state.nftPage = 0;
+        state.isEndNft = false;
+        state.nftList[state.nftCurrentTab] =  [];
+        state.nftList[state.nftCurrentTab] =  await getNftList();
       }
-      const getCreated = async () => {
-        const created = await proxy.$axios.profile.get_user_nfts({
+      const getNftList = async () => {
+        state.isLoadingNft = true;
+        let result = [];
+        const res = await proxy.$axios.profile.get_user_nfts({
           accountId:state.accountId,
-          type:'created'
+          type:state.nftCurrentTab,
+          page:state.nftPage,
+          limit:9
         });
-        const createdList = [];
-        for(let i = 0;i<created.data.length;i++){
-          const item = created.data[i];
-          const res = await store.state.viewAccount.viewFunction(item.contract_id, "nft_token", {token_id: item.token_id}); 
-          // const nft_info = await nftContract.getSeries({token_series_id});
-          createdList.push({...res,contract_id:item.contract_id});;
-          // const token_series_id = item.token_id.split(':')[0];
-          // try{
-          //   const nft_info = await nftContract.getSeries({token_series_id});
-          //   createdList.push(nft_info);
-          // }catch(e){
-          //   console.log(e,token_series_id);
-          // }
+        if(res.success){
+          if(state.nftPage==0){
+            state.nftList[state.nftCurrentTab] = res.count;
+          }
+          state.nftPage++;
+          result = await handleNftData(res.data);
         }
-        state.nftCount.created = created.data.length;
-        state.nftList.created = createdList;
+
+        if(result.length==0){
+          state.isEndNft = true;
+        }
+        state.isLoadingNft = false;
+        return result;
+      }
+      const nftDiv = ref();
+      const nftScroll = async () => {
+        const nftBox = nftDiv.value;
+        if(((nftBox.scrollTop + window.innerHeight - 192) >= nftBox.scrollHeight-200) && !state.isLoadingNft && !state.isEndNft){
+          const res = await getNftList();
+          state.nftList[state.nftCurrentTab] = state.nftList[state.nftCurrentTab].concat(res);
+        }
+      }
+      const handleNftData = async (data) => {
+        const list = [];
+        for(let i = 0;i<data.length;i++){
+          const item = data[i];
+          const res = await store.state.viewAccount.viewFunction(item.contract_id, "nft_token", {token_id: item.token_id}); 
+          list.push({...res,contract_id:item.contract_id});;
+        }
+        return list;
+      }
+
+
+      //showNftLayer
+      const showNftLayer = (item) => {
+        state.currentNftItem = item;
+        state.showNftDetail = true;
+      }
+      const checkNftMedia = (url) => {
+        if(url.indexOf('http://')<0 && url.indexOf('https://')<0){
+          return `${store.state.nearConfig.IPFS}/ipfs/${url}`
+        }else{
+          return url;
+        }
       }
 
       //share
@@ -714,6 +747,18 @@
           clipboard.destroy();
         })
       }
+
+
+      //redirectPage
+      const redirectPage = (path,need_login=true) => {
+        if(!store.getters.isLogin && need_login){
+          state.showLogin = true
+        }else{
+          router.push({
+            path
+          });
+        }
+      };
 
       //changePostListStatus 
       const changePostListStatus = (item,close=false) => {
@@ -761,25 +806,35 @@
         postSuccess,
         changeTab,
         handleScroll,
-        redirectPage,
-        profileList,
-        showPostList,
+        //follow
         showFollowList,
         closeFollowList,
         changeFollowTab,
         followDiv,
         followScroll,
-        showEditLayer,
-        updateInfo,
+        //community
         showCommunityList,
         closeCommunityList,
+        //nft
         showNftList,
         closeNftList,
         changeNftTab,
+        showNftLayer,
+        checkNftMedia,
+        nftDiv,
+        nftScroll,
+        //share
         shareTwitter,
         copy_text,
         triggerCopy,
         handleCopyFun,
+        //edit
+        showEditLayer,
+        updateInfo,
+        //other
+        redirectPage,
+        profileList,
+        showPostList,
         changePostListStatus,
         changeCommentListStatus,
         checkUrl,
@@ -788,6 +843,11 @@
       };
     },
     mounted(){
+      if(this.$route.query.nft){
+        this.$router.push({query: {nft:this.$route.query.nft}});
+      }else{
+        this.$router.push({query: {}});
+      }
       this.init();
       window.addEventListener('scroll',this.handleScroll);
     },
@@ -1153,6 +1213,9 @@
       justify-content:space-between;
       .filter-menu{
         margin-top:0;
+        .filter-menu-item.active{
+          font-weight:700;
+        }
       }
     }
     .community-list{
@@ -1196,43 +1259,64 @@
       flex-wrap: wrap;
       margin-top:30px;
       .nft-item{
-        margin-bottom:30px;
+        margin-bottom:20px;
         margin-right:20px;
-        width: 155px;
-        height: 211px;
+        width: 216px;
+        height: 357px;
+        background: #28282D;
         display:flex;
         flex-direction: column;
+        border-radius: 24px;
+        overflow: hidden;
         cursor:pointer;
         &.mr0{
           margin-right:0;
         }
         .media{
-          width: 155px;
-          height: 155px;
-          border-radius: 10px;
+          width: 216px;
+          height: 216px;
           object-fit: cover;
         }
-        .name{
-          margin-top:15px;
-          width:124px;
-          font-family: D-DINExp-Bold;
-          font-size: 18px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 700;
-          line-height:20px;
-        }
-        .collection{
-          margin-top:4px;
-          opacity: 0.8;
-          font-family: D-DINExp;
-          font-size: 14px;
-          color: #FFFFFF;
-          letter-spacing: 0;
-          font-weight: 400;
-          line-height:16px;
+        .nft-info{
+          padding:20px;
+          .name{
+            font-family: D-DINExp-Bold;
+            font-size: 14px;
+            color: #FFFFFF;
+            font-weight: 700;
+            line-height:16px;
+          }
+          .sale{
+            padding-top:12px;
+            padding-bottom:20px;
+            font-family: D-DINExp;
+            font-size: 14px;
+            color: #FFFFFF;
+            font-weight: 400;
+            line-height:16px;
+            text-decoration:line-through;
+          }
+          .see-details{
+            font-family: D-DINExp;
+            font-size: 14px;
+            color: #FED23C;
+            font-weight: 400;
+            padding-top:20px;
+            border-top:1px solid rgba(255,255,255,0.1);
+          }
         }
       }
     }
+  }
+  .loading-box{
+    width:690px;
+    margin-top:20px;
+    min-height:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .no-more{
+    width:100%;
   }
 </style>

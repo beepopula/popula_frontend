@@ -8,7 +8,6 @@
           <div class="button">Cancel</div>
         </div>
         <div class="button-border" @click="confirm()">
-          
           <div class="button">
             <img  v-if="isLoading" class="white-loading" src="@/assets/images/common/loading.png"/>
             <template v-else>Ok</template>
@@ -122,6 +121,10 @@
         width:190px;
         height:50px;
         border-radius:25px;
+        background:#FF6868;
+        &:hover::after{
+          display:none;
+        }
         .button{
           background: #28282D;
           width:186px;
@@ -145,16 +148,7 @@
         }
       }
       .button-cancel{
-        background: #FED23C;
-        &::after{
-          display:block;
-        }
-        &:hover{
-          &::after {
-            display:block;
-            opacity:0.8;
-          }
-        }
+        background: #FF6868;
       }
     }
   }

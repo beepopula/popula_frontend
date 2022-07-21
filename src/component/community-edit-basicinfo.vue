@@ -44,7 +44,7 @@
         </el-upload>
         <div class="mian-form">
           <!-- Name -->
-          <div class="form-item">
+          <div class="form-item form-item-name">
             <div class="form-item-tip" v-if="nameError"> Name can’t be blank</div>
             <div class="form-item-label" v-else> Name</div>
             <div class="form-item-content">
@@ -195,6 +195,7 @@
       background: #28282D;
       border-radius: 24px;
       overflow: hidden;
+      padding-bottom:20px;
       .edit-head{
         display:flex;
         align-items: center;
@@ -287,7 +288,7 @@
         .upload-avatar{
           position:absolute;
           left:16px;
-          top:140px;
+          top:200px;
           z-index: 2;
           :deep(.el-upload){
             width: 98px;
@@ -324,16 +325,16 @@
           margin-bottom: 68px;
           :deep(.el-upload){
             width: 690px;
-            height: 170px;
+            height: 240px;
             background: #111113;
             border:none;
             .cover-box{
               width: 690px;
-              height: 170px;
+              height: 240px;
               position:relative;
               .cover{
                 width: 690px;
-                height: 170px;
+                height: 240px;
                 object-fit: cover;
               }
               .upload-button{
@@ -351,14 +352,14 @@
           }
         }
         .mian-form{
-          padding:0 20px 20px;
-          max-height: calc(100vh - 464px);
+          padding:0 20px;
+          max-height: calc(100vh - 544px);
           overflow-y: scroll;
           .form-item{
-            padding-top:40px;
+            padding-top:60px;
             .form-item-label{
               font-family: D-DINExp-Bold;
-              font-size: 14px;
+              font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
@@ -415,7 +416,7 @@
                   width:100%;
                   min-height:82px!important;
                   background: transparent;
-                  border-radius: 10px;
+                  border-radius: 0px;
                   padding:0;
                   font-family: D-DINExp;
                   font-size: 16px;
@@ -439,6 +440,9 @@
                   font-weight: 400;
                 }
               }
+            }
+            &.form-item-name{
+              padding-top:50px;
             }
           }
 
