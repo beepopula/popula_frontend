@@ -1571,20 +1571,19 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
       .community-select{
         margin-right:30px;
         position: relative;
-        padding: 0 10px;
+
         height: 36px;
         border-radius: 6px;
         border: 1px solid rgba(255,255,255,0.2);
-        cursor: pointer;
         &#pop-communitydetail,&#pop-communitydetail-suspend{
           cursor:default;
         }
         .community-selected{
-          width: 124px;
+          width: 144px;
           height: 34px;
           line-height: 34px;
-          padding-right:22px;
-          background:url("@/assets/images/common/icon-arrow-right.png") no-repeat right center;
+          padding:0 32px 0 10px;
+          background:url("@/assets/images/common/icon-arrow-right.png") no-repeat calc(100% - 10px) center;
           background-size:12px 12px;
           display:flex;
           align-items: center;
@@ -1593,6 +1592,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
           color: #FFFFFF;
           letter-spacing: 0;
           font-weight: 400;
+          cursor: pointer;
           img{
             width: 18px;
             height: 18px;
@@ -1644,6 +1644,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
               font-weight: 400;
               display:flex;
               align-items: center;
+              cursor: pointer;
               &:hover,&.active{
                 background: #28282D;
                 border: 1px solid #28282D;
@@ -1670,14 +1671,14 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
         display:flex;
         position:relative;
         >div.type-select{
-          padding:0 10px;
           border-radius: 6px;
           line-height: 36px;
-          cursor: pointer;
         }
         .token-gated{
+          padding:0 10px;
           display: flex;
           align-items:center;
+          cursor: pointer;
           .selected-list{
             margin-left:12px;
             display:flex;
@@ -1741,6 +1742,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
                 background: #28282D url("@/assets/images/common/icon-close-mini.png") no-repeat center center;
                 background-size:16px 16px;
                 border-radius:50%;
+                cursor: pointer;
               }
               .token-icon{
                 width: 40px;
@@ -1816,6 +1818,7 @@ quantity and price of your NFTs, which can then be sold on the market.</div>
                 margin-right:20px;
                 display:flex;
                 align-items: center;
+                cursor: pointer;
                 .search-token-icon{
                   width: 30px;
                   height: 30px;

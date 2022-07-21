@@ -401,13 +401,13 @@
           max-height: calc(100vh - 196px);
           overflow-y: scroll;
           .form-item{
-            padding-top:40px;
+            padding-top:60px;
             &:first-child{
               padding-top:20px;
             }
             .form-item-label{
               font-family: D-DINExp-Bold;
-              font-size: 14px;
+              font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;

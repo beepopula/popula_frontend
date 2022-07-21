@@ -78,15 +78,16 @@
             <div class="upload-button"></div>
           </div>
         </el-upload>
+        <!-- Account -->
+        <div class="account">
+          {{$props.accountId}}
+          <!-- <div class="form-item-content">
+            <el-input placeholder="Your name"  v-model="$props.accountId"  disabled/>
+          </div> -->
+        </div>
         <div class="mian-form">
-          <!-- Account -->
-          <div class="form-item form-item-account">
-            <div class="form-item-content">
-              <el-input placeholder="Your name"  v-model="$props.accountId"  disabled/>
-            </div>
-          </div>
           <!-- Name -->
-          <div class="form-item">
+          <div class="form-item form-item-name">
             <div class="form-item-tip" v-if="nameError"> Name can’t be blank</div>
             <div class="form-item-label" v-else> Name</div>
             <div class="form-item-content">
@@ -373,7 +374,7 @@
         .upload-avatar{
           position:absolute;
           left:16px;
-          top:210px;
+          top:200px;
           z-index: 2;
           :deep(.el-upload){
             width: 98px;
@@ -407,7 +408,7 @@
           }
         }
         .upload-background{
-          margin-bottom: 68px;
+          margin-bottom: 70px;
           :deep(.el-upload){
             width: 690px;
             height: 240px;
@@ -436,15 +437,25 @@
             }
           }
         }
+        .account{
+          padding:0 20px 10px;
+          opacity: 0.5;
+          font-family: D-DINExp;
+          font-size: 14px;
+          color: #FFFFFF;
+          letter-spacing: 0;
+          line-height: 18px;
+          font-weight: 400;
+        }
         .mian-form{
           padding:0 20px;
-          max-height: calc(100vh - 534px);
+          max-height: calc(100vh - 560px);
           overflow-y: scroll;
           .form-item{
-            padding-top:40px;
+            padding-top:60px;
             .form-item-label{
               font-family: D-DINExp-Bold;
-              font-size: 14px;
+              font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
@@ -526,18 +537,8 @@
                 }
               }
             }
-            &.form-item-account{
-              padding-top:30px;
-              .form-item-content{
-                margin-top:0;
-                :deep(.el-input){
-                  width:100%;
-                  input{
-                    background: #36363C;
-                    color: rgba(255,255,255,0.3);
-                  }
-                }
-              }
+            &.form-item-name{
+              padding-top:50px;
             }
             &.form-item-media{
               .empty{

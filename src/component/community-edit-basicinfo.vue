@@ -44,7 +44,7 @@
         </el-upload>
         <div class="mian-form">
           <!-- Name -->
-          <div class="form-item">
+          <div class="form-item form-item-name">
             <div class="form-item-tip" v-if="nameError"> Name can’t be blank</div>
             <div class="form-item-label" v-else> Name</div>
             <div class="form-item-content">
@@ -288,7 +288,7 @@
         .upload-avatar{
           position:absolute;
           left:16px;
-          top:210px;
+          top:200px;
           z-index: 2;
           :deep(.el-upload){
             width: 98px;
@@ -353,13 +353,13 @@
         }
         .mian-form{
           padding:0 20px;
-          max-height: calc(100vh - 534px);
+          max-height: calc(100vh - 544px);
           overflow-y: scroll;
           .form-item{
-            padding-top:40px;
+            padding-top:60px;
             .form-item-label{
               font-family: D-DINExp-Bold;
-              font-size: 14px;
+              font-size: 16px;
               color: #FFFFFF;
               letter-spacing: 0;
               font-weight: 700;
@@ -440,6 +440,9 @@
                   font-weight: 400;
                 }
               }
+            }
+            &.form-item-name{
+              padding-top:50px;
             }
           }
 
