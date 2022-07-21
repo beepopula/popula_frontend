@@ -195,6 +195,7 @@
       background: #28282D;
       border-radius: 24px;
       overflow: hidden;
+      padding-bottom:20px;
       .edit-head{
         display:flex;
         align-items: center;
@@ -287,7 +288,7 @@
         .upload-avatar{
           position:absolute;
           left:16px;
-          top:140px;
+          top:210px;
           z-index: 2;
           :deep(.el-upload){
             width: 98px;
@@ -324,16 +325,16 @@
           margin-bottom: 68px;
           :deep(.el-upload){
             width: 690px;
-            height: 170px;
+            height: 240px;
             background: #111113;
             border:none;
             .cover-box{
               width: 690px;
-              height: 170px;
+              height: 240px;
               position:relative;
               .cover{
                 width: 690px;
-                height: 170px;
+                height: 240px;
                 object-fit: cover;
               }
               .upload-button{
@@ -351,8 +352,8 @@
           }
         }
         .mian-form{
-          padding:0 20px 20px;
-          max-height: calc(100vh - 464px);
+          padding:0 20px;
+          max-height: calc(100vh - 534px);
           overflow-y: scroll;
           .form-item{
             padding-top:40px;
@@ -415,7 +416,7 @@
                   width:100%;
                   min-height:82px!important;
                   background: transparent;
-                  border-radius: 10px;
+                  border-radius: 0px;
                   padding:0;
                   font-family: D-DINExp;
                   font-size: 16px;

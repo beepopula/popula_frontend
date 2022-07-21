@@ -525,9 +525,7 @@ export default {
       }
       .like-item,.follow-item{
         border-bottom:1px solid rgba(255,255,255,0.1);
-        padding: 20px 0 20px 60px;
-        background:url('@/assets/images/notice/icon-like.png') no-repeat left 20px;
-        background-size:40px 40px;
+        padding: 20px 0;
         cursor: pointer;
         .avatar-list{
           display: flex;
@@ -568,15 +566,18 @@ export default {
         }
         .intro{
           margin-top:16px;
-          height: 17px;
+          height: 20px;
           font-family: D-DINExp;
           font-size: 16px;
           color: rgba(255,255,255,0.50);
           letter-spacing: 0;
-          line-height: 17px;
+          line-height: 20px;
           font-weight: 400;
           display:flex;
           align-items: center;
+          padding-left:24px;
+          background:url('@/assets/images/notice/icon-like.png') no-repeat left center;
+          background-size:20px 20px;
           span{
             display:inline-block;
             max-width: 100px;
@@ -604,8 +605,10 @@ export default {
         }
       }
       .follow-item{
-        background:url('@/assets/images/notice/icon-users.png') no-repeat left 20px;
-        background-size:40px 40px;
+        .intro{
+          background:url('@/assets/images/notice/icon-users.png') no-repeat left center;
+          background-size:20px 20px;
+        }
       }
 
     }
