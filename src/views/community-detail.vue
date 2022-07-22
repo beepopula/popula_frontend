@@ -514,7 +514,8 @@
   import CommunityEditContributor from "@/component/community-edit-contributor.vue";
   import CommunityEditBenefits from "@/component/community-edit-benefits.vue";
   import CommunityEditNews from "@/component/community-edit-news.vue";
-  import draggable from 'vuedraggable'
+  import draggable from 'vuedraggable';
+  import axios from 'axios';
   export default {
     components: {
       Post,
@@ -733,7 +734,7 @@
 
       //changeTab
       const changeTab = async (tab) => {
-        // if(state.currentTab == tab) return;
+        if(state.currentTab == tab) return;
         //reset data
         state.currentTab = tab;
         state.postList[state.currentTab] = [];
@@ -746,7 +747,14 @@
       }
 
       //getPosts
+      let CancelToken = axios.CancelToken;
       const getPosts = async () => {
+        if(state.cancel){
+          state.cancel();
+        }
+        const cancelToken = new CancelToken((c) => {
+          state.cancel = c;
+        })
         state.isLoading = true;
         const res = await proxy.$axios.post.get_post_list({
           type: state.currentTab,
@@ -754,7 +762,7 @@
           limit:state.limit,
           communityId:route.params.id,
           accountId:store.getters.isLogin ? store.getters.accountId : "",
-        });
+        },cancelToken);
         state.isLoading = false;
         if(res.success){
           if(state.page==0 && state.currentTab=='new' && res.data.length>0){

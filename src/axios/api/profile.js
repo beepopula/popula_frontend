@@ -9,14 +9,14 @@ export default {
   get_user_info(data) {
     return get("v1/user/info", data);
   },
-  get_user_posts(data) {
-    return get("v1/user/posts", data);
+  get_user_posts(data, cancelToken=null) {
+    return get("v1/user/posts", data, cancelToken);
   },
-  get_user_replies(data) {
-    return get("v1/user/replies", data);
+  get_user_replies(data, cancelToken=null) {
+    return get("v1/user/replies", data, cancelToken);
   },
-  get_user_likes(data) {
-    return get("v1/user/likes", data);
+  get_user_likes(data, cancelToken=null) {
+    return get("v1/user/likes", data, cancelToken);
   },
   get_user_nfts(data) {
     return get("v1/communities/findLikelyNFTs", data);

@@ -67,6 +67,7 @@ import CommunityItem from '@/component/community-item.vue';
 import About from '@/component/about.vue';
 import LoginMask from "@/component/login-mask.vue";
 import suspend from "@/component/suspend.vue";
+import axios from 'axios';
 export default {
   components: {
     Post,
@@ -124,8 +125,8 @@ export default {
 
     //changeTab
     const changeTab = async (tab) => {
-      if(state.isLoading) return;
-      // if(state.currentTab == tab) return;
+      // if(state.isLoading) return;
+      if(state.currentTab == tab) return;
       //reset data
       state.currentTab = tab;
       state.postList[state.currentTab] = [];
@@ -138,14 +139,21 @@ export default {
     }
 
     //getPosts
+    let CancelToken = axios.CancelToken;
     const getPosts = async () => {
+      if(state.cancel){
+        state.cancel();
+      }
+      const cancelToken = new CancelToken((c) => {
+        state.cancel = c;
+      })
       state.isLoading = true;
       const res = await proxy.$axios.post.get_post_list({
         type: state.currentTab,
         page:state.page,
         limit:state.limit,
         accountId:store.getters.accountId || ''
-      });
+      },cancelToken);
       state.isLoading = false;
       if(res.success){
         if(state.page==0 && state.currentTab=='new' && res.data.length>0){

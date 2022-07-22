@@ -23,8 +23,8 @@ export default {
 
 
   //new
-  get_post_list(data) {
-    return get("v1/post/list", data);
+  get_post_list(data, cancelToken=null) {
+    return get("v1/post/list", data, cancelToken);
   },
   get_post_detail(data) {
     return get("v1/post/detail", data);

@@ -303,6 +303,7 @@
   import NftDetail from "@/component/nft-detail.vue";
   import Clipboard from 'clipboard';
   import * as bs58 from 'bs58';
+  import axios from 'axios';
 
   export default {
     components: {
@@ -464,7 +465,7 @@
 
       //changeTab
       const changeTab = async (tab) => {
-        // if(state.currentTab == tab) return;
+        if(state.currentTab == tab) return;
         //reset data
         state.currentTab = tab;
         state.list[state.currentTab] = [];
@@ -477,7 +478,14 @@
       }
 
       //getList
+      let CancelToken = axios.CancelToken;
       const getList = async () => {
+        if(state.cancel){
+          state.cancel();
+        }
+        const cancelToken = new CancelToken((c) => {
+          state.cancel = c;
+        })
         state.isLoading = true;
         let res = null
         if(state.currentTab=="post"){
@@ -486,21 +494,21 @@
             limit:state.limit,
             accountId:state.accountId,
             currentAccountId: store.getters.accountId || ''
-          });
+          },cancelToken);
         }else if(state.currentTab=="reply"){
           res = await proxy.$axios.profile.get_user_replies({
             page:state.page,
             limit:state.limit,
             accountId:state.accountId,
             currentAccountId: store.getters.accountId || ''
-          });
+          },cancelToken);
         }else if(state.currentTab=="like"){
           res = await proxy.$axios.profile.get_user_likes({
             page:state.page,
             limit:state.limit,
             accountId:state.accountId,
             currentAccountId: store.getters.accountId || ''
-          });
+          },cancelToken);
         }
         state.isLoading = false;
         if(res && res.success){
