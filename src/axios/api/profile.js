@@ -39,4 +39,7 @@ export default {
   get_user_new_notifications(data) {
     return get("v1/user/getNotificationsNewestCount", data);
   },
+  get_twitter_auth_url() {
+    return post("v1/user/getTwitterAuthUrl", {})
+  },
 };

@@ -208,17 +208,20 @@
       }
 
       const verify = async () => {
-        if(!state.twitter.trim()){
-          proxy.$Message({message: "Please copy the tweet link first and paste it into the input box in the second step",type: ""});
-        }
-        const res = await proxy.$axios.profile.verify_twitter({twitter: state.twitter, sign: state.signtrue,accountId:store.getters.accountId});
-        if(res.success){
-          proxy.$Message({message: "Twitter account verified successfully",type: "success"});
-          state.editProfile.twitter.url = res.data.author_url;
-          state.showVerify = false;
-        }else{
-          proxy.$Message({message: "Twitter Account verification failed",type: "error"});
-        }
+        // if(!state.twitter.trim()){
+        //   proxy.$Message({message: "Please copy the tweet link first and paste it into the input box in the second step",type: ""});
+        // }
+        // const res = await proxy.$axios.profile.verify_twitter({twitter: state.twitter, sign: state.signtrue,accountId:store.getters.accountId});
+        // if(res.success){
+        //   proxy.$Message({message: "Twitter account verified successfully",type: "success"});
+        //   state.editProfile.twitter.url = res.data.author_url;
+        //   state.showVerify = false;
+        // }else{
+        //   proxy.$Message({message: "Twitter Account verification failed",type: "error"});
+        // }
+
+        const res = await proxy.$axios.profile.get_twitter_auth_url()
+        window.open(res.data.auth_url)
       }
 
       //save
